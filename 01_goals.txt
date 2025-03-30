@@ -1,4 +1,32 @@
 Requirements
 ---
 
+1. Create challenge_temple nbt structure
+---
+
+2. compile and get challenge_temple to spawn in world
+---
+
+
+3. create challenge_base 2x2 chunk structure
+---
+	- The floors and walls of a challenge room
+	- to be used as the default template for a challenge
+
+4. Spawn challenge_base in super flat dimension
+---
+	- SKIPPED
+	- we perhaps want each challenge_temple to be its own structure
+
+5. Create a superflat single biom dimension to host challenges
+---
+	-
+
+
+6. Spawn immersive portal that can travel to external dimension
+---
+
+	- add immersive portal dependency
+	- 
+
 

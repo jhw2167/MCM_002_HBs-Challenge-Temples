@@ -1,0 +1,24 @@
+{
+  "type": "hbs_challenge_temple:challenge_dimension_type",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "layers": [
+          {
+            "height": 64,
+            "block": "minecraft:air"
+          },
+          {
+            "height": 4,
+            "block": "minecraft:dirt"
+          },
+          {
+          "height": 1,
+          "block": "minecraft:grass_block"
+          }
+        ],
+        "structure_overrides": [
+        ]
+    }
+  }
+}

@@ -1,5 +1,7 @@
 package com.holybuckets.challengetemple;
 
+import net.minecraft.world.level.levelgen.GenerationStep;
+
 public class ChallengeTempleMain {
 
     public static final String CLASS_ID = "001";    //unused variable, value will be used for logging messages
@@ -11,6 +13,8 @@ public class ChallengeTempleMain {
     public static final Boolean DEBUG = false;
 
     public static ChallengeTempleMain INSTANCE;
+
+    public static GenerationStep featureGenerationStep;
 
     public ChallengeTempleMain()
     {

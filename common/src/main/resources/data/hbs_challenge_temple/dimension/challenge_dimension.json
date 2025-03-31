@@ -18,6 +18,7 @@
           }
         ],
         "structure_overrides": [
+			"hbs_challenge_temple:challenge_temple"
         ]
     }
   }

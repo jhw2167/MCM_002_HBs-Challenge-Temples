@@ -23,11 +23,13 @@ import org.jetbrains.annotations.NotNull;
 
 public class GridStructurePlacement extends StructurePlacement {
 
-    private static Map<ResourceLocation, GridStructurePlacement> USE_GRID;
+    static Map<ResourceLocation, GridStructurePlacement> USE_GRID;
     static {
         USE_GRID = new HashMap<>();
         ResourceLocation templeLoc = new ResourceLocation("hbs_challenge_temple", "challenge_temple");
-        USE_GRID.put(templeLoc, new GridStructurePlacement(2, 1, 1, 526287558));
+        USE_GRID.put(templeLoc, new GridStructurePlacement(20, 4, 16, 526287558));
+        ResourceLocation templeRoom = new ResourceLocation("hbs_challenge_temple", "challenge_room_2x2");
+        USE_GRID.put(templeRoom, new GridStructurePlacement(20, 4, 4, 0));
     }
 
     //Valid ints range to 2^24, so you can have singleton placements by setting spacing really high.
@@ -60,16 +62,6 @@ public class GridStructurePlacement extends StructurePlacement {
         this(Vec3i.ZERO, FrequencyReductionMethod.DEFAULT, 1.0F, salt, Optional.empty(), spacing, xOffset, zOffset);
     }
 
-    public static <T> StructureSet updatePlacementOnRegister(ResourceKey<T> key, StructureSet value) {
-        if(USE_GRID.containsKey(key.location()))
-        {
-            if (value instanceof StructureSet) {
-                return new StructureSet(value.structures(), USE_GRID.get(key.location()));
-            }
-        }
-        return value;
-    }
-
     public int spacing() {
         return this.spacing;
     }
@@ -84,11 +76,29 @@ public class GridStructurePlacement extends StructurePlacement {
 
     //Remember -1 = 9 mod 10 when placing near the origin.
     protected boolean isPlacementChunk(ChunkGeneratorStructureState structureState, int x, int z) {
-        return Math.floorMod(x, this.spacing) == this.xOffset && Math.floorMod(z, this.spacing) == this.zOffset;
+        return mod(x, this.xOffset) == 0 && mod(z, this.zOffset) == 0;
     }
+
+    private int mod(int value, int modulus) {
+        int result = value % modulus;
+        return result < 0 ? result + modulus : result;
+    }
+
 
     public @NotNull StructurePlacementType<?> type() {
         return StructurePlacementType.RANDOM_SPREAD;
+    }
+
+
+    //MIXIN
+    public static <T> StructureSet updatePlacementOnRegister(ResourceKey<T> key, StructureSet value) {
+        if(USE_GRID.containsKey(key.location()))
+        {
+            if (value instanceof StructureSet) {
+                return new StructureSet(value.structures(), USE_GRID.get(key.location()));
+            }
+        }
+        return value;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.structure.GridStructurePlacement;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 public class ChallengeTempleMain {
@@ -13,8 +15,6 @@ public class ChallengeTempleMain {
     public static final Boolean DEBUG = false;
 
     public static ChallengeTempleMain INSTANCE;
-
-    public static GenerationStep featureGenerationStep;
 
     public ChallengeTempleMain()
     {

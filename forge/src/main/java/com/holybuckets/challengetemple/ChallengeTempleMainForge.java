@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.structure.GridStructurePlacement;
 import net.blay09.mods.balm.api.Balm;
 import net.minecraftforge.fml.common.Mod;
 

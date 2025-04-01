@@ -10,5 +10,8 @@
     "salt": 0,
     "spacing": 32,
     "separation": 16
-  }
+  },
+  "dimensions": [
+    "hbs_challenge_temple:challenge_dimension"
+  ]
 }

@@ -35,7 +35,7 @@ public abstract class MixinListPoolElement {
             Rotation r = StructurePieceSettings.checkApplyCustomSettings(manager)
                 ? Rotation.NONE
                 : rotation;
-            BoundingBox result = ((SinglePoolElement) (Object) this)
+            BoundingBox result = ((ListPoolElement) (Object) this)
                 .getBoundingBox(manager, pos, r);
             cir.setReturnValue(result);
         } finally {

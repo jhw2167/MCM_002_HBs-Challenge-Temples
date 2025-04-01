@@ -7,6 +7,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 public class StructurePieceSettings {
 
     public static boolean checkApplyCustomSettings(StructureTemplateManager templates) {
+        if (templates == null)  return false;
         for( ResourceLocation loc : GridStructurePlacement.USE_GRID.keySet() ) {
             if( templates.get(loc) != null ) {
                 return true;

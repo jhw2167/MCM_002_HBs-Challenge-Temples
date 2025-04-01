@@ -18,7 +18,7 @@
           }
         ],
         "structure_overrides": [
-			"hbs_challenge_temple:challenge_temple"
+			"hbs_challenge_temple:challenge_room_2x2"
         ]
     }
   }

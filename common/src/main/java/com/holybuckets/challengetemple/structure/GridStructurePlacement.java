@@ -29,7 +29,7 @@ public class GridStructurePlacement extends StructurePlacement {
         ResourceLocation templeLoc = new ResourceLocation("hbs_challenge_temple", "challenge_temple");
         USE_GRID.put(templeLoc, new GridStructurePlacement(20, 4, 16, 526287558));
         ResourceLocation templeRoom = new ResourceLocation("hbs_challenge_temple", "challenge_room_2x2");
-        USE_GRID.put(templeRoom, new GridStructurePlacement(20, 4, 4, 0));
+        USE_GRID.put(templeRoom, new GridStructurePlacement(20, 8, 8, 0));
     }
 
     //Valid ints range to 2^24, so you can have singleton placements by setting spacing really high.

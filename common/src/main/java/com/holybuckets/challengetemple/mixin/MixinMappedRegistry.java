@@ -25,7 +25,6 @@ public class MixinMappedRegistry<T> {
     private void injectRegister(ResourceKey<T> key, T value, Lifecycle lifecycle, CallbackInfoReturnable<Holder.Reference<T>> cir) {
         if (key.registry().equals(Registries.STRUCTURE_SET.location()) && value instanceof StructureSet set)
         {
-            System.out.println("Intercepted StructureSet registration: " + key.location());
             T newValue = (T) GridStructurePlacement.updatePlacementOnRegister(key, set);
 
             // manually invoke the original logic with modified value

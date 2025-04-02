@@ -23,6 +23,7 @@ plugins {
 base {
     version="${mod_version}"
     archivesName = "${mod_name}-common-${minecraft_version}"
+
 }
 minecraft {
     version(minecraft_version)
@@ -30,6 +31,7 @@ minecraft {
         accessWideners(file("src/main/resources/${mod_id}.accesswidener"))
     }
 }
+
 
 dependencies {
      compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
@@ -42,6 +44,7 @@ dependencies {
     implementation ("com.holybuckets.foundation:HBs_Foundation-common-${minecraft_version}:${foundation_version}") {
         changing = true
     }
+
 }
 
 publishing {

@@ -50,6 +50,11 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven {
+            name 'Fabric'
+            url 'https://maven.fabricmc.net/'
+        }
         maven {
             name = 'Sponge / Mixin'
             url = 'https://repo.spongepowered.org/repository/maven-public/'
@@ -59,11 +64,20 @@ subprojects {
             url = 'https://maven.blamejared.com'
         }
         maven {
+            name = 'JitPack'
+            url = 'https://jitpack.io'
+        }
+        maven {
             url "https://maven.twelveiterations.com/repository/maven-public/"
             content {
                 includeGroup "net.blay09.mods"
             }
         }
+        maven { url 'https://hephaestus.dev/release' }
+        maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+        maven { url 'https://maven.shedaniel.me' }
+        maven { url 'https://maven.fabricmc.net/io/github/prospector/modmenu' }
+        maven { url 'https://maven.terraformersmc.com/releases/' }
     }
 
     dependencies {

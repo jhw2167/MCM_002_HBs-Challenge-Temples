@@ -20,16 +20,16 @@ dependencies {
     modImplementation ("net.blay09.mods:balm-fabric:${balm_version}") {
         transitive = false
     }
-	
-	 modImplementation ("net.blay09.mods:balm-fabric:${balm_version}") {
-        transitive = false
-        changing = true
-    }
 
     modImplementation ("com.holybuckets.foundation:HBs_Foundation-fabric-${minecraft_version}:${foundation_version}") {
         transitive = false
         changing = true
     }
+
+    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:imm_ptl_core:${immptl_version}")
+    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:q_misc_util:${immptl_version}")
+    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:build:${immptl_version}")
+
 
 }
 

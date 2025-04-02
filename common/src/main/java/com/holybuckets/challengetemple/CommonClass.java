@@ -1,6 +1,7 @@
 package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.platform.Services;
+import com.holybuckets.foundation.event.BalmEventRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
 
@@ -13,13 +14,17 @@ public class CommonClass {
         if (isInitialized)
             return;
 
-        if (Services.PLATFORM.isModLoaded(Constants.MOD_ID)) {
+        //Initialize Foundations
+        com.holybuckets.foundation.FoundationInitializers.commonInitialize();
 
+        if (Services.PLATFORM.isModLoaded(Constants.MOD_ID)) {
             Constants.LOG.info("Hello to " + Constants.MOD_NAME + "!");
         }
-        
-        isInitialized = true;
+
         ChallengeTempleMain.INSTANCE = new ChallengeTempleMain();
+        BalmEventRegister.registerEvents();
+        BalmEventRegister.registerCommands();
+        isInitialized = true;
     }
 
     /**

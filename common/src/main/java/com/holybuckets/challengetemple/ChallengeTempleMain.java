@@ -2,15 +2,15 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.core.TempleManager;
 import com.holybuckets.challengetemple.portal.PortalApi;
-import com.holybuckets.challengetemple.structure.GridStructurePlacement;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.LevelLoadingEvent;
-import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.StructureTags;
 
+//net.minecraft.server.commands.LocateCommand;
 public class ChallengeTempleMain {
 
     public static final String CLASS_ID = "001";    //unused variable, value will be used for logging messages
@@ -37,7 +37,6 @@ public class ChallengeTempleMain {
 
     private void init()
     {
-        Constants.LOG.info("Initializing Challenge Temples mod with ID: {}", MODID);
 
         this.portalApi = (PortalApi) Balm.platformProxy()
             .withFabric("com.holybuckets.challengetemple.portal.FabricPortalApi")
@@ -56,9 +55,7 @@ public class ChallengeTempleMain {
         Constants.LOG.info("Level loaded: {}", event.getLevel() );
         MinecraftServer server = GeneralConfig.getInstance().getServer();
         if(event.getLevel() != server.overworld()) return;
-
-        this.templeManager = new TempleManager(event.getLevel());
-
+        this.templeManager = new TempleManager( (ServerLevel) event.getLevel(), portalApi);
     }
 
 

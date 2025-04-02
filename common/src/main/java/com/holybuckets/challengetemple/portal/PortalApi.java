@@ -5,5 +5,5 @@ import net.minecraft.world.phys.Vec3;
 
 public interface PortalApi {
 
-    boolean createPortal(double width, double height, Entity sourceEntity, LevelAccessor toDimension, Vec3 dest);
+    Entity createPortal(double width, double height, Entity sourceEntity, LevelAccessor toDimension, Vec3 dest);
 }

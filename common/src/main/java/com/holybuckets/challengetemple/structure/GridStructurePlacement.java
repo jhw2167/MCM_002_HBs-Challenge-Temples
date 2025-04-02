@@ -25,11 +25,12 @@ public class GridStructurePlacement extends StructurePlacement {
 
     static Map<ResourceLocation, GridStructurePlacement> USE_GRID;
     static {
+        int DIST = 8;
         USE_GRID = new HashMap<>();
         ResourceLocation templeLoc = new ResourceLocation("hbs_challenge_temple", "challenge_temple");
-        USE_GRID.put(templeLoc, new GridStructurePlacement(20, 16, 16, 526287558));
+        USE_GRID.put(templeLoc, new GridStructurePlacement(20, DIST, DIST, 526287558));
         ResourceLocation templeRoom = new ResourceLocation("hbs_challenge_temple", "challenge_room_2x2");
-        USE_GRID.put(templeRoom, new GridStructurePlacement(20, 16, 16, 526287558));
+        USE_GRID.put(templeRoom, new GridStructurePlacement(20, DIST, DIST, 526287558));
     }
 
     //Valid ints range to 2^24, so you can have singleton placements by setting spacing really high.

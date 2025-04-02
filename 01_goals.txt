@@ -54,6 +54,15 @@ Requirements
 7. Add API to common to call forge/fabric portals API dynamically
 ---
 
+	- using Blay's PlatformProxy system
+
+8. Add spawn entity command
+---
+	
+	Summonable entities: SuggestionProviders.SUMMONABLE_ENTITIES
+
+	
+
 
 	
 

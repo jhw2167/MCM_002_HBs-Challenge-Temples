@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TempleManager {
-    private static TempleManager INSTANCE;
+    private static TempleManager INSTANCE = new TempleManager();
     private final Map<String, ManagedTemple> temples;
 
-    public TempleManager() {
+    private TempleManager() {
         this.temples = new HashMap<>();
     }
 
@@ -37,5 +37,25 @@ public class TempleManager {
 
     public void clear() {
         temples.clear();
+    }
+
+    public static TempleManager getInstance() {
+        return INSTANCE;
+    }
+
+    public static void onChunkLoad(Level level, ChunkPos pos) {
+        getInstance().handleChunkLoaded(level, pos);
+    }
+
+    public static void onChunkUnload(ChunkPos pos) {
+        getInstance().handleChunkUnloaded(pos);
+    }
+
+    private void handleChunkLoaded(Level level, ChunkPos pos) {
+        // TODO: Implement chunk load handling
+    }
+
+    private void handleChunkUnloaded(ChunkPos pos) {
+        // TODO: Implement chunk unload handling
     }
 }

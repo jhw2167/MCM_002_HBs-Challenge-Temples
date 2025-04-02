@@ -1,5 +1,6 @@
-package com.holybuckets.challengetemple.temple;
+package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.foundation.HBUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
@@ -9,10 +10,10 @@ public class ManagedTemple {
     private final String templeId;
     private boolean isActive;
 
-    public ManagedTemple(Level level, BlockPos pos, String id) {
+    public ManagedTemple(Level level, BlockPos pos) {
         this.level = level;
         this.position = pos;
-        this.templeId = id;
+        this.templeId = HBUtil.ChunkUtil.getId(pos);
         this.isActive = false;
     }
 

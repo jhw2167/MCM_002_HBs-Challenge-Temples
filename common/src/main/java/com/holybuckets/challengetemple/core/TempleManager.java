@@ -1,29 +1,36 @@
 package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.foundation.HBUtil;
+import com.holybuckets.foundation.event.EventRegistrar;
+import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class TempleManager {
-    private static TempleManager INSTANCE = new TempleManager();
+    private static Map<LevelAccessor, TempleManager> MANAGERS;
     private final Map<String, ManagedTemple> temples;
+    private final LevelAccessor level;
 
-    private TempleManager() {
+    public TempleManager(LevelAccessor level) {
+        this.level = level;
         this.temples = new HashMap<>();
+
     }
 
-    private String generateTempleId(BlockPos blockPos) {
-        return HBUtil.ChunkUtil.getId(blockPos);
+    public static void init(EventRegistrar reg) {
+        reg.registerOnChunkLoad(TempleManager::onChunkLoad);
+        reg.registerOnChunkUnload(TempleManager::onChunkUnload);
     }
 
     public ManagedTemple registerTemple(Level level, BlockPos pos) {
-        String id = generateTempleId(pos);
-        ManagedTemple temple = new ManagedTemple(level, pos, id);
-        temples.put(id, temple);
+        ManagedTemple temple = new ManagedTemple(level, pos);
+        temples.put(temple.getTempleId(), temple);
         return temple;
     }
 
@@ -39,23 +46,29 @@ public class TempleManager {
         temples.clear();
     }
 
-    public static TempleManager getInstance() {
-        return INSTANCE;
+    public static TempleManager getInstance(LevelAccessor level) {
+        return MANAGERS.get(level);
     }
 
-    public static void onChunkLoad(Level level, ChunkPos pos) {
-        getInstance().handleChunkLoaded(level, pos);
+    public static void onChunkLoad(ChunkLoadingEvent.Load event) {
+        TempleManager m = MANAGERS.get(event.getLevel());
+        if (m != null) {
+            m.handleChunkLoaded(event.getChunk());
+        }
     }
 
-    public static void onChunkUnload(ChunkPos pos) {
-        getInstance().handleChunkUnloaded(pos);
+    public static void onChunkUnload(ChunkLoadingEvent.Unload event) {
+        TempleManager m = MANAGERS.get(event.getLevel());
+        if (m != null) {
+            m.handleChunkUnloaded(event.getChunk());
+        }
     }
 
-    private void handleChunkLoaded(Level level, ChunkPos pos) {
-        // TODO: Implement chunk load handling
+    private void handleChunkLoaded(ChunkAccess c) {
+
     }
 
-    private void handleChunkUnloaded(ChunkPos pos) {
-        // TODO: Implement chunk unload handling
+    private void handleChunkUnloaded(ChunkAccess c) {
+
     }
 }

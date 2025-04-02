@@ -1,7 +1,14 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.core.TempleManager;
+import com.holybuckets.challengetemple.portal.PortalApi;
 import com.holybuckets.challengetemple.structure.GridStructurePlacement;
+import com.holybuckets.foundation.GeneralConfig;
+import com.holybuckets.foundation.event.EventRegistrar;
+import net.blay09.mods.balm.api.Balm;
+import net.blay09.mods.balm.api.event.LevelLoadingEvent;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 public class ChallengeTempleMain {
@@ -16,6 +23,10 @@ public class ChallengeTempleMain {
 
     public static ChallengeTempleMain INSTANCE;
 
+    PortalApi portalApi;
+
+    TempleManager templeManager;
+
     public ChallengeTempleMain()
     {
         super();
@@ -28,6 +39,27 @@ public class ChallengeTempleMain {
     {
         Constants.LOG.info("Initializing Challenge Temples mod with ID: {}", MODID);
 
+        this.portalApi = (PortalApi) Balm.platformProxy()
+            .withFabric("com.holybuckets.challengetemple.portal.FabricPortalApi")
+            //.withForge("com.holybuckets.challengetemple.portal.ForgePortalApi")
+            .build();
+
+            EventRegistrar registrar = EventRegistrar.getInstance();
+            TempleManager.init(registrar);
+
+            //register events
+            registrar.registerOnLevelLoad(this::onLevelLoad);
     }
+
+
+    private void onLevelLoad(LevelLoadingEvent event) {
+        Constants.LOG.info("Level loaded: {}", event.getLevel() );
+        MinecraftServer server = GeneralConfig.getInstance().getServer();
+        if(event.getLevel() != server.overworld()) return;
+
+        this.templeManager = new TempleManager(event.getLevel());
+
+    }
+
 
 }

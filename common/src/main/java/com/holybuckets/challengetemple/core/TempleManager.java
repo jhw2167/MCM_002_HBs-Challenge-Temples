@@ -1,20 +1,16 @@
 package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.Constants;
-import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.portal.PortalApi;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
-import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
-import com.holybuckets.challengetemple.structure.StructureTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -22,8 +18,6 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class TempleManager {
 
@@ -96,12 +90,18 @@ public class TempleManager {
      */
     private void handleFindTemple(ChunkAccess c)
     {
+        /*
         BlockPos structurePos = level.findNearestMapStructure(
             StructureTags.CHALLENGE_STRUCTURE,
             c.getPos().getWorldPosition(),
             100,
             false
         );
+        */
+        if( !TempleUtility.candidateChunkForTemple(c) ) return;
+
+        BlockPos structurePos = TempleUtility.findTempleBlockEntity(c);
+
         if(structurePos != null) {
             registerTemple(level, structurePos);
         }
@@ -116,12 +116,12 @@ public class TempleManager {
     private static final double P_WIDTH = 2;
     private static final String DIM_ID = Constants.MOD_ID + ":challenge_dimension";
 
-    private static final Vec3i OFFSET = new Vec3i(4, 2, 4);
+    private static final Vec3i OFFSET = new Vec3i(0, 0, 0);
     private static final int CHALLENGE_DIM_HEIGHT = 70;
 
     private void handleBuildPortal(ManagedTemple temple)
     {
-        BlockPos pos = temple.getPosition().offset(OFFSET);
+        BlockPos pos = temple.getPortalSourcePos().offset(OFFSET);
         Entity spawnEntity = EntityType.ARMOR_STAND.create(
             this.level,
             null,               // Optional NBT data (e.g., from a spawn egg or saved entity)
@@ -134,8 +134,7 @@ public class TempleManager {
 
         LevelAccessor dim = HBUtil.LevelUtil.toLevel( HBUtil.LevelUtil.LevelNameSpace.SERVER, DIM_ID );
         Vec3 destination = new Vec3(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ());
-        temple.portal = portalApi.createPortal(P_WIDTH, P_HEIGHT,
-            spawnEntity, dim, destination);
+        //temple.portal = portalApi.createPortal(P_WIDTH, P_HEIGHT, spawnEntity, dim, destination);
 
     }
 

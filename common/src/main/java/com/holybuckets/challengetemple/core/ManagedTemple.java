@@ -12,10 +12,11 @@ public class ManagedTemple {
     private final BlockPos structurePos;
     private final Level level;
     private final String templeId;
-    public Entity portal;
+    public Entity portalToChallenge;
+    public Entity portalToHome;
     private boolean isActive;
 
-    private static Vec3i STRUCTURE_OFFSET = new Vec3i(-3, 2, -4);
+    private static Vec3i STRUCTURE_OFFSET = new Vec3i(-4, -4, -2);
 
     public ManagedTemple(Level level, BlockPos pos) {
         this.level = level;
@@ -52,6 +53,11 @@ public class ManagedTemple {
     }
 
     public boolean hasPortal() {
-        return portal != null;
+        return portalToChallenge != null;
+    }
+
+    public boolean hasNearPlayer() {
+        HBUtil.TripleInt source = new HBUtil.TripleInt(this.portalSourcePos);
+        return this.level.hasNearbyAlivePlayer(source.x, source.y, source.z, 128);
     }
 }

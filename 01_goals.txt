@@ -61,7 +61,7 @@ Requirements
 	
 	Summonable entities: SuggestionProviders.SUMMONABLE_ENTITIES
 
-	
+	hbs_challenge_temple:challenge_temple
 
 
 	

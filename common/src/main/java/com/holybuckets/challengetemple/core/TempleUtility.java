@@ -47,7 +47,7 @@ public class TempleUtility {
                         {
                             //If there is an identical block to the right, take the position of this block
                             HBUtil.TripleInt relativePos = HBUtil.TripleInt.of(x, y, z);
-                            HBUtil.WorldPos worldPos = new HBUtil.WorldPos(relativePos, y, c);
+                            HBUtil.WorldPos worldPos = new HBUtil.WorldPos(relativePos, i, c);
                             return  worldPos.getWorldPos();
                         }
 

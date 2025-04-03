@@ -3,12 +3,17 @@ package com.holybuckets.challengetemple;
 import com.holybuckets.challengetemple.core.TempleManager;
 import com.holybuckets.challengetemple.portal.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
+import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.LevelLoadingEvent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.StructureTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import org.apache.logging.log4j.core.jmx.Server;
 
 //net.minecraft.server.commands.LocateCommand;
 public class ChallengeTempleMain {
@@ -24,8 +29,8 @@ public class ChallengeTempleMain {
     public static ChallengeTempleMain INSTANCE;
 
     PortalApi portalApi;
-
     TempleManager templeManager;
+    ServerLevel challengeDimension;
 
     public ChallengeTempleMain()
     {
@@ -48,14 +53,41 @@ public class ChallengeTempleMain {
 
             //register events
             registrar.registerOnLevelLoad(this::onLevelLoad);
+            registrar.registerOnLevelUnload(this::onLevelunload);
     }
 
 
-    private void onLevelLoad(LevelLoadingEvent event) {
+    private static final ResourceLocation CHALLENGE_DIM = new ResourceLocation(Constants.MOD_ID, "challenge_dimension");
+    private static final ResourceLocation OVERWORLD_DIM = new ResourceLocation("minecraft", "overworld");
+    private void onLevelLoad(LevelLoadingEvent event)
+    {
         Constants.LOG.info("Level loaded: {}", event.getLevel() );
-        MinecraftServer server = GeneralConfig.getInstance().getServer();
-        if(event.getLevel() != server.overworld()) return;
-        this.templeManager = new TempleManager( (ServerLevel) event.getLevel(), portalApi);
+        Level level = (Level) event.getLevel();
+        if(level.isClientSide()) return;
+
+        if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
+            this.templeManager = new TempleManager( (ServerLevel) level, portalApi);
+            this.templeManager.setChallengeDim(this.challengeDimension);
+
+        } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
+            this.challengeDimension = (ServerLevel) level;
+            if( this.templeManager != null ) {
+                this.templeManager.setChallengeDim(this.challengeDimension);
+            }
+        }
+    }
+
+    private void onLevelunload(LevelLoadingEvent.Unload event )
+    {
+        //Constants.LOG.info("Level unloaded: {}", event.getLevel() );
+        Level level = (Level) event.getLevel();
+        if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
+            this.templeManager.shutdown();
+            this.templeManager = null;
+        } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
+            int i = 0;
+        }
+
     }
 
 

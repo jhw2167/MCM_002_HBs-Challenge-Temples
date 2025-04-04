@@ -122,12 +122,17 @@ public class TempleManager {
     private static final double P_HEIGHT = 2;
     private static final double P_WIDTH = 2;
 
-    private static final Vec3 SOURCE_OFFSET = new Vec3(0, -1, 0);
+    private static final Vec3 SOURCE_OFFSET = new Vec3(1, -1, 0);
     private static final Vec3 DEST_OFFSET = new Vec3(0, 0, -1);
-    private static final int CHALLENGE_DIM_HEIGHT = 70;
+    private static final int CHALLENGE_DIM_HEIGHT = 66;
+
+
+    private static boolean DISABLE_PORTALS = false;
 
     private void handleBuildPortal(ManagedTemple temple)
     {
+        if( DISABLE_PORTALS) return;
+
         BlockPos pos = temple.getPortalSourcePos();
         Vec3 sourcePos = new Vec3(pos.getX(), pos.getY(), pos.getZ()).add(SOURCE_OFFSET);
         Vec3 destination = new Vec3(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ()).add(DEST_OFFSET);

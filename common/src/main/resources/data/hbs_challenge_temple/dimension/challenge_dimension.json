@@ -3,18 +3,15 @@
   "generator": {
     "type": "minecraft:flat",
     "settings": {
+      "biome": "hbs_challenge_temple:empty_biome",
       "layers": [
           {
             "height": 64,
             "block": "minecraft:air"
           },
           {
-            "height": 4,
-            "block": "minecraft:stone"
-          },
-          {
           "height": 1,
-          "block": "minecraft:grass_block"
+          "block": "minecraft:obsidian"
           }
         ],
         "structure_overrides": [

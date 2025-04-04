@@ -2,18 +2,13 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.core.TempleManager;
 import com.holybuckets.challengetemple.portal.PortalApi;
-import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.LevelLoadingEvent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.StructureTags;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import org.apache.logging.log4j.core.jmx.Server;
 
 //net.minecraft.server.commands.LocateCommand;
 public class ChallengeTempleMain {
@@ -53,7 +48,7 @@ public class ChallengeTempleMain {
 
             //register events
             registrar.registerOnLevelLoad(this::onLevelLoad);
-            registrar.registerOnLevelUnload(this::onLevelunload);
+            registrar.registerOnLevelUnload(this::onLevelUnload);
     }
 
 
@@ -77,7 +72,7 @@ public class ChallengeTempleMain {
         }
     }
 
-    private void onLevelunload(LevelLoadingEvent.Unload event )
+    private void onLevelUnload(LevelLoadingEvent.Unload event )
     {
         //Constants.LOG.info("Level unloaded: {}", event.getLevel() );
         Level level = (Level) event.getLevel();

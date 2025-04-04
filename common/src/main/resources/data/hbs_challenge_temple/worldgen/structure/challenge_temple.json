@@ -4,7 +4,7 @@
   "size": 2,
   "max_distance_from_center": 80,
   "biomes": "#hbs_challenge_temple:has_structure/challenge_temple_biomes",
-  "step": "top_layer_modification",
+  "step": "underground_decoration",
   "terrain_adaptation": "beard_thin",
   "start_height": {
     "absolute": 0

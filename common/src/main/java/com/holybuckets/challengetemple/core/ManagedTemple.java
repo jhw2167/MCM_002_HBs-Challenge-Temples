@@ -14,7 +14,7 @@ public class ManagedTemple {
     private final String templeId;
     public Entity portalToChallenge;
     public Entity portalToHome;
-    private boolean isActive;
+    private boolean isCompleted;
 
     private static Vec3i STRUCTURE_OFFSET = new Vec3i(-4, -4, -2);
 
@@ -23,7 +23,7 @@ public class ManagedTemple {
         this.portalSourcePos = pos;
         this.structurePos = pos.offset(STRUCTURE_OFFSET);
         this.templeId = HBUtil.ChunkUtil.getId(pos);
-        this.isActive = false;
+        this.isCompleted = false;
     }
 
     public BlockPos getPortalSourcePos() {
@@ -34,12 +34,14 @@ public class ManagedTemple {
         return level;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public boolean isCompleted() {
+        return isCompleted;
     }
 
-    public void setActive(boolean active) {
-        this.isActive = active;
+    public void setCompleted() {
+        this.isCompleted = true;
+        this.portalToChallenge = null;
+        this.portalToHome = null;
     }
 
     public String getTempleId() {

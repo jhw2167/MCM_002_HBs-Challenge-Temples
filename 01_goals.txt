@@ -56,14 +56,43 @@ Requirements
 
 	- using Blay's PlatformProxy system
 
-8. Add spawn entity command
+8. To do
 ---
+
+	hbs_challenge_temple:challenge_room_2x2
+	/give @p minecraft:structure_block
+
+
+	- remodel 2x2 challenge temple
+	- build 4x4 challenge temple variant
+		- decide on ID, naming convention
+		- build gem variants
+		- id: challenge_000000.nbt
+		- hash author code + challenge_name
+
+	- Take player inventory when they travel to challenge dimension
+ 		- remove armor
+		- remove potion effects
+
+	- ManagedTemple data effectively
+		- don't re-place portals
+		- intercept template pool logic to determine which was placed
+		- please don't rotate the pools
+		- delete portal on temple completion
+
+	- Build ManagedPlayer class to keep track of player data
+	- Keep track of shrine attempts, completions, deaths
+
+	- add Challenge blocks - stone bricks, glowstone, glass, wood, leaves
+	- use processor lists to edit structure NBT data
+		- compile time nbt editor: https://offroaders123.github.io/Dovetail/
+
+	- determine how to fix chests at runtime
+	- refill chests on player death
+	- create algorithm to reset structure on player death
+		- can use a pool for that
+
 	
-	Summonable entities: SuggestionProviders.SUMMONABLE_ENTITIES
 
-	hbs_challenge_temple:challenge_temple
-
-
-	
 
 

@@ -5,10 +5,12 @@
 	"difficulty": "PEACEFUL | EASY | NORMAL | HARD",
 	"challengeRules": {
 		"playerMaxHearts": 10,
-		"maxDeaths": 3,
+		"maxDeaths": -1,
 		"resetBlocksOnPlayerDeath": true,
 		"resetChestsOnPlayerDeath": true,
-		"clearInventoryOnPlayerDeath": true
+		"clearInventoryOnPlayerDeath": true,
+		"playerDropsInventoryOnDeath": true
+		
 	},
 	"lootRules": {
 		"lootPool": "minor | standard | major | epic | lengendary",

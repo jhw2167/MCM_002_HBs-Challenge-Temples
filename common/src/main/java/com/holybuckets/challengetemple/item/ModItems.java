@@ -21,10 +21,10 @@ public class ModItems {
                 ModBlocks.challengeBrick,
                 ModBlocks.challengeBrickSlab,
                 ModBlocks.challengeGlowstone,
-                //ModBlocks.challengeGlass,
-                //ModBlocks.challengeGlassPane,
-                //ModBlocks.challengeWoodPlank
-
+                ModBlocks.challengeGlass,
+                ModBlocks.challengeGlassPane,
+                ModBlocks.challengeWood,
+                ModBlocks.challengeStone
         });
     }
 

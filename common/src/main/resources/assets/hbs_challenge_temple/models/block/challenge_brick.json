@@ -1,6 +1,6 @@
 {
     "parent": "minecraft:block/cube_all",
     "textures": {
-        "all": "hbs_challenge_temple:block/challenge_brick"
+        "all": "minecraft:block/stone_bricks"
     }
 }

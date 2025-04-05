@@ -1,4 +1,9 @@
 {
   "block.hbs_challenge_temple.challenge_brick": "Challenge Brick",
-  "block.hbs_challenge_temple.challenge_glowstone": "Challenge Glowstone"
+  "block.hbs_challenge_temple.challenge_glowstone": "Challenge Glowstone",
+  "block.hbs_challenge_temple.challenge_brick_slab": "Challenge Brick Slab",
+  "block.hbs_challenge_temple.challenge_wood": "Challenge Wood",
+  "block.hbs_challenge_temple.challenge_glass": "Challenge Glass",
+  "block.hbs_challenge_temple.challenge_glass_pane": "Challenge Glass Pane",
+  "block.hbs_challenge_temple.challenge_stone": "Challenge Stone"
 }

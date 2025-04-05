@@ -1,32 +1,30 @@
 Notes, Bugs, Freehand edits
 ---
 
-Basic MC world info
+Documentation
 ---
-Minecraft mc = Minecraft.getInstance()
+
+Block_id - converted from block_id - description
+challenge_brick - stone_bricks - essentialy bedrock, but reskinned as stone brick, translucent to light, cant break it, push it, explode it or burn it
+faux_brick - stone_bricks - bedrock copy, but non obstructive, mobs can pass through
+invisble_brick - totally invisible, but also bedrock
+
+challenge_glowstone - glowstone - bedrock reskin; gives off light
+challenge_brick_slab - stone_brick_slab - bedrock reskin, as a slab
+challenge_stone - stone - can't be broken or moved, can be exploded
+challenge_wood - oak_planks - can't be broken or pushed; can be exploded or burned
+challenge_glass - glass - bedrock reskin; glass
+challenge_glass_pane - glass_pane - bedrock reskin; glass
 
 
-Subscription Events
+challenges
 ---
-https://events.serilum.com/
-
-onLoad - intial game loading, no world instance loaded
-onServerStarting - server is being prepared for a game, should have access to world seed
-
-
+Mirror Mirror - make a simple parkour obstacle course with faux brick
+Portal Maze - a 2D maze, except instead of walls, we offset the y and use portals to go up and down
+gladiator - given 3 hearts and simple weapons
+	- iron sword
+	- shield + wooden sword
+	- chestplate + stone sword
 
 Errors
----
-
-onLoad not a valid
-	- use the correct minecraftforge.level.ChunkEvent
-	- use the correct @EventBusSubscriber(bus = EventBusSubscriber.Bus.FORGE, modid = OreClustersAndRegenMain.MODID)
-	- 
-
-2. .toml config suddenly stopped loading
-	- Forge didnt like solo mod id on the event handlers class
-	- bus = EventBusSubscriber.Bus.FORGE
-	- AllConfigs uses EventBusSubscriber.Bus.mod
-	
-
-3. 
+--- 

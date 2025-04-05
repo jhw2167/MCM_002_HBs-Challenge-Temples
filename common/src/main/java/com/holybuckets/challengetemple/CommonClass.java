@@ -1,7 +1,10 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.platform.Services;
+import com.holybuckets.challengetemple.item.ModItems;
 import com.holybuckets.foundation.event.BalmEventRegister;
+import net.blay09.mods.balm.api.Balm;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
 
@@ -24,6 +27,9 @@ public class CommonClass {
         ChallengeTempleMain.INSTANCE = new ChallengeTempleMain();
         BalmEventRegister.registerEvents();
         BalmEventRegister.registerCommands();
+        ModBlocks.initialize(Balm.getBlocks());
+        ModItems.initialize(Balm.getItems());
+
         isInitialized = true;
     }
 

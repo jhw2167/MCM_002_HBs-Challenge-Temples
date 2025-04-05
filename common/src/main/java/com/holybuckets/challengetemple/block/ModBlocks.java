@@ -11,19 +11,10 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class ModBlocks {
 
-    public static Block w;
-    //public static Block[] scopedSharestones = new SharestoneBlock[DyeColor.values().length];
+    public static Block challengeBrick;
 
     public static void initialize(BalmBlocks blocks) {
-        //blocks.register(() -> w = new WaystoneBlock(defaultProperties()), () -> itemBlock(w), id("waystone"));
-
-        /*
-        DyeColor[] colors = DyeColor.values();
-        for (DyeColor color : colors) {
-            blocks.register(() -> scopedSharestones[color.ordinal()] = new SharestoneBlock(defaultProperties(), color), () -> itemBlock(scopedSharestones[color.ordinal()]), id(color.getSerializedName() + "_sharestone"));
-        }
-        */
-
+        blocks.register(() -> challengeBrick = new ChallengeBrickBlock(), () -> itemBlock(challengeBrick), id("challenge_brick"));
     }
 
     private static BlockItem itemBlock(Block block) {
@@ -34,7 +25,7 @@ public class ModBlocks {
         return new ResourceLocation(Constants.MOD_ID, name);
     }
 
-    private static BlockBehaviour.Properties defaultProperties() {
+    static BlockBehaviour.Properties defaultProperties() {
         return Balm.getBlocks().blockProperties().sound(SoundType.STONE).strength(5f, 2000f);
     }
 }

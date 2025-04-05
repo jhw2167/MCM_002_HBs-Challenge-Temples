@@ -3,6 +3,7 @@ package com.holybuckets.challengetemple.core;
 import com.holybuckets.challengetemple.portal.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
+import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
@@ -10,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.Vec3;
 
@@ -122,7 +124,7 @@ public class TempleManager {
     private static final double P_HEIGHT = 2;
     private static final double P_WIDTH = 2;
 
-    private static final Vec3 SOURCE_OFFSET = new Vec3(1, -1, 0);
+    private static final Vec3 SOURCE_OFFSET = new Vec3(0, -1, 1);
     private static final Vec3 DEST_OFFSET = new Vec3(0, 0, -1);
     private static final int CHALLENGE_DIM_HEIGHT = 66;
 
@@ -131,9 +133,21 @@ public class TempleManager {
 
     private void handleBuildPortal(ManagedTemple temple)
     {
-        if( DISABLE_PORTALS) return;
+        if( DISABLE_PORTALS ) return;
 
         BlockPos pos = temple.getPortalSourcePos();
+        BlockEntity entity = level.getBlockEntity(pos);
+        if( entity == null ) return;
+        if( entity instanceof SimpleBlockEntity ) {
+            SimpleBlockEntity be = (SimpleBlockEntity) entity;
+            if( be.getProperty("hasPortal") == null ) {
+
+            } else if (be.getProperty("hasPortal").equals("true")) {
+                return;
+            }
+            be.setProperty("hasPortal", "true");
+        }
+
         Vec3 sourcePos = new Vec3(pos.getX(), pos.getY(), pos.getZ()).add(SOURCE_OFFSET);
         Vec3 destination = new Vec3(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ()).add(DEST_OFFSET);
         temple.portalToChallenge = portalApi.createPortal(P_WIDTH, P_HEIGHT, level,

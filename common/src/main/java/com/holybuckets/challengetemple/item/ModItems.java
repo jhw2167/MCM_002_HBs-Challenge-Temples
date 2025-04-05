@@ -18,7 +18,13 @@ public class ModItems {
             //com.holybuckets.foundation.item.ModItems.FOUNDATIONS_TAB);
 
         items.addToCreativeModeTab(FOUNDATIONS_TAB, () -> new ItemLike[]{
-                ModBlocks.challengeBrick
+                ModBlocks.challengeBrick,
+                ModBlocks.challengeBrickSlab,
+                ModBlocks.challengeGlowstone,
+                //ModBlocks.challengeGlass,
+                //ModBlocks.challengeGlassPane,
+                //ModBlocks.challengeWoodPlank
+
         });
     }
 

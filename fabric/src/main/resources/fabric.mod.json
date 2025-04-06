@@ -17,6 +17,9 @@
     "entrypoints": {
         "main": [
             "com.holybuckets.challengetemple.ChallengeTempleMainFabric"
+        ],
+        "client": [
+            "com.holybuckets.challengetemple.ChallengeTempleMainClientFabric"
         ]
     },
     "mixins": [

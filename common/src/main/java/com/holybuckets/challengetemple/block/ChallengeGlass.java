@@ -16,6 +16,5 @@ public class ChallengeGlass extends GlassBlock {
     static Properties PROPERTIES = Properties.copy(Blocks.GLASS)
         .destroyTime(-1f)
         .explosionResistance(3600000f)
-        .pushReaction(PushReaction.IGNORE)
-        .noOcclusion();
+        .pushReaction(PushReaction.IGNORE);
 }

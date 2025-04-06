@@ -1,10 +1,12 @@
 package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
+import com.holybuckets.challengetemple.client.ModRenderers;
 import com.holybuckets.challengetemple.platform.Services;
 import com.holybuckets.challengetemple.item.ModItems;
 import com.holybuckets.foundation.event.BalmEventRegister;
 import net.blay09.mods.balm.api.Balm;
+import net.blay09.mods.balm.api.client.BalmClient;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
 
@@ -33,6 +35,10 @@ public class CommonClass {
         isInitialized = true;
     }
 
+    public static void initClient() {
+        ModRenderers.clientInitialize(BalmClient.getRenderers());
+    }
+
     /**
      * Description: Run sample tests methods
      */
@@ -40,5 +46,6 @@ public class CommonClass {
     {
 
     }
+
 
 }

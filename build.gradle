@@ -50,6 +50,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url "https://cursemaven.com" }
         maven { url = 'https://maven.minecraftforge.net' }
         maven {
             name 'Fabric'

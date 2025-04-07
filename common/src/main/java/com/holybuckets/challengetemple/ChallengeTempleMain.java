@@ -40,7 +40,7 @@ public class ChallengeTempleMain {
 
         this.portalApi = (PortalApi) Balm.platformProxy()
             .withFabric("com.holybuckets.challengetemple.portal.FabricPortalApi")
-            //.withForge("com.holybuckets.challengetemple.portal.ForgePortalApi")
+            .withForge("com.holybuckets.challengetemple.portal.ForgePortalApi")
             .build();
 
             EventRegistrar registrar = EventRegistrar.getInstance();

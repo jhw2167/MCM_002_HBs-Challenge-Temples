@@ -26,9 +26,9 @@ dependencies {
         changing = true
     }
 
-    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:imm_ptl_core:${immptl_version}")
-    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:q_misc_util:${immptl_version}")
-    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:build:${immptl_version}")
+    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:imm_ptl_core:${immptl_version_fabric}")
+    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:q_misc_util:${immptl_version_fabric}")
+    modImplementation ("com.github.iPortalTeam.ImmersivePortalsMod:build:${immptl_version_fabric}")
 
 
 }

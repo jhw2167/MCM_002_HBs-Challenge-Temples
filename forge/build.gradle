@@ -85,10 +85,14 @@ dependencies {
         changing = true
     }
 
+
     implementation fg.deobf("com.holybuckets.foundation:HBs_Foundation-forge-${minecraft_version}:${foundation_version}") {
         changing = true
         transitive = false
     }
+
+    implementation fg.deobf("curse.maven:immersive-portals-for-forge-${immptl_forge_projid}:${immptl_forge_fileid}")
+    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:${cloth_config_version_forge}")
 
 }
 

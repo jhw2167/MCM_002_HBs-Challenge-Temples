@@ -16,6 +16,7 @@ public class ClientEvents {
     public static void onClientSetup(FMLClientSetupEvent event) {
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.challengeGlass, RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.challengeGlassPane, RenderType.translucent());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.challengeInvisibleBrick, RenderType.translucent());
     }
 
 }

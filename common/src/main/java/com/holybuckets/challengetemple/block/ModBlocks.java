@@ -18,7 +18,10 @@ public class ModBlocks {
     public static Block challengeGlassPane;
     public static Block challengeWood;
     public static Block challengeStone;
-    //public static Block challengeWoodPlankSlab;
+    public static Block challengeFauxBrick;
+    public static Block challengeInvisibleBrick;
+
+
 
     public static void initialize(BalmBlocks blocks) {
         blocks.register(() -> challengeBrick = new ChallengeBrick(), () -> itemBlock(challengeBrick), id("challenge_brick"));
@@ -28,6 +31,8 @@ public class ModBlocks {
         blocks.register(() -> challengeGlassPane = new ChallengeGlassPane(), () -> itemBlock(challengeGlassPane), id("challenge_glass_pane"));
         blocks.register(() -> challengeWood = new ChallengeWood(), () -> itemBlock(challengeWood), id("challenge_wood"));
         blocks.register(() -> challengeStone = new ChallengeStone(), () -> itemBlock(challengeStone), id("challenge_stone"));
+        blocks.register(() -> challengeFauxBrick = new ChallengeFauxBrick(), () -> itemBlock(challengeFauxBrick), id("challenge_faux_brick"));
+        blocks.register(() -> challengeInvisibleBrick = new ChallengeInvisibleBrick(), () -> itemBlock(challengeInvisibleBrick), id("challenge_invisible_brick"));
 
     }
 

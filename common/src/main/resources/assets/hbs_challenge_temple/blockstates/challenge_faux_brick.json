@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "hbs_challenge_temple:block/challenge_faux_brick" }
+  }
+}

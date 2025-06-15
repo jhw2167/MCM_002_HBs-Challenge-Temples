@@ -92,6 +92,54 @@ Requirements
 	- create algorithm to reset structure on player death
 		- can use a pool for that
 
+
+keep notes
+---
+
+Temples:
+0: WAITING - waiting for portal construction
+0.5 FAILED - entity block not found - RAM only
+1: DETERMINED -  portal has been set
+3. CHALLENGED - player has entered the portal
+4. COMPLETED - player has right clicked the torch to complete the challenge, fill rewards chest
+5. RECHALLENGED - challenged again, but don't give rewards
+
+1. onChunkLoad - test grid check and create Managed Temple, set(0)
+2. Attempt to find block entity, set(1) or set(0.5) for failed
+3. onPlayerChangeDimension
+- check dimension was to or from challengeDim
+- check entity is player
+- handle each player uniquely in case players use temples concurrently
+- take all items from inventory and store in entity outside of temple
+- clear all items on the floor in and outside the temple
+- destroy any blocks placed in or outside the temple
+- clear any items in the players inventory
+- destroy the portal
+- close the portal from the outside
+3.5 onPlayerChangeDimension (x2) 
+- if portalStatus == CHALLENGED, then player is leaving the temple
+- give them their stuff back
+- set temple status to DETERMINED
+- given it 10 seconds, then rebuild the portal
+
+4. OnPlayerRightClickSoulTorch
+- check if temple is RE-CHALLENGED
+- temple set(4)
+- 
+- fill rewards chest if first completion
+
+
+- maintain player's current dimension
+
+
+TempleCleanUp()
+- cleanupLoot - removes loot on the floor
+- cleanupEntities - kills and respawns entities
+- cleanupBlocks - removes all blocks
+- cleanupChests - cleans and refills chests
+- cleanPlayer - reset hearts, remove effects, remove loot
+
+
 	
 
 

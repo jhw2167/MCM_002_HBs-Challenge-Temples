@@ -12,9 +12,26 @@ public class ChallengeWood extends Block {
         super(PROPERTIES);
     }
 
-    static Properties PROPERTIES = Properties.copy(Blocks.OAK_PLANKS)
-        .destroyTime(-1f);
 
+    static Properties PROPERTIES = Properties.copy(Blocks.OAK_PLANKS)
+        .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH, ModBlocks.CHALLENGE_BLOCK_EXPL_RES);
+
+    /*
+    @Override
+    public boolean isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+        return true;
+    }
+
+    @Override
+    public int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+        return 60;
+    }
+
+    @Override
+    public int getFireSpreadSpeed(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+        return 20;
+    }
+    */
 
     @Override
     public int getLightBlock(BlockState $$0, BlockGetter $$1, BlockPos $$2) {

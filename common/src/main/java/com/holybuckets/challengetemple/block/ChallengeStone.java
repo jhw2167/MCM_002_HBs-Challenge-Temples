@@ -12,6 +12,6 @@ public class ChallengeStone extends Block {
     }
 
     static Properties PROPERTIES = Properties.copy(Blocks.STONE)
-        .destroyTime(-1f);
+        .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH);
 
 }

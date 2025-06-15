@@ -29,7 +29,7 @@ public class ModItems {
                 ModBlocks.challengeGlowstone,
                 ModBlocks.challengeGlass,
                 ModBlocks.challengeGlassPane,
-                ModBlocks.challengeWood,
+                //ModBlocks.challengeWood,
                 ModBlocks.challengeStone,
                 ModBlocks.challengeFauxBrick,
                 ModBlocks.challengeInvisibleBrick

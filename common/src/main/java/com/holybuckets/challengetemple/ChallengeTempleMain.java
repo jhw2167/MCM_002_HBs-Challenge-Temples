@@ -77,7 +77,8 @@ public class ChallengeTempleMain {
         //Constants.LOG.info("Level unloaded: {}", event.getLevel() );
         Level level = (Level) event.getLevel();
         if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
-            this.templeManager.shutdown();
+            if( this.templeManager != null )
+                this.templeManager.shutdown();
             this.templeManager = null;
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             int i = 0;

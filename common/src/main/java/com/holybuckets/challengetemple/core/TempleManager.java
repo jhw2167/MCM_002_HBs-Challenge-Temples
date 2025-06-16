@@ -9,6 +9,7 @@ import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -136,6 +137,11 @@ public class TempleManager {
         if( DISABLE_PORTALS ) return;
 
         BlockPos pos = temple.getPortalSourcePos();
+        if( HBUtil.ChunkUtil.getId(pos).equals("0,0") ) {
+            System.out.println("no portal at 0,0: " );
+            return;
+        }
+
         BlockEntity entity = level.getBlockEntity(pos);
         if( entity == null ) return;
         if( entity instanceof SimpleBlockEntity ) {

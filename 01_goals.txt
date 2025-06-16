@@ -56,11 +56,22 @@ Requirements
 
 	- using Blay's PlatformProxy system
 
-8. To do
+
+8. Remodel 2x2 temple room
+---
+
+	- prevent portal from spawning in one room 0x0
+	- 
+
+
+12. To do
 ---
 
 	hbs_challenge_temple:challenge_room_2x2
+	hbs_challenge_temple:challenge_brick
+	hbs_challenge_temple:challenge_glowstone
 	/give @p minecraft:structure_block
+	/give @s jigsaw
 
 
 	- remodel 2x2 challenge temple
@@ -92,6 +103,18 @@ Requirements
 	- create algorithm to reset structure on player death
 		- can use a pool for that
 
+2148104148
+
+,
+    {
+      "weight": 10,
+      "element": {
+        "location": "hbs_challenge_temple:challenge_room_4x4_00",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
+    }
 
 keep notes
 ---

@@ -36,7 +36,15 @@
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "location": "hbs_challenge_temple:challenge_room_4x4_00",
+        "processors": "minecraft:empty",
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element"
+      }
     }
-
   ]
 }

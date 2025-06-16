@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+
 
 
 @Mixin(SinglePoolElement.class)

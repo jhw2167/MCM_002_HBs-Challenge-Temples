@@ -19,7 +19,7 @@ public class ChallengeTempleMain {
     public static final String MODID = Constants.MOD_ID;
     public static final String NAME = "HBs Challenge Temples";
     public static final String VERSION = "1.0.0f";
-    public static final Boolean DEBUG = false;
+    public static final Boolean DEBUG = true;
 
     public static ChallengeTempleMain INSTANCE;
 
@@ -62,12 +62,12 @@ public class ChallengeTempleMain {
 
         if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
             this.templeManager = new TempleManager( (ServerLevel) level, portalApi);
-            this.templeManager.setChallengeDim(this.challengeDimension);
+            this.templeManager.setChallengeLevel(this.challengeDimension);
 
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             this.challengeDimension = (ServerLevel) level;
             if( this.templeManager != null ) {
-                this.templeManager.setChallengeDim(this.challengeDimension);
+                this.templeManager.setChallengeLevel(this.challengeDimension);
             }
         }
     }

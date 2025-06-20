@@ -82,6 +82,10 @@ Requirements
 		- id: challenge_000000.nbt
 		- hash author code + challenge_name
 
+hbs_challenge_temple:challenge_room_4x4_00
+- spawn 00, 00 contains 01-08, 
+- _08 can replace everything else
+
 	- Take player inventory when they travel to challenge dimension
  		- remove armor
 		- remove potion effects

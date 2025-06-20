@@ -8,7 +8,8 @@
         "MixinMappedRegistry",
         "MixinPoolElementStructurePiece",
         "MixinListPoolElement",
-        "MixinSinglePoolElement"
+        "MixinSinglePoolElement",
+        "StructureTemplateMixin"
     ],
     "client": [
     ],

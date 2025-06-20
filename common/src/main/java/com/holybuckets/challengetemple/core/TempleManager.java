@@ -8,7 +8,6 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -26,7 +25,7 @@ public class TempleManager {
     private static Map<LevelAccessor, TempleManager> MANAGERS;
 
     private final ServerLevel level;
-    private ServerLevel challengeDim;
+    private ServerLevel challengeLevel;
     private final PortalApi portalApi;
     private final GeneralConfig generalConfig;
 
@@ -68,8 +67,9 @@ public class TempleManager {
         temples.clear();
     }
 
-    public void setChallengeDim(ServerLevel challengeDim) {
-        this.challengeDim = challengeDim;
+    public void setChallengeLevel(ServerLevel challengeLevel) {
+        this.challengeLevel = challengeLevel;
+        ChallengeRoom.CHALLENGE_LEVEL = challengeLevel;
     }
 
     public static TempleManager get(Level level) {
@@ -125,7 +125,7 @@ public class TempleManager {
     private static final double P_HEIGHT = 2;
     private static final double P_WIDTH = 2;
 
-    private static boolean DISABLE_PORTALS = true;
+    private static boolean DISABLE_PORTALS = false;
 
     private void handleBuildPortal(ManagedTemple temple)
     {
@@ -152,10 +152,12 @@ public class TempleManager {
         Vec3 sourcePos = toVec3(temple.getPortalSourcePos());
         Vec3 destination = toVec3( temple.getPortalDest() );
         temple.portalToChallenge = portalApi.createPortal(P_WIDTH, P_HEIGHT, level,
-             this.challengeDim, sourcePos, destination, PortalApi.Direction.SOUTH);
+             this.challengeLevel, sourcePos, destination, PortalApi.Direction.SOUTH);
 
-        temple.portalToHome = portalApi.createPortal(P_WIDTH, P_HEIGHT, this.challengeDim,
+        temple.portalToHome = portalApi.createPortal(P_WIDTH, P_HEIGHT, this.challengeLevel,
             level, destination, sourcePos, PortalApi.Direction.NORTH);
+
+        temple.buildChallenge();
 
     }
 
@@ -174,7 +176,7 @@ public class TempleManager {
         //LoggerProject.logInfo( "00501","Chunk unloaded: " + c.getPos());
     }
 
-    private void handleOnServerTick() {
+    private void handleOnServerTicks120() {
         workerThreadBuildPortal();
     }
 
@@ -200,11 +202,11 @@ public class TempleManager {
     }
 
     private static void onServerTick120(ServerTickEvent e) {
-        MANAGERS.values().forEach(TempleManager::handleOnServerTick);
+        MANAGERS.values().forEach(TempleManager::handleOnServerTicks120);
     }
 
 
-    public Level getChallengeDim() {
-        return this.challengeDim;
+    public ServerLevel getChallengeLevel() {
+        return this.challengeLevel;
     }
 }

@@ -8,8 +8,8 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -125,18 +125,13 @@ public class TempleManager {
     private static final double P_HEIGHT = 2;
     private static final double P_WIDTH = 2;
 
-    private static final Vec3 SOURCE_OFFSET = new Vec3(0, -1, 1);
-    private static final Vec3 DEST_OFFSET = new Vec3(0, 0, -1);
-    private static final int CHALLENGE_DIM_HEIGHT = 66;
-
-
-    private static boolean DISABLE_PORTALS = false;
+    private static boolean DISABLE_PORTALS = true;
 
     private void handleBuildPortal(ManagedTemple temple)
     {
         if( DISABLE_PORTALS ) return;
 
-        BlockPos pos = temple.getPortalSourcePos();
+        BlockPos pos = temple.getEntityPos();
         if( HBUtil.ChunkUtil.getId(pos).equals("0,0") ) {
             System.out.println("no portal at 0,0: " );
             return;
@@ -154,8 +149,8 @@ public class TempleManager {
             be.setProperty("hasPortal", "true");
         }
 
-        Vec3 sourcePos = new Vec3(pos.getX(), pos.getY(), pos.getZ()).add(SOURCE_OFFSET);
-        Vec3 destination = new Vec3(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ()).add(DEST_OFFSET);
+        Vec3 sourcePos = toVec3(temple.getPortalSourcePos());
+        Vec3 destination = toVec3( temple.getPortalDest() );
         temple.portalToChallenge = portalApi.createPortal(P_WIDTH, P_HEIGHT, level,
              this.challengeDim, sourcePos, destination, PortalApi.Direction.SOUTH);
 
@@ -164,6 +159,10 @@ public class TempleManager {
 
     }
 
+    //BlockUtil
+    public Vec3 toVec3(BlockPos pos) {
+        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+    }
 
     private void handleChunkLoaded(ChunkAccess c) {
         //LoggerProject.logInfo( "00500","Chunk loaded: " + c.getPos());
@@ -205,5 +204,7 @@ public class TempleManager {
     }
 
 
-
+    public Level getChallengeDim() {
+        return this.challengeDim;
+    }
 }

@@ -72,6 +72,7 @@ Requirements
 	hbs_challenge_temple:challenge_glowstone
 	/give @p minecraft:structure_block
 	/give @s jigsaw
+	hbs_challenge_temple:challenge_room_4x4_00
 
 
 	- remodel 2x2 challenge temple

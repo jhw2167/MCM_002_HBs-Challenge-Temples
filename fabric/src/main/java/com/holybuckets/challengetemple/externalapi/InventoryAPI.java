@@ -9,15 +9,13 @@ import eu.pb4.graves.grave.PositionedItemStack;
 import eu.pb4.graves.mixin.PlayerEntityAccessor;
 import eu.pb4.graves.other.Location;
 import eu.pb4.graves.other.VanillaInventoryMask;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-
-import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,6 +1,5 @@
 package com.holybuckets.challengetemple.core;
 
-import com.holybuckets.challengetemple.ChallengeTempleMain;
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.foundation.HBUtil;
@@ -9,26 +8,21 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
-import org.apache.logging.log4j.core.jmx.Server;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 public class ChallengeRoom {
 
     private static final String CLASS_ID = "007"; // Class ID for logging purposes
 
     private final String challengeId;
+    private final String chunkId;
     private BlockEntity structureBlock;
     private StructureTemplate structureTemplate;
 
@@ -50,18 +44,27 @@ public class ChallengeRoom {
         new Vec3i(0, 0, 0) // 08
     };
 
-    ChallengeRoom(String challengeId)
+    ChallengeRoom(String chunkId)
     {
-        this.challengeId = challengeId;
+        this.chunkId = chunkId;
+        this.challengeId = Challenges.chooseChallengeId(null);
     }
 
+
+    //A challenge could be a 2x2 or 4x4 room
+    private static final String CHALLENGE_NAME = "challenge_<challengeId>_<pieceId>";
     private static final String STRUCTURE_NAME = "challenge_room_4x4_";
-    private boolean generateStructure(String id, boolean useTemplate) {
+    private boolean generateStructure(String pieceId, boolean useTemplate) {
         
         StructureTemplateManager manager =  CHALLENGE_LEVEL.getStructureManager();
-        ResourceLocation structure = new ResourceLocation(Constants.MOD_ID, STRUCTURE_NAME + id);
-        StructureTemplate template = manager.getOrCreate(structure);
-        Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(id))];
+        String location = CHALLENGE_NAME.replace("<challengeId>", challengeId).replace("<pieceId>", pieceId);
+        //String location = STRUCTURE_NAME + pieceId;
+        ResourceLocation structure = new ResourceLocation(Constants.MOD_ID, location);
+        Optional<StructureTemplate> temp = manager.get(structure);
+        if(!temp.isPresent()) return false;
+
+        StructureTemplate template = temp.get();
+        Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(pieceId))];
 
         template.placeInWorld(
             CHALLENGE_LEVEL,                   // ServerLevel
@@ -86,9 +89,9 @@ public class ChallengeRoom {
 
         Arrays.stream(ids).forEach(id -> {
         Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(id))];
-        String msg = String.format("[%s] Loading structure with pos %s id: %s", this.challengeId, offset, id);
+        String msg = String.format("[%s] Loading structure with pos %s id: %s", this.chunkId, offset, id);
             LoggerProject.logDebug("007000", msg);
-            this.generateStructure(id, false);
+            //this.generateStructure(id, false);
         });
 
         return true;
@@ -114,7 +117,7 @@ public class ChallengeRoom {
 
     //* UTILITY
     public BlockPos getWorldPos() {
-        BlockPos pos = HBUtil.ChunkUtil.getWorldPos(challengeId);
+        BlockPos pos = HBUtil.ChunkUtil.getWorldPos(chunkId);
         return new BlockPos(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ());
     }
 

@@ -26,7 +26,7 @@ public class ManagedTemple {
     private static Vec3i STRUCTURE_OFFSET = new Vec3i(-4, -4, -2);
 
     private static final Vec3i SOURCE_OFFSET = new Vec3i(0, -1, 1);
-    private static final Vec3i DEST_OFFSET = new Vec3i(3, 2, 1);
+    private static final Vec3i DEST_OFFSET = new Vec3i(2, 2, 1);
     private static final int CHALLENGE_DIM_HEIGHT = 64;
 
 

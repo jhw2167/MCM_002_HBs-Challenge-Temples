@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.core.ManagedChallenger;
 import com.holybuckets.challengetemple.core.TempleManager;
 import com.holybuckets.challengetemple.portal.PortalApi;
 import com.holybuckets.foundation.HBUtil;
@@ -45,6 +46,7 @@ public class ChallengeTempleMain {
 
             EventRegistrar registrar = EventRegistrar.getInstance();
             TempleManager.init(registrar);
+            ManagedChallenger.init(registrar);
 
             //register events
             registrar.registerOnLevelLoad(this::onLevelLoad);
@@ -62,13 +64,9 @@ public class ChallengeTempleMain {
 
         if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
             this.templeManager = new TempleManager( (ServerLevel) level, portalApi);
-            this.templeManager.setChallengeLevel(this.challengeDimension);
-
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             this.challengeDimension = (ServerLevel) level;
-            if( this.templeManager != null ) {
-                this.templeManager.setChallengeLevel(this.challengeDimension);
-            }
+            TempleManager.CHALLENGE_LEVEL = (ServerLevel) level;
         }
     }
 

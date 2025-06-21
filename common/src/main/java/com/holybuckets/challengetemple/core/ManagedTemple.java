@@ -4,9 +4,18 @@ import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ManagedTemple {
 
@@ -23,10 +32,15 @@ public class ManagedTemple {
     public Entity portalToHome;
     private boolean isCompleted;
 
+    Set<ServerPlayer> nearPlayers;  // players close enough to start challenge
+    Set<ServerPlayer> activePlayers; //players taking challenge
+
+    Thread watchChallengersThread;
+
     private static Vec3i STRUCTURE_OFFSET = new Vec3i(-4, -4, -2);
 
     private static final Vec3i SOURCE_OFFSET = new Vec3i(0, -1, 1);
-    private static final Vec3i DEST_OFFSET = new Vec3i(2, 2, 1);
+    private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 1);
     private static final int CHALLENGE_DIM_HEIGHT = 64;
 
 
@@ -39,6 +53,10 @@ public class ManagedTemple {
         this.templeId = HBUtil.ChunkUtil.getId(pos);
         this.challengeRoom = new ChallengeRoom(this.templeId);
         this.isCompleted = false;
+
+        this.activePlayers = new HashSet<>();
+        this.nearPlayers = new HashSet<>();
+
     }
 
     public BlockPos getPortalSourcePos() {
@@ -73,7 +91,91 @@ public class ManagedTemple {
         return templeId;
     }
 
+    public ChallengeRoom getChallengeRoom() {
+        return challengeRoom;
+    }
+
+    //** CORE
+
+    void startWatchChallengers()
+    {
+        if( watchChallengersThread != null ) // Stop the previous thread if it's still running
+            return;
+
+        this.challengeRoom.loadStructure();
+        //We need to save this thread in a variable so we can interrupt it on shutdown
+        this.watchChallengersThread = new Thread( this::threadWatchChallengers);
+        this.watchChallengersThread.start();
+    }
+
+    //Add ServerPlayer to hashSet if he is 16u away from block entity pos
+    //keep while(1) loop, surround with try catch for interrupt, wait 100ms between loops
+    void threadWatchChallengers()
+    {
+        try {
+            while (true)
+            {
+                Vec3i p = entityPos;
+                nearPlayers.clear();
+                List<? extends Player> players = this.level.getNearbyPlayers(
+                    TargetingConditions.forNonCombat().range(16),
+                    null,
+                    new AABB(
+                        p.getX() - 8, p.getY() - 8, p.getZ() - 8,
+                        p.getX() + 8, p.getY() + 8, p.getZ() + 8
+                    )
+                );
+                players.stream()
+                    .filter(p1 -> p1 instanceof ServerPlayer)
+                    .map(p1 -> (ServerPlayer) p1)
+                    .forEach(nearPlayers::add);
+                Thread.sleep(100); // Sleep for 100 milliseconds
+            }
+        } catch (InterruptedException e) {
+            // Thread was interrupted, exit the loop
+    }
+
+
+    }
+
+    public void buildChallenge() {
+        if (this.challengeRoom != null)
+            this.challengeRoom.loadStructure();
+    }
+
+    public void playerTakeChallenge(ManagedChallenger player)
+    {
+        if( player == null || player.getServerPlayer() == null) {
+            return;
+        }
+
+        if( nearPlayers.contains(player.getServerPlayer()) ) {
+            if (activePlayers.contains(player.getServerPlayer())) return;
+            activePlayers.add(player.getServerPlayer());
+            player.startChallenge(this);
+        }
+    }
+
+    public void playerEndChallenge(ManagedChallenger player) {
+
+    }
+
+    void shutdown() {
+        if (watchChallengersThread != null && watchChallengersThread.isAlive()) {
+            watchChallengersThread.interrupt();
+        }
+        if (challengeRoom != null) {
+            //challengeRoom.shutdown();
+        }
+        this.nearPlayers.clear();
+        this.activePlayers.clear();
+    }
+
     //** UTILITY
+    private static Vec3 toVec3(BlockPos pos) {
+        return ManagedTemple.toVec3(pos);
+    }
+
     public boolean isFullyLoaded() {
         return ManagedChunkUtility.isChunkFullyLoaded(level, this.templeId);
     }
@@ -82,13 +184,20 @@ public class ManagedTemple {
         return portalToChallenge != null;
     }
 
-    public boolean hasNearPlayer() {
+
+    public boolean playerInPortalRange()
+    {
         HBUtil.TripleInt source = new HBUtil.TripleInt(this.entityPos);
-        return this.level.hasNearbyAlivePlayer(source.x, source.y, source.z, 128);
+        boolean isClose = this.level.hasNearbyAlivePlayer(source.x, source.y, source.z, 128);
+        if (!isClose) {
+            if( this.watchChallengersThread != null && this.watchChallengersThread.isAlive())
+                this.watchChallengersThread.interrupt();
+            this.watchChallengersThread = null;
+        }
+
+        return isClose;
     }
 
-    public void buildChallenge() {
-        if (this.challengeRoom != null)
-            this.challengeRoom.loadStructure();
-    }
+
+
 }

@@ -81,7 +81,7 @@ dependencies {
     compileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 	
-	    implementation fg.deobf("net.blay09.mods:balm-forge:${balm_version}") {
+    implementation fg.deobf("net.blay09.mods:balm-forge:${balm_version}") {
         changing = true
     }
 
@@ -93,6 +93,7 @@ dependencies {
 
     implementation fg.deobf("curse.maven:immersive-portals-for-forge-${immptl_forge_projid}:${immptl_forge_fileid}")
     implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:${cloth_config_version_forge}")
+    implementation fg.deobf("curse.maven:corpse-${corpse_forge_projid}:${corpse_forge_fileid}")
 
 }
 

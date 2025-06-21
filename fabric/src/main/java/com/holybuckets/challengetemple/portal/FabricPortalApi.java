@@ -3,6 +3,7 @@ package com.holybuckets.challengetemple.portal;
 import com.holybuckets.foundation.GeneralConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -11,6 +12,7 @@ import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.api.PortalAPI.*;
 import qouteall.imm_ptl.core.portal.Portal;
 import qouteall.imm_ptl.core.portal.PortalManipulation;
+import qouteall.imm_ptl.core.teleportation.ServerTeleportationManager;
 
 public class FabricPortalApi implements PortalApi {
 
@@ -45,6 +47,10 @@ public class FabricPortalApi implements PortalApi {
 
         McHelper.spawnServerEntity(portal);
         return portal;
+    }
+
+    public void storeInventory(ServerPlayer player) {
+
     }
 
 }

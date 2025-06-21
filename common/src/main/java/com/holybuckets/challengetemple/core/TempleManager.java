@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.portal.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
@@ -7,6 +8,7 @@ import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
+import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -18,14 +20,16 @@ import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.holybuckets.foundation.HBUtil.LevelUtil;
+
 public class TempleManager {
 
     public static String CLASS_ID = "005";
 
-    private static Map<LevelAccessor, TempleManager> MANAGERS;
+    public static ServerLevel CHALLENGE_LEVEL;
+    static Map<LevelAccessor, TempleManager> MANAGERS;
 
     private final ServerLevel level;
-    private ServerLevel challengeLevel;
     private final PortalApi portalApi;
     private final GeneralConfig generalConfig;
 
@@ -45,6 +49,7 @@ public class TempleManager {
         reg.registerOnChunkLoad(TempleManager::onChunkLoad);
         reg.registerOnChunkUnload(TempleManager::onChunkUnload);
         reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, TempleManager::onServerTick120 );
+
         MANAGERS = new HashMap<>();
     }
 
@@ -67,15 +72,11 @@ public class TempleManager {
         temples.clear();
     }
 
-    public void setChallengeLevel(ServerLevel challengeLevel) {
-        this.challengeLevel = challengeLevel;
-        ChallengeRoom.CHALLENGE_LEVEL = challengeLevel;
-    }
-
     public static TempleManager get(Level level) {
         return MANAGERS.get(level);
     }
 
+    //** CORE
 
     /**
      * Description: 1. Finds all temples in the world
@@ -88,7 +89,7 @@ public class TempleManager {
         temples.values().stream()
             .filter(t -> t.isFullyLoaded() )
             .filter(t -> !t.hasPortal() )
-            .filter(t -> t.hasNearPlayer() )
+            .filter(t -> t.playerInPortalRange() )
             .forEach( this::handleBuildPortal );
     }
 
@@ -138,6 +139,7 @@ public class TempleManager {
         }
 
         BlockEntity entity = level.getBlockEntity(pos);
+        temple.startWatchChallengers();
         if( entity == null ) return;
         if( entity instanceof SimpleBlockEntity ) {
             SimpleBlockEntity be = (SimpleBlockEntity) entity;
@@ -149,22 +151,19 @@ public class TempleManager {
             be.setProperty("hasPortal", "true");
         }
 
-        Vec3 sourcePos = toVec3(temple.getPortalSourcePos());
-        Vec3 destination = toVec3( temple.getPortalDest() );
+        Vec3 sourcePos = HBUtil.BlockUtil.toVec3(temple.getPortalSourcePos());
+        Vec3 destination = HBUtil.BlockUtil.toVec3( temple.getPortalDest() );
         temple.portalToChallenge = portalApi.createPortal(P_WIDTH, P_HEIGHT, level,
-             this.challengeLevel, sourcePos, destination, PortalApi.Direction.SOUTH);
+             this.CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
 
-        temple.portalToHome = portalApi.createPortal(P_WIDTH, P_HEIGHT, this.challengeLevel,
+        temple.portalToHome = portalApi.createPortal(P_WIDTH, P_HEIGHT, this.CHALLENGE_LEVEL,
             level, destination, sourcePos, PortalApi.Direction.NORTH);
 
-        temple.buildChallenge();
+
 
     }
 
-    //BlockUtil
-    public Vec3 toVec3(BlockPos pos) {
-        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
-    }
+
 
     private void handleChunkLoaded(ChunkAccess c) {
         //LoggerProject.logInfo( "00500","Chunk loaded: " + c.getPos());
@@ -180,9 +179,29 @@ public class TempleManager {
         workerThreadBuildPortal();
     }
 
+    public static void onPlayerChangeDimension(PlayerChangedDimensionEvent event, ManagedChallenger managedChallenger)
+    {
+        Level dimFrom = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getFromDim() );
+        Level dimTo = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getToDim() );
+        LoggerProject.logDebug("005010", "Player changed dimension from " + dimFrom + " to " + dimTo);
+
+        if( dimFrom == CHALLENGE_LEVEL ) {
+            MANAGERS.get(dimTo).temples.values().forEach(m -> m.playerEndChallenge(managedChallenger));
+        } else if( dimTo == CHALLENGE_LEVEL ) {
+            MANAGERS.get(dimFrom).temples.values().forEach(m -> m.playerTakeChallenge(managedChallenger));
+        }
+
+    }
+
+    public void playerTakeChallenge(ManagedChallenger player) {
+
+    }
 
     public void shutdown() {
-        //nothing
+        LoggerProject.logInfo("005999", "Shutting down TempleManager for level: " + this.level);
+        temples.values().forEach(ManagedTemple::shutdown);
+        temples.clear();
+        MANAGERS.remove(this.level);
     }
 
 
@@ -207,6 +226,6 @@ public class TempleManager {
 
 
     public ServerLevel getChallengeLevel() {
-        return this.challengeLevel;
+        return this.CHALLENGE_LEVEL;
     }
 }

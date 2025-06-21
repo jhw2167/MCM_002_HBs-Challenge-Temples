@@ -39,6 +39,12 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="immersive_portals"
 mandatory=true
+versionRange="[${immptl_version_forge},)"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.${mod_id}]]
+modId="corpse-forge"
+mandatory=true
 versionRange="[3.0.7,)"
 ordering="AFTER"
 side="BOTH"

@@ -50,8 +50,11 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven { url "https://cursemaven.com" }
+        maven { url "https://api.modrinth.com/maven" }
         maven { url = 'https://maven.minecraftforge.net' }
+        repositories {
+            maven { url 'https://maven.nucleoid.xyz' } // You should have it
+        }
         maven {
             name 'Fabric'
             url 'https://maven.fabricmc.net/'
@@ -79,6 +82,33 @@ subprojects {
         maven { url 'https://maven.shedaniel.me' }
         maven { url 'https://maven.fabricmc.net/io/github/prospector/modmenu' }
         maven { url 'https://maven.terraformersmc.com/releases/' }
+
+        maven { url 'https://maven.nucleoid.xyz' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://api.modrinth.com/maven' }
+        maven { url 'https://jitpack.io' }
+        maven { url "https://maven.shedaniel.me/" }
+        maven {
+            name = "TerraformersMC"
+            url = "https://maven.terraformersmc.com/"
+        }
+
+        maven {
+            name = "Ladysnake Libs"
+            url = "https://maven.ladysnake.org/releases"
+        }
+
+        flatDir {
+            dirs './modsWithCompat'
+        }
+
+        maven {
+            name 'Gegy'
+            url 'https://maven.gegy.dev'
+        }
+
+        maven { url "https://maven.wispforest.io/releases" }
+
     }
 
     dependencies {
@@ -114,7 +144,9 @@ subprojects {
                 "description": project.description,
                 "balm_version": project.balm_version,
                 "balm_version_range": project.balm_version_range,
-                "foundation_version": project.foundation_version
+                "foundation_version": project.foundation_version,
+                "ugraves_version": project.ugraves_version,
+                "corpse_forge_version": project.corpse_forge_version,
         ]
 
         filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {

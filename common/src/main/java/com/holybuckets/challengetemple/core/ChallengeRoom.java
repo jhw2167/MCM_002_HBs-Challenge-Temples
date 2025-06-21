@@ -17,6 +17,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.*;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
+
 public class ChallengeRoom {
 
     private static final String CLASS_ID = "007"; // Class ID for logging purposes
@@ -27,13 +29,12 @@ public class ChallengeRoom {
     private StructureTemplate structureTemplate;
 
     //Statics
-    static ServerLevel CHALLENGE_LEVEL;
     static final int CHALLENGE_DIM_HEIGHT = 64;
 
     //Offset for structureBlock that constructs the start challenge_room
     private static Vec3i STRUCTURE_BLOCK_OFFSET = new Vec3i(0, CHALLENGE_DIM_HEIGHT+1 , 0);
     private static Vec3i[] STRUCTURE_BLOCK_PIECE_OFFSETS = {
-        new Vec3i(-1, -1, -1), // 00
+        new Vec3i(0, 0, 0), // 00
         new Vec3i(32, 0, 0), // 01
         new Vec3i(0, 0, 32), // 02
         new Vec3i(32, 0, 32), // 03
@@ -79,7 +80,7 @@ public class ChallengeRoom {
     }
 
     //lsit ids from 01 to 08
-    static final String[] ids = {"01", "02", "03", "04", "05", "06", "07", "08"};
+    static final String[] ids = {"00", "01", "02", "03", "04", "05", "06", "07", "08"};
     /**
      * Loads the physical structure in challenge_dimension by trigering all structure blocks
      * to generate.
@@ -91,7 +92,7 @@ public class ChallengeRoom {
         Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(id))];
         String msg = String.format("[%s] Loading structure with pos %s id: %s", this.chunkId, offset, id);
             LoggerProject.logDebug("007000", msg);
-            //this.generateStructure(id, false);
+            this.generateStructure(id, false);
         });
 
         return true;
@@ -121,6 +122,10 @@ public class ChallengeRoom {
         return new BlockPos(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ());
     }
 
+    public String getChallengeId() {
+        return this.challengeId;
+    }
+
     private static final StructurePlaceSettings TEMPLATE_SETTINGS = new StructurePlaceSettings()
         .setMirror(Mirror.NONE)
         .setRotation(Rotation.NONE)
@@ -144,7 +149,6 @@ public class ChallengeRoom {
         .setFinalizeEntities(true)
         .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK)
         .addProcessor(JigsawReplacementProcessor.INSTANCE);
-
 
 
 }

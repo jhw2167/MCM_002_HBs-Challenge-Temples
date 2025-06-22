@@ -1,4 +1,4 @@
-package com.holybuckets.challengetemple.externalapi;
+package com.holybuckets.challengetemple.portal;
 
 import eu.pb4.graves.grave.Grave;
 import eu.pb4.graves.grave.GraveManager;
@@ -25,7 +25,7 @@ import java.util.UUID;
 /**
  * API for managing player inventory snapshots using UniversalGraves functionality
  */
-public class FabricInventoryAPI {
+public class FabricInventoryAPI implements InventoryAPI {
     private static final Map<UUID, SnapshotData> playerSnapshots = new HashMap<>();
 
     private static class SnapshotData {

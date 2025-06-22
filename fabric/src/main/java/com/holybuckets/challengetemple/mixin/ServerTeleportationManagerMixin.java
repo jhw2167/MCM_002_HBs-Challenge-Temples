@@ -34,7 +34,6 @@ public class ServerTeleportationManagerMixin {
         Vec3 newEyePos,
         CallbackInfo ci
     ) {
-        System.out.println("TP!: ");
         if (player instanceof ServerPlayer)
         {
             ResourceKey<Level> fromDim = fromWorld.dimension();

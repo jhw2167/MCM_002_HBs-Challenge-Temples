@@ -1,21 +1,27 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.ChallengeTempleMain;
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.LoggerProject;
+import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
+import com.holybuckets.foundation.event.EventRegistrar;
+import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
+import org.antlr.v4.runtime.misc.MultiMap;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 
 import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
 
@@ -25,11 +31,15 @@ public class ChallengeRoom {
 
     private final String challengeId;
     private final String chunkId;
+    private boolean roomLoaded;
     private BlockEntity structureBlock;
     private StructureTemplate structureTemplate;
+    private List<BlockPos> graveyardPositions = new ArrayList<>(); // Maps player UUID to their grave position
 
     //Statics
     static final int CHALLENGE_DIM_HEIGHT = 64;
+    static final int MAX_GRAVES = 3;
+    static final Map<String, ChallengeRoom> ACTIVE_ROOMS = new HashMap<>(); // Maps chunkId to ChallengeRoom
 
     //Offset for structureBlock that constructs the start challenge_room
     private static Vec3i STRUCTURE_BLOCK_OFFSET = new Vec3i(0, CHALLENGE_DIM_HEIGHT+1 , 0);
@@ -49,6 +59,8 @@ public class ChallengeRoom {
     {
         this.chunkId = chunkId;
         this.challengeId = Challenges.chooseChallengeId(null);
+        this.roomLoaded = false;
+        ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
     }
 
 
@@ -86,8 +98,11 @@ public class ChallengeRoom {
      * to generate.
      * @return true if strcuture was loaded successfully, false if any issues where encountered
      */
-    public boolean loadStructure() {
+    boolean loadStructure()
+    {
+        if( this.roomLoaded ) return false;
 
+        this.roomLoaded = true;
         Arrays.stream(ids).forEach(id -> {
         Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(id))];
         String msg = String.format("[%s] Loading structure with pos %s id: %s", this.chunkId, offset, id);
@@ -96,6 +111,15 @@ public class ChallengeRoom {
         });
 
         return true;
+    }
+
+    /**
+     * Triggers a refresh of the structure by reloading all parts
+     * @return
+     */
+    boolean refreshStructure() {
+        this.roomLoaded = false;
+        return this.loadStructure();
     }
 
     //* MIXIN
@@ -149,6 +173,67 @@ public class ChallengeRoom {
         .setFinalizeEntities(true)
         .addProcessor(BlockIgnoreProcessor.STRUCTURE_BLOCK)
         .addProcessor(JigsawReplacementProcessor.INSTANCE);
+
+
+    private static final Vec3i GRAVEYARD_START_OFFSET = new Vec3i(-4, 1, 1);
+    private static final int GRVYRD_MAX_Z = 64; // max z position for graveyard, resets at 0
+    private static final int GRVYRD_MAX_X = 16; // max x position for graveyard, resets at -1
+    /**
+     * Adds a player grave to the "graveyar" in the challenge dimension where challenger
+     * items will be stored untl challenge is complete. moves in positive z axis until z > 64
+     * then resets at 0, x moves -1
+     * @param player
+     */
+    public BlockPos addGrave(ManagedChallenger player)
+    {
+        //setupt a while loop to wait for player to be in CHALLENGE_DIM
+        UUID playerId = player.getPlayer().getUUID();
+        BlockPos pos;
+
+        //if (pos == null) //dont want to create some new grave with empty items to overwrite old one
+        {
+            // Calculate new position for the grave
+            int z = this.graveyardPositions.size() / GRVYRD_MAX_Z;
+            int x = ((this.graveyardPositions.size() / GRVYRD_MAX_Z) % GRVYRD_MAX_X)*-1; // -1 to start at -1
+            if (z >= GRVYRD_MAX_Z) {
+                z = 0; // Reset z if it exceeds max
+                x--; // Move x back one step
+            }
+            pos = this.getWorldPos().offset(GRAVEYARD_START_OFFSET).offset(x, 0, z);
+            this.graveyardPositions.add(pos);
+        }
+
+        ChallengeTempleMain.INSTANCE.inventoryApi.createGrave(
+            player.getServerPlayer(),
+            pos
+        );
+        /*
+        ChallengeTempleMain.INSTANCE.inventoryApi.clearInventory(
+            managedChallenger.getServerPlayer()
+        );
+        */
+        return pos;
+    }
+
+
+    //** STATICS
+    public static void init(EventRegistrar reg) {
+        // Register the static event handler
+        reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
+    }
+
+    private static void on120TicksClearGraves(ServerTickEvent event) {
+        // Clear graves every 120 ticks
+        int totalGraves = ACTIVE_ROOMS.values().stream()
+            .mapToInt(room -> room.graveyardPositions.size())
+            .sum();
+
+        if (totalGraves > MAX_GRAVES) {
+            MinecraftServer server = GeneralConfig.getInstance().getServer();
+            ChallengeTempleMain.INSTANCE.inventoryApi.clearUnusedGraves(server);
+        }
+    }
+
 
 
 }

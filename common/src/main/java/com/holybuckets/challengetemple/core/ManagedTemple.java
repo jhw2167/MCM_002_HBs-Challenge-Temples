@@ -156,8 +156,14 @@ public class ManagedTemple {
         }
     }
 
-    public void playerEndChallenge(ManagedChallenger player) {
-
+    public void playerEndChallenge(ManagedChallenger player)
+    {
+        activePlayers.remove(player.getServerPlayer());
+        player.endChallenge(this);
+        //restart thread
+        if (watchChallengersThread == null || !watchChallengersThread.isAlive()) {
+            startWatchChallengers();
+        }
     }
 
     void shutdown() {

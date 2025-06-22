@@ -1,7 +1,7 @@
 package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.LoggerProject;
-import com.holybuckets.challengetemple.portal.PortalApi;
+import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
@@ -49,6 +49,9 @@ public class TempleManager {
         reg.registerOnChunkLoad(TempleManager::onChunkLoad);
         reg.registerOnChunkUnload(TempleManager::onChunkUnload);
         reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, TempleManager::onServerTick120 );
+
+        //ManagedTemple.init();
+        ChallengeRoom.init(reg);
 
         MANAGERS = new HashMap<>();
     }

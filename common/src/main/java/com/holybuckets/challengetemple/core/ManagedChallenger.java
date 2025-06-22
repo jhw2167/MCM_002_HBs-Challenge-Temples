@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.ChallengeTempleMain;
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.console.Messager;
@@ -7,13 +8,16 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.modelInterface.IManagedPlayer;
 import com.holybuckets.foundation.player.ManagedPlayer;
 import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
 import static com.holybuckets.foundation.player.ManagedPlayer.registerManagedPlayerData;
 
 public class ManagedChallenger implements IManagedPlayer {
@@ -23,6 +27,11 @@ public class ManagedChallenger implements IManagedPlayer {
     static final Map<Player, ManagedChallenger> CHALLENGERS = new ConcurrentHashMap<>();
 
     Player p;
+    final LinkedHashSet<String> challengesTaken;
+    final LinkedHashSet<String> templesEntered;
+    final LinkedHashSet<String> challengesComplete;
+    BlockPos lastGravePos;  //last position of grave where items were stored
+
     static {
         registerManagedPlayerData(
                 ManagedChallenger.class,
@@ -32,11 +41,13 @@ public class ManagedChallenger implements IManagedPlayer {
 
     public ManagedChallenger(Player player) {
         this.p = player;
+        this.challengesTaken = new LinkedHashSet<>();
+        this.templesEntered = new LinkedHashSet<>();
+        this.challengesComplete = new LinkedHashSet<>();
     }
 
     public static void init(EventRegistrar reg) {
         reg.registerOnPlayerChangedDimension(ManagedChallenger::onPlayerChangeDimension);
-        reg.registerOnBreakBlock( arg -> System.out.println("breakBlock"));
     }
 
     //** CORE
@@ -51,17 +62,65 @@ public class ManagedChallenger implements IManagedPlayer {
     public void startChallenge(ManagedTemple managedTemple)
     {
         //1. Message Player
-        String msg = String.format("Beginning challenge: %s ,id: %s ",
-            "<TITLE>",
-            managedTemple.getChallengeRoom().getChallengeId()
+        String msg = String.format("%s started challenge: [%s] %s ",
+            p.getDisplayName().getString(),
+            managedTemple.getChallengeRoom().getChallengeId(),
+            "<TITLE>"
         );
         LoggerProject.logDebug("010012", msg);
         Messager.getInstance().sendChat( (ServerPlayer) p, msg );
 
         //2. Clear Inventory
+        new Thread(() -> challengerClearInventory(managedTemple)).start();
 
         //3. Set player spawn to inside the temple
 
+    }
+
+        private void challengerClearInventory(ManagedTemple managedTemple)
+        {
+
+            //1. wait until player is in challegne dimension
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                return;
+            }
+
+            if (p.level() != CHALLENGE_LEVEL) {
+                LoggerProject.logDebug("000000", "Player in dimension " + p.level());
+            }
+
+
+            lastGravePos = managedTemple.getChallengeRoom().addGrave(this);
+
+            //2. Clear the inventory multiple times, protecting against cheese
+            final int TOTAL_CLEARS = 10;
+            for (int i = 0; i < TOTAL_CLEARS; i++) {
+                LoggerProject.logDebug("010013", "Clearing inventory: " + (i + 1) + "/" + TOTAL_CLEARS);
+                p.getInventory().
+                try {
+                    Thread.sleep(100); // wait a second before next clear
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+
+            //3. Clear items on the ground around the player
+
+            //4. Collect data
+            challengesTaken.add(managedTemple.getChallengeRoom().getChallengeId());
+            templesEntered.add(managedTemple.getTempleId());
+        }
+
+    public void endChallenge(ManagedTemple managedTemple) {
+        //2. Restore inventory
+        ChallengeTempleMain.INSTANCE.inventoryApi.returnInventory((ServerPlayer) p, lastGravePos);
+    }
+
+    public void completedChallenge(ManagedTemple managedTemple) {
+        challengesComplete.add(managedTemple.getChallengeRoom().getChallengeId());
+        this.endChallenge(managedTemple);
     }
 
     //** EVENTS

@@ -2,7 +2,8 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.core.ManagedChallenger;
 import com.holybuckets.challengetemple.core.TempleManager;
-import com.holybuckets.challengetemple.portal.PortalApi;
+import com.holybuckets.challengetemple.externalapi.InventoryApi;
+import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
@@ -25,6 +26,7 @@ public class ChallengeTempleMain {
     public static ChallengeTempleMain INSTANCE;
 
     PortalApi portalApi;
+    public InventoryApi inventoryApi;
     TempleManager templeManager;
     ServerLevel challengeDimension;
 
@@ -40,9 +42,14 @@ public class ChallengeTempleMain {
     {
 
         this.portalApi = (PortalApi) Balm.platformProxy()
-            .withFabric("com.holybuckets.challengetemple.portal.FabricPortalApi")
-            .withForge("com.holybuckets.challengetemple.portal.ForgePortalApi")
+            .withFabric("com.holybuckets.challengetemple.externalapi.FabricPortalApi")
+            .withForge("com.holybuckets.challengetemple.externalapi.ForgePortalApi")
             .build();
+
+        this.inventoryApi = (InventoryApi) Balm.platformProxy()
+        .withFabric("com.holybuckets.challengetemple.externalapi.FabricInventoryApi")
+        .withForge("com.holybuckets.challengetemple.externalapi.ForgeInventoryApi")
+        .build();
 
             EventRegistrar registrar = EventRegistrar.getInstance();
             TempleManager.init(registrar);

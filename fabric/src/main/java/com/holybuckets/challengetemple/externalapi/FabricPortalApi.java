@@ -1,13 +1,13 @@
-package com.holybuckets.challengetemple.portal;
+package com.holybuckets.challengetemple.externalapi;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
-import qouteall.imm_ptl.core.platform_specific.IPRegistry;
 
-public class ForgePortalApi implements PortalApi {
+public class FabricPortalApi implements PortalApi {
 
 
     public Entity createPortal(double width, double height, Level fromLevel, Level toLevel,
@@ -16,7 +16,7 @@ public class ForgePortalApi implements PortalApi {
         if(toLevel == null) return null;
         if(fromLevel == null) return null;
 
-        Portal portal = new Portal(IPRegistry.PORTAL.get(), fromLevel);
+        Portal portal = new Portal(Portal.entityType, fromLevel);
         if (portal == null) return null;
 
         portal.setPosRaw(sourcePos.x, sourcePos.y, sourcePos.z);

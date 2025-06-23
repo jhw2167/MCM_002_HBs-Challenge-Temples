@@ -179,12 +179,14 @@ public class TempleManager {
             level, destination, sourcePos, PortalApi.Direction.NORTH);
     }
 
-    public static void handlePlayerJoinedInTemple( ServerPlayer p, Level templeLevel, String id )
+    public static ManagedTemple handlePlayerJoinedInTemple( ServerPlayer p, Level templeLevel, String id )
     {
         TempleManager m = MANAGERS.get(templeLevel);
         if( m != null ) {
             m.temples.get(id).playerJoinedInChallenge(p);
+            return m.temples.get(id);
         }
+        return null;
     }
 
 

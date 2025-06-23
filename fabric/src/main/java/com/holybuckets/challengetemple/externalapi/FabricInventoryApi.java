@@ -17,7 +17,6 @@ import net.minecraft.server.level.ServerPlayer;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 
@@ -88,7 +87,7 @@ public class FabricInventoryApi implements InventoryApi {
             // Add grave to manager and clear player inventory
             //create anonymous runnable with above code
             GravesMod.DO_ON_NEXT_TICK.add(() -> {
-                level.setBlock(position, Blocks.AIR.defaultBlockState(), 3);
+                level.setBlock(position, GraveBlock.INSTANCE.defaultBlockState(), 3);
                 BlockEntity entity = level.getBlockEntity(position);
                 if (entity instanceof GraveBlockEntity graveBlockEntity) {
                     GraveManager.INSTANCE.add(grave);

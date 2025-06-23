@@ -51,9 +51,11 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven { url "https://api.modrinth.com/maven" }
-        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url 'https://maven.minecraftforge.net' }
+        maven { url 'https://cursemaven.com' }
+
         repositories {
-            maven { url 'https://maven.nucleoid.xyz' } // You should have it
+            maven { url 'https://maven.nucleoid.xyz' }
         }
         maven {
             name 'Fabric'
@@ -146,6 +148,7 @@ subprojects {
                 "balm_version_range": project.balm_version_range,
                 "foundation_version": project.foundation_version,
                 "ugraves_version": project.ugraves_version,
+                "immptl_version_forge": project.immptl_version_forge,
                 "corpse_forge_version": project.corpse_forge_version,
         ]
 

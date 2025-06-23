@@ -10,16 +10,16 @@ import java.util.Map;
 /**
  * Forge implementation of inventory management API
  */
-public class ForgeInventoryAPI implements InventoryApi {
+public class ForgeInventoryApi implements InventoryApi {
 
-    private static ForgeInventoryAPI INSTANCE;
+    private static ForgeInventoryApi INSTANCE;
 
     @Override
     public void setInstance(InventoryApi ai) {
-        INSTANCE = (ForgeInventoryAPI) ai;
+        INSTANCE = (ForgeInventoryApi) ai;
     }
 
-    public static ForgeInventoryAPI getInstance() {
+    public static ForgeInventoryApi getInstance() {
         return INSTANCE;
     }
 

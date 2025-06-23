@@ -43,8 +43,8 @@ versionRange="[${immptl_version_forge},)"
 ordering="AFTER"
 side="BOTH"
 [[dependencies.${mod_id}]]
-modId="corpse-forge"
+modId="corpse"
 mandatory=true
-versionRange="[3.0.7,)"
+versionRange="[${corpse_forge_version},)"
 ordering="AFTER"
 side="BOTH"

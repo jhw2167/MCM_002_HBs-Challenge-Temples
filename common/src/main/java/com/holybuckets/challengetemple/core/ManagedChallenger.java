@@ -174,14 +174,16 @@ public class ManagedChallenger implements IManagedPlayer {
     @Override
     public void handlePlayerJoin(Player player) {
         if(p == player && this.activeTempleInfo != null)
-            TempleManager.handlePlayerJoinedInTemple( (ServerPlayer) p,
+            this.activeTemple = TempleManager.handlePlayerJoinedInTemple( (ServerPlayer) p,
                  activeTempleInfo.level, activeTempleInfo.templeId );
     }
 
     @Override
     public void handlePlayerLeave(Player player) {
-        if(p == player)
+        if(p == player && this.activeTemple != null) {
             this.activeTemple.onPlayerLeave( (ServerPlayer) player );
+        }
+
     }
 
     @Override
@@ -294,11 +296,11 @@ public class ManagedChallenger implements IManagedPlayer {
         }
 
         public String serialize() {
-            return templeId + ":" + HBUtil.LevelUtil.toLevelId(level);
+            return templeId + "&" + HBUtil.LevelUtil.toLevelId(level);
         }
 
         public static ActiveTempleInfo deserialize(String data) {
-            String[] parts = data.split(":");
+            String[] parts = data.split("&");
             if (parts.length != 2) return null;
             return new ActiveTempleInfo(parts[0], parts[1]);
         }

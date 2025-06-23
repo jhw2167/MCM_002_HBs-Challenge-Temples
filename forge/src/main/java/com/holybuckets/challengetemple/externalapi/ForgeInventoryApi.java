@@ -3,7 +3,7 @@ package com.holybuckets.challengetemple.externalapi;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
-
+import  de.maxhenkel.corpse.*;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,8 @@ public class ForgeInventoryApi implements InventoryApi {
     @Override
     public boolean createGrave(ServerPlayer player, BlockPos position) {
         // TODO: Implement with appropriate Forge grave mod
-        return false;
+
+        return true;
     }
 
     @Override

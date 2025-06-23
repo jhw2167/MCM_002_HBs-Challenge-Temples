@@ -4,10 +4,16 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * API for managing player inventory snapshots
  */
 public interface InventoryApi {
+
+    void setInstance(InventoryApi ai);
+
     /**
      * Creates a grave at the specified location containing the player's current inventory
      *
@@ -27,4 +33,11 @@ public interface InventoryApi {
 
     void clearUnusedGraves(MinecraftServer server);
 
+    Map<ServerPlayer, BlockPos> getGravePos();
+
+    /**
+     * Sets the positions of protected graves that should not be cleared
+     * @param positions List of BlockPos representing protected grave locations
+     */
+    void setProtectedGravePos(List<BlockPos> positions);
 }

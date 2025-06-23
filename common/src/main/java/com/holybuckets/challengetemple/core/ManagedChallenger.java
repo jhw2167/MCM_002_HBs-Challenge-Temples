@@ -9,9 +9,11 @@ import com.holybuckets.foundation.modelInterface.IManagedPlayer;
 import com.holybuckets.foundation.player.ManagedPlayer;
 import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -30,6 +32,8 @@ public class ManagedChallenger implements IManagedPlayer {
     final LinkedHashSet<String> challengesTaken;
     final LinkedHashSet<String> templesEntered;
     final LinkedHashSet<String> challengesComplete;
+    ManagedTemple activeTemple;
+    ActiveTempleInfo activeTempleInfo; //serialize temple data
     BlockPos lastGravePos;  //last position of grave where items were stored
 
     static {
@@ -61,6 +65,9 @@ public class ManagedChallenger implements IManagedPlayer {
      */
     public void startChallenge(ManagedTemple managedTemple)
     {
+        this.activeTemple = managedTemple;
+        this.activeTempleInfo = new ActiveTempleInfo( managedTemple );
+
         //1. Message Player
         String msg = String.format("%s started challenge: [%s] %s ",
             p.getDisplayName().getString(),
@@ -98,9 +105,9 @@ public class ManagedChallenger implements IManagedPlayer {
             final int TOTAL_CLEARS = 10;
             for (int i = 0; i < TOTAL_CLEARS; i++) {
                 LoggerProject.logDebug("010013", "Clearing inventory: " + (i + 1) + "/" + TOTAL_CLEARS);
-                p.getInventory().
+                ((ServerPlayer) p).getInventory().clearContent();
                 try {
-                    Thread.sleep(100); // wait a second before next clear
+                    Thread.sleep(250); // wait a second before next clear
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -116,6 +123,8 @@ public class ManagedChallenger implements IManagedPlayer {
     public void endChallenge(ManagedTemple managedTemple) {
         //2. Restore inventory
         ChallengeTempleMain.INSTANCE.inventoryApi.returnInventory((ServerPlayer) p, lastGravePos);
+        this.activeTemple = null;
+        this.activeTempleInfo = null;
     }
 
     public void completedChallenge(ManagedTemple managedTemple) {
@@ -125,13 +134,15 @@ public class ManagedChallenger implements IManagedPlayer {
 
     //** EVENTS
     public static void onPlayerChangeDimension(PlayerChangedDimensionEvent event) {
-        LoggerProject.logDebug(
-            "010011",
-            "onPlayerChangeDimension"
-        );
+        LoggerProject.logDebug("010011", "onPlayerChangeDimension " + event.getPlayer().getDisplayName());
 
-        TempleManager.onPlayerChangeDimension(event,
-            CHALLENGERS.get(event.getPlayer()));
+    try {
+        TempleManager.onPlayerChangeDimension(event, CHALLENGERS.get(event.getPlayer()));
+    } catch (Exception e) {
+        LoggerProject.logError("010011", "Error handling player change dimension leaving challenge temple: " + e.getMessage());
+        e.printStackTrace();
+    }
+
     }
 
 
@@ -162,21 +173,15 @@ public class ManagedChallenger implements IManagedPlayer {
 
     @Override
     public void handlePlayerJoin(Player player) {
+        if(p == player && this.activeTempleInfo != null)
+            TempleManager.handlePlayerJoinedInTemple( (ServerPlayer) p,
+                 activeTempleInfo.level, activeTempleInfo.templeId );
     }
 
     @Override
     public void handlePlayerLeave(Player player) {
-
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        return new CompoundTag();
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag compoundTag) {
-
+        if(p == player)
+            this.activeTemple.onPlayerLeave( (ServerPlayer) player );
     }
 
     @Override
@@ -198,6 +203,105 @@ public class ManagedChallenger implements IManagedPlayer {
 
     public ServerPlayer getServerPlayer() {
         return (ServerPlayer) p;
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        //serialize lastGravePos and challenges taken
+        CompoundTag compoundTag = new CompoundTag();
+        if(lastGravePos != null) {
+            String pos = HBUtil.BlockUtil.positionToString(lastGravePos);
+            compoundTag.putString("lastGravePos", pos);
+        }
+
+        if(this.activeTempleInfo != null) {
+            compoundTag.putString("activeTempleInfo", this.activeTempleInfo.serialize());
+        }
+
+        String challengesTaken = "";
+        if( !challengesTaken.isEmpty())
+            challengesTaken = String.join("&", challengesTaken);
+        compoundTag.putString("challengesTaken", challengesTaken);
+
+        String challengesComplete = "";
+        if( !challengesComplete.isEmpty())
+            challengesComplete = String.join("&", challengesComplete);
+        compoundTag.putString("challengesComplete", challengesComplete);
+
+
+        return compoundTag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag compoundTag)
+    {
+        //deserialize the data
+        if (compoundTag.contains("lastGravePos"))
+        {
+            String posString = compoundTag.getString("lastGravePos");
+            Vec3i pos = HBUtil.BlockUtil.stringToBlockPos(posString);
+            this.lastGravePos = (pos != null) ? new BlockPos(pos) : null;
+        }
+
+        if (compoundTag.contains("activeTempleInfo")) {
+            String activeTempleData = compoundTag.getString("activeTempleInfo");
+            this.activeTempleInfo = ActiveTempleInfo.deserialize(activeTempleData);
+        }
+
+        if (compoundTag.contains("challengesTaken"))
+        {
+            String challenges = compoundTag.getString("challengesTaken");
+            if (!challenges.isEmpty()) {
+                String[] challengesArray = challenges.split("&");
+                for (String challenge : challengesArray) {
+                    this.challengesTaken.add(challenge);
+                }
+            }
+        }
+
+        if (compoundTag.contains("challengesComplete"))
+        {
+            String challenges = compoundTag.getString("challengesComplete");
+            if (!challenges.isEmpty()) {
+                String[] challengesArray = challenges.split("&");
+                for (String challenge : challengesArray) {
+                    this.challengesComplete.add(challenge);
+                }
+            }
+        }
+
+
+    }
+
+    //write a private class ActiveTempleInfo that contains templeId and levelId both as strings
+    //they support deserialize and serialize operations to and from string
+    private static class ActiveTempleInfo {
+        private String templeId;
+        private Level level;
+
+        public ActiveTempleInfo(String templeId, Level level) {
+            this.templeId = templeId;
+            this.level = level;
+        }
+
+        public ActiveTempleInfo(String templeId, String levelId) {
+            this(templeId, HBUtil.LevelUtil.toLevel(HBUtil.LevelUtil.LevelNameSpace.SERVER, levelId));
+        }
+
+        public ActiveTempleInfo(ManagedTemple temple) {
+            this.templeId = temple.getTempleId();
+            this.level = temple.getLevel();
+        }
+
+        public String serialize() {
+            return templeId + ":" + HBUtil.LevelUtil.toLevelId(level);
+        }
+
+        public static ActiveTempleInfo deserialize(String data) {
+            String[] parts = data.split(":");
+            if (parts.length != 2) return null;
+            return new ActiveTempleInfo(parts[0], parts[1]);
+        }
     }
 
 }

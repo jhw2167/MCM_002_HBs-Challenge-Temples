@@ -50,6 +50,7 @@ public class ChallengeTempleMain {
         .withFabric("com.holybuckets.challengetemple.externalapi.FabricInventoryApi")
         .withForge("com.holybuckets.challengetemple.externalapi.ForgeInventoryApi")
         .build();
+        inventoryApi.setInstance(inventoryApi);
 
             EventRegistrar registrar = EventRegistrar.getInstance();
             TempleManager.init(registrar);
@@ -73,7 +74,7 @@ public class ChallengeTempleMain {
             this.templeManager = new TempleManager( (ServerLevel) level, portalApi);
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             this.challengeDimension = (ServerLevel) level;
-            TempleManager.CHALLENGE_LEVEL = (ServerLevel) level;
+            TempleManager.setChallengeLevel( (ServerLevel) level);
         }
     }
 

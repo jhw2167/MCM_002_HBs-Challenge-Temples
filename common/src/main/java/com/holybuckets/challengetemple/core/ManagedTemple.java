@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -43,7 +44,11 @@ public class ManagedTemple {
     private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 1);
     private static final int CHALLENGE_DIM_HEIGHT = 64;
 
-
+    /**
+     * MUST RECORD AND PERSIST WHAT CHALLENGE WAS ATTACHED TO IT
+     * @param level
+     * @param pos
+     */
     public ManagedTemple(Level level, BlockPos pos) {
         this.level = level;
         this.entityPos = pos;
@@ -154,28 +159,31 @@ public class ManagedTemple {
             activePlayers.add(player.getServerPlayer());
             player.startChallenge(this);
         }
+
+        this.challengeRoom.setActive( true );
+    }
+
+    public void playerJoinedInChallenge(ServerPlayer p) {
+        nearPlayers.add(p);
+        activePlayers.add(p);
+        this.challengeRoom.setActive( true );
     }
 
     public void playerEndChallenge(ManagedChallenger player)
     {
-        activePlayers.remove(player.getServerPlayer());
+        boolean containedPlayer = activePlayers.remove(player.getServerPlayer());
+        if(!containedPlayer) return;
+        if( activePlayers.isEmpty() ) {
+            this.challengeRoom.setActive( false );
+        }
         player.endChallenge(this);
-        //restart thread
+        this.challengeRoom.removeGravePos(player.lastGravePos);
+
         if (watchChallengersThread == null || !watchChallengersThread.isAlive()) {
             startWatchChallengers();
         }
     }
 
-    void shutdown() {
-        if (watchChallengersThread != null && watchChallengersThread.isAlive()) {
-            watchChallengersThread.interrupt();
-        }
-        if (challengeRoom != null) {
-            //challengeRoom.shutdown();
-        }
-        this.nearPlayers.clear();
-        this.activePlayers.clear();
-    }
 
     //** UTILITY
     private static Vec3 toVec3(BlockPos pos) {
@@ -204,6 +212,23 @@ public class ManagedTemple {
         return isClose;
     }
 
+
+    //** EVENTS
+    public void onPlayerLeave(ServerPlayer p) {
+        if (p == null) return;
+        this.activePlayers.remove(p);
+    }
+
+    void shutdown() {
+        if (watchChallengersThread != null && watchChallengersThread.isAlive()) {
+            watchChallengersThread.interrupt();
+        }
+        if (challengeRoom != null) {
+            //challengeRoom.shutdown();
+        }
+        this.nearPlayers.clear();
+        this.activePlayers.clear();
+    }
 
 
 }

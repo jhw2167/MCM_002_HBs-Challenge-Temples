@@ -4,10 +4,25 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Forge implementation of inventory management API
  */
 public class ForgeInventoryAPI implements InventoryApi {
+
+    private static ForgeInventoryAPI INSTANCE;
+
+    @Override
+    public void setInstance(InventoryApi ai) {
+        INSTANCE = (ForgeInventoryAPI) ai;
+    }
+
+    public static ForgeInventoryAPI getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public boolean createGrave(ServerPlayer player, BlockPos position) {
         // TODO: Implement with appropriate Forge grave mod
@@ -26,18 +41,14 @@ public class ForgeInventoryAPI implements InventoryApi {
     }
 
     @Override
-    public void clearInventory(ServerPlayer player) {
-        player.getInventory().clearContent();
+    public Map<ServerPlayer, BlockPos> getGravePos() {
+        return Map.of();
     }
 
     @Override
-    public long getSnapshotTimestamp(ServerPlayer player) {
-        // TODO: Implement snapshot timestamp tracking
-        return -1;
+    public void setProtectedGravePos(List<BlockPos> positions) {
+
     }
 
-    @Override
-    public void removeSnapshot(ServerPlayer player) {
-        // TODO: Implement snapshot removal
-    }
+
 }

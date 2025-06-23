@@ -13,7 +13,6 @@ import eu.pb4.graves.registry.GraveBlock;
 import eu.pb4.graves.registry.GraveBlockEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.server.level.ServerPlayer;
 
 import net.minecraft.network.chat.Component;
@@ -35,10 +34,11 @@ public class FabricInventoryApi implements InventoryApi {
     private final Map<ServerPlayer, GraveBlockEntity> playerGraves = new HashMap<>();
     private final List<GraveBlockEntity> allGraves = new LinkedList<>();
 
+    @Override
+    public void setInstance(InventoryApi ai) {
+        INSTANCE = (FabricInventoryApi) ai;
+    }
     public static FabricInventoryApi getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new FabricInventoryApi();
-        }
         return INSTANCE;
     }
 
@@ -88,10 +88,11 @@ public class FabricInventoryApi implements InventoryApi {
             // Add grave to manager and clear player inventory
             //create anonymous runnable with above code
             GravesMod.DO_ON_NEXT_TICK.add(() -> {
-                level.setBlock(position, GraveBlock.INSTANCE.defaultBlockState(), 3);
+                level.setBlock(position, Blocks.AIR.defaultBlockState(), 3);
                 BlockEntity entity = level.getBlockEntity(position);
                 if (entity instanceof GraveBlockEntity graveBlockEntity) {
-                    graveBlockEntity.setGrave(grave, Blocks.AIR.defaultBlockState());
+                    GraveManager.INSTANCE.add(grave);
+                    graveBlockEntity.setGrave(grave, GraveBlock.INSTANCE.defaultBlockState());
                     entity.setChanged();
                     playerGraves.put(player, graveBlockEntity);
                     allGraves.add(graveBlockEntity);
@@ -119,6 +120,7 @@ public class FabricInventoryApi implements InventoryApi {
     public boolean returnInventory(ServerPlayer player, BlockPos gravePos) {
         GraveBlockEntity graveEntity = playerGraves.get(player);
         if (graveEntity == null) {
+            if( gravePos == null ) return false;
             graveEntity = (GraveBlockEntity) player.serverLevel().getBlockEntity(gravePos);
         }
         if (graveEntity == null || graveEntity.getGrave() == null)
@@ -151,7 +153,9 @@ public class FabricInventoryApi implements InventoryApi {
      * @param server
      */
     @Override
-    public void clearUnusedGraves(MinecraftServer server) {
+    public void clearUnusedGraves(MinecraftServer server)
+    {
+    /*
         Set<GraveBlockEntity> existingGraves = playerGraves.values().stream().collect(Collectors.toSet());
         allGraves.removeIf(grave -> {
             if (!existingGraves.contains(grave)) {
@@ -161,11 +165,24 @@ public class FabricInventoryApi implements InventoryApi {
             }
             return false;
         });
+    */
+    }
+
+    @Override
+    public Map<ServerPlayer, BlockPos> getGravePos() {
+        return playerGraves.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getBlockPos()));
+    }
+
+    @Override
+    public void setProtectedGravePos(List<BlockPos> positions) {
 
     }
 
+    //Utility method to treate graves I am using as distinct from other graves in the mod
     public boolean hasGrave(Grave grave) {
         return allGraves.stream()
                 .anyMatch(graveBlockEntity -> graveBlockEntity.getGrave().equals(grave));
     }
+
 }

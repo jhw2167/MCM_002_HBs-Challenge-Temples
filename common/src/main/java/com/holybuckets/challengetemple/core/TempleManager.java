@@ -11,6 +11,8 @@ import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
 import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,7 +28,7 @@ public class TempleManager {
 
     public static String CLASS_ID = "005";
 
-    public static ServerLevel CHALLENGE_LEVEL;
+    static ServerLevel CHALLENGE_LEVEL;
     static Map<LevelAccessor, TempleManager> MANAGERS;
 
     private final ServerLevel level;
@@ -43,6 +45,7 @@ public class TempleManager {
 
         this.temples = new HashMap<>();
         MANAGERS.put(level, this);
+        this.load();
     }
 
     public static void init(EventRegistrar reg) {
@@ -54,6 +57,10 @@ public class TempleManager {
         ChallengeRoom.init(reg);
 
         MANAGERS = new HashMap<>();
+    }
+
+    public void load() {
+        LoggerProject.logInfo("005000", "Loading TempleManager for level: " + this.level);
     }
 
     //** UTILITY
@@ -77,6 +84,15 @@ public class TempleManager {
 
     public static TempleManager get(Level level) {
         return MANAGERS.get(level);
+    }
+
+    public ServerLevel getChallengeLevel() {
+        return this.CHALLENGE_LEVEL;
+    }
+
+    public static void setChallengeLevel(ServerLevel challengeLevel) {
+        CHALLENGE_LEVEL = challengeLevel;
+        ChallengeRoom.load();
     }
 
     //** CORE
@@ -161,11 +177,15 @@ public class TempleManager {
 
         temple.portalToHome = portalApi.createPortal(P_WIDTH, P_HEIGHT, this.CHALLENGE_LEVEL,
             level, destination, sourcePos, PortalApi.Direction.NORTH);
-
-
-
     }
 
+    public static void handlePlayerJoinedInTemple( ServerPlayer p, Level templeLevel, String id )
+    {
+        TempleManager m = MANAGERS.get(templeLevel);
+        if( m != null ) {
+            m.temples.get(id).playerJoinedInChallenge(p);
+        }
+    }
 
 
     private void handleChunkLoaded(ChunkAccess c) {
@@ -182,6 +202,8 @@ public class TempleManager {
         workerThreadBuildPortal();
     }
 
+
+    //* EVENTS
     public static void onPlayerChangeDimension(PlayerChangedDimensionEvent event, ManagedChallenger managedChallenger)
     {
         Level dimFrom = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getFromDim() );
@@ -196,19 +218,7 @@ public class TempleManager {
 
     }
 
-    public void playerTakeChallenge(ManagedChallenger player) {
 
-    }
-
-    public void shutdown() {
-        LoggerProject.logInfo("005999", "Shutting down TempleManager for level: " + this.level);
-        temples.values().forEach(ManagedTemple::shutdown);
-        temples.clear();
-        MANAGERS.remove(this.level);
-    }
-
-
-    //* EVENTS
     private static void onChunkLoad(ChunkLoadingEvent.Load event) {
         TempleManager m = MANAGERS.get(event.getLevel());
         if (m != null) {
@@ -228,7 +238,18 @@ public class TempleManager {
     }
 
 
-    public ServerLevel getChallengeLevel() {
-        return this.CHALLENGE_LEVEL;
+    public static void onPlayerLeave(Player p) {
+
     }
+
+    public void shutdown() {
+        LoggerProject.logInfo("005999", "Shutting down TempleManager for level: " + this.level);
+        temples.values().forEach(ManagedTemple::shutdown);
+        temples.clear();
+
+        ChallengeRoom.shutdown();
+        MANAGERS.remove(this.level);
+    }
+
+
 }

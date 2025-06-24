@@ -1,6 +1,8 @@
 package com.holybuckets.challengetemple.externalapi;
 
+import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 
@@ -12,6 +14,8 @@ import java.util.Map;
  */
 public interface InventoryApi {
 
+
+    void setChallengeLevel(ServerLevel level);
     void setInstance(InventoryApi ai);
 
     /**

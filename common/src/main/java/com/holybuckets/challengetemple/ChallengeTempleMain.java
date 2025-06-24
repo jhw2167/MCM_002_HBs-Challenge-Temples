@@ -75,6 +75,7 @@ public class ChallengeTempleMain {
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             this.challengeDimension = (ServerLevel) level;
             TempleManager.setChallengeLevel( (ServerLevel) level);
+            this.inventoryApi.setChallengeLevel((ServerLevel) level);
         }
     }
 

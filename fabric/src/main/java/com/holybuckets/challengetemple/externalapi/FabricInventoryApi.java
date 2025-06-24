@@ -1,6 +1,7 @@
 package com.holybuckets.challengetemple.externalapi;
 
 import com.holybuckets.challengetemple.LoggerProject;
+import com.holybuckets.foundation.GeneralConfig;
 import eu.pb4.graves.GravesApi;
 import eu.pb4.graves.GravesMod;
 import eu.pb4.graves.grave.Grave;
@@ -32,6 +33,12 @@ public class FabricInventoryApi implements InventoryApi {
 
     private final Map<ServerPlayer, GraveBlockEntity> playerGraves = new HashMap<>();
     private final List<GraveBlockEntity> allGraves = new LinkedList<>();
+    private static ServerLevel CHALLENGE_LEVEL;
+
+    @Override
+    public void setChallengeLevel(ServerLevel level) {
+        CHALLENGE_LEVEL = level;
+    }
 
     @Override
     public void setInstance(InventoryApi ai) {
@@ -64,7 +71,7 @@ public class FabricInventoryApi implements InventoryApi {
             }
 
             // Create new grave with collected items
-            ServerLevel level = player.serverLevel();
+            ServerLevel level = CHALLENGE_LEVEL;
             Grave grave = new Grave(
                 GraveManager.INSTANCE.requestId(),
                 player.getGameProfile(),
@@ -80,7 +87,7 @@ public class FabricInventoryApi implements InventoryApi {
                 Collections.singleton(player.getUUID()),     // was getUuid()
                 items,
                 true,
-                (int) (player.level().getGameTime() / 24000L)  // was player.getWorld().getTime()
+                (int) (level.getGameTime() / 24000L)  // was player.getWorld().getTime()
             );
 
 
@@ -120,7 +127,7 @@ public class FabricInventoryApi implements InventoryApi {
         GraveBlockEntity graveEntity = playerGraves.get(player);
         if (graveEntity == null) {
             if( gravePos == null ) return false;
-            graveEntity = (GraveBlockEntity) player.serverLevel().getBlockEntity(gravePos);
+            graveEntity = (GraveBlockEntity) CHALLENGE_LEVEL.getBlockEntity(gravePos);
         }
         if (graveEntity == null || graveEntity.getGrave() == null)
             return false;
@@ -130,6 +137,8 @@ public class FabricInventoryApi implements InventoryApi {
 
         // Restore items using VanillaInventoryMask
         graveEntity.getGrave().quickEquip(player);
+        graveEntity.getGrave().destroyGrave(GeneralConfig.getInstance().getServer(), null);
+        graveEntity.breakBlock();
         LoggerProject.logDebug("000111", "Returned inventory");
         return true;
     }
@@ -154,7 +163,7 @@ public class FabricInventoryApi implements InventoryApi {
     @Override
     public void clearUnusedGraves(MinecraftServer server)
     {
-    /*
+        /*
         Set<GraveBlockEntity> existingGraves = playerGraves.values().stream().collect(Collectors.toSet());
         allGraves.removeIf(grave -> {
             if (!existingGraves.contains(grave)) {
@@ -164,7 +173,8 @@ public class FabricInventoryApi implements InventoryApi {
             }
             return false;
         });
-    */
+        */
+
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "eu.pb4.graves.grave.Grave", remap = false)
+@Mixin(value = Grave.class, remap = false)
 public class GraveMixin {
 
     @Inject(

@@ -137,7 +137,7 @@ public class ManagedChallenger implements IManagedPlayer {
         LoggerProject.logDebug("010011", "onPlayerChangeDimension " + event.getPlayer().getDisplayName());
 
     try {
-        TempleManager.onPlayerChangeDimension(event, CHALLENGERS.get(event.getPlayer()));
+          TempleManager.onPlayerChangeDimension(event, CHALLENGERS.get(event.getPlayer()));
     } catch (Exception e) {
         LoggerProject.logError("010011", "Error handling player change dimension leaving challenge temple: " + e.getMessage());
         e.printStackTrace();
@@ -183,7 +183,7 @@ public class ManagedChallenger implements IManagedPlayer {
         if(p == player && this.activeTemple != null) {
             this.activeTemple.onPlayerLeave( (ServerPlayer) player );
         }
-
+        CHALLENGERS.remove(player);
     }
 
     @Override

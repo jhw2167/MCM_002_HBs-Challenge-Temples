@@ -294,7 +294,7 @@ public class ChallengeRoom {
     {
         //1. Clear unused graves
         MinecraftServer server = GeneralConfig.getInstance().getServer();
-        ChallengeTempleMain.INSTANCE.inventoryApi.clearUnusedGraves(server);
+        //ChallengeTempleMain.INSTANCE.inventoryApi.clearUnusedGraves(server);
 
         //2. Save most recent grave for each player using HBDataStore
         InventoryApi api = ChallengeTempleMain.INSTANCE.inventoryApi;

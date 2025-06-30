@@ -107,6 +107,15 @@ hbs_challenge_temple:challenge_room_4x4_00
 	- refill chests on player death
 	- create algorithm to reset structure on player death
 		- can use a pool for that
+ 
+- Save player inventory still having some issues with hb_foundation Managed Player save order
+Fabric: User is not loadeded in correct order, no Managed Challenger loaded with NBt data, skipped
+	- Login must be happening befor NBT read or something
+Forge: login happens before read, player constructed successfullly
+	- Corpse mod is destroying player graves on world reload, fail to return items
+
+
+
 
 2148104148
 

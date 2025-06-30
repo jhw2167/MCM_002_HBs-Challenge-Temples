@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple.externalapi;
 
+import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.foundation.HBUtil;
 import de.maxhenkel.corpse.corelib.death.Death;
 import de.maxhenkel.corpse.entities.CorpseEntity;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 
 // Simple InventoryApi interface (you must define in your common code)
 public class ForgeInventoryApi implements InventoryApi {
+
+    public static final String CLASS_ID = "777";
 
     private static ForgeInventoryApi INSTANCE;
     private final Map<ServerPlayer, CorpseEntity> playerGraves = new HashMap<>();
@@ -53,6 +56,7 @@ public class ForgeInventoryApi implements InventoryApi {
 
         //track corpse
         playerGraves.put(player, corpse);
+        protectedGraves.add(position);
         allGraves.add(corpse);
 
         return true;
@@ -97,7 +101,12 @@ public class ForgeInventoryApi implements InventoryApi {
             HBUtil.BlockUtil.mapTo1DNumber(grave.blockPosition()),
             player.getInventory(), grave, true, false);
             container.transferItems();
+            boolean removed = allGraves.remove(grave);
+            System.out.println("Removed grave from allGraves: " + removed);
+            removed = protectedGraves.remove(grave.blockPosition());
+            System.out.println("Removed grave from protectedGraves: " + removed);
             grave.getEquipment().clear();
+
             grave.discard();
             return true;
         } catch (Exception e) {

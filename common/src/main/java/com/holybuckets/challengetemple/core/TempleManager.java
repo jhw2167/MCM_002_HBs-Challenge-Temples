@@ -206,16 +206,18 @@ public class TempleManager {
 
 
     //* EVENTS
-    public static void onPlayerChangeDimension(PlayerChangedDimensionEvent event, ManagedChallenger managedChallenger)
+    public static void onPlayerChangeDimension(PlayerChangedDimensionEvent event, ManagedChallenger c)
     {
         Level dimFrom = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getFromDim() );
         Level dimTo = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getToDim() );
         LoggerProject.logDebug("005010", "Player changed dimension from " + dimFrom + " to " + dimTo);
 
         if( dimFrom == CHALLENGE_LEVEL ) {
-            MANAGERS.get(dimTo).temples.values().forEach(m -> m.playerEndChallenge(managedChallenger));
+            MANAGERS.get(dimTo).temples.values().stream()
+                .filter(mt -> mt.playerInChallenge(c))
+                .forEach(m -> m.playerEndChallenge(c));
         } else if( dimTo == CHALLENGE_LEVEL ) {
-            MANAGERS.get(dimFrom).temples.values().forEach(m -> m.playerTakeChallenge(managedChallenger));
+            MANAGERS.get(dimFrom).temples.values().forEach(m -> m.playerTakeChallenge(c));
         }
 
     }

@@ -212,6 +212,10 @@ public class ManagedTemple {
         return isClose;
     }
 
+    public boolean playerInChallenge(ManagedChallenger c) {
+        if (c == null || c.getServerPlayer() == null) return false;
+        return activePlayers.contains(c.getServerPlayer());
+    }
 
     //** EVENTS
     public void onPlayerLeave(ServerPlayer p) {

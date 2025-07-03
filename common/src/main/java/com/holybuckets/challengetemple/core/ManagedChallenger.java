@@ -221,13 +221,13 @@ public class ManagedChallenger implements IManagedPlayer {
         }
 
         String challengesTaken = "";
-        if( !challengesTaken.isEmpty())
-            challengesTaken = String.join("&", challengesTaken);
+        if( !this.challengesTaken.isEmpty())
+            challengesTaken = String.join("&", this.challengesTaken);
         compoundTag.putString("challengesTaken", challengesTaken);
 
         String challengesComplete = "";
-        if( !challengesComplete.isEmpty())
-            challengesComplete = String.join("&", challengesComplete);
+        if( !this.challengesComplete.isEmpty())
+            challengesComplete = String.join("&", this.challengesComplete);
         compoundTag.putString("challengesComplete", challengesComplete);
 
 

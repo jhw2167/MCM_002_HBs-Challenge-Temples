@@ -71,6 +71,7 @@ loom {
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
             runDir("run")
+            programArgs "--username", "Dev"
         }
         server {
             server()

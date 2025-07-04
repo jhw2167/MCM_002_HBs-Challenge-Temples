@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.core.ChallengeDB;
 import com.holybuckets.challengetemple.core.ManagedChallenger;
 import com.holybuckets.challengetemple.core.TempleManager;
 import com.holybuckets.challengetemple.externalapi.InventoryApi;
@@ -55,6 +56,7 @@ public class ChallengeTempleMain {
             EventRegistrar registrar = EventRegistrar.getInstance();
             TempleManager.init(registrar);
             ManagedChallenger.init(registrar);
+            ChallengeDB.init(registrar);
 
             //register events
             registrar.registerOnLevelLoad(this::onLevelLoad);

@@ -5,10 +5,33 @@ INPUT_FILE = "challenges.csv"
 OUTPUT_FILE = "challenges_updated.csv"
 
 
-def hash_to_n_digits(s, digits):
-    """Hash a string to an N-digit integer as a zero-padded string."""
-    h = int(hashlib.sha256(s.encode()).hexdigest(), 16)
-    return f"{h % (10 ** digits):0{digits}d}"
+# Global set of used IDs
+used_ids = set()
+
+# Optional counter map per prefix if you want to remember last suffix for an author or whole ID
+id_counters = {}
+def hash_to_n_digits(s, digits, key=None):
+    """
+    Hash a string to an N-digit integer as a zero-padded string.
+    If `key` is provided, auto-increment until unique for that key.
+    """
+    base_hash = int(hashlib.sha256(s.encode()).hexdigest(), 16)
+    number = base_hash % (10 ** digits)
+
+    # If no collision check, just return
+    if key is None:
+        return f"{number:0{digits}d}"
+
+    tries = 0
+    while True:
+        candidate = f"{number % (10 ** digits):0{digits}d}"
+        if key + candidate not in used_ids:
+            used_ids.add(key + candidate)
+            return candidate
+        number += 1
+        tries += 1
+        if tries > 999:
+            raise ValueError(f"Too many hash collisions for key={key}")
 
 
 def generate_challenge_id(author, challenge_name):
@@ -22,7 +45,7 @@ def generate_challenge_id(author, challenge_name):
     else:
         author_part = hash_to_n_digits(author, 6)
 
-    name_part = hash_to_n_digits(author + "|" + challenge_name, 3)
+    name_part = hash_to_n_digits(challenge_name, 3)
 
     return author_part + name_part
 
@@ -59,4 +82,4 @@ with open(OUTPUT_FILE, 'w', newline='', encoding='utf-8') as csvfile:
     writer.writeheader()
     writer.writerows(rows)
 
-print(f"✅ Updated CSV written to: {OUTPUT_FILE}")
+print(f"Updated CSV written to: {OUTPUT_FILE}")

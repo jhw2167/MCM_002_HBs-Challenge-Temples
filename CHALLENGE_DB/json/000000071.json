@@ -1,0 +1,21 @@
+{
+	"challengeId": "000000071",
+	"author": "Holy_Buckets",
+	"challengeName": "Gold Challenge",
+	"difficulty": 0,
+	"size": "4x4",
+	"challengeRules": {
+		"playerMaxHearts": 10,
+		"maxDeaths": -1,
+		"resetBlocksOnPlayerDeath": false,
+		"resetChestsOnPlayerDeath": true,
+		"clearInventoryOnPlayerDeath": true,
+		"playerDropsInventoryOnDeath": true
+		
+	},
+	"lootRules": {
+		"lootPool": 0,
+		"specificLoot": ["minecraft:gold_sword"]
+	}
+
+}

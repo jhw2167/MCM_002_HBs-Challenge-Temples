@@ -63,6 +63,86 @@ Requirements
 	- prevent portal from spawning in one room 0x0
 	- 
 
+9. Add support for exit portal
+---
+
+	- create syntax for building end portal
+		- Create sample of implementation to determine space needed
+		- 8x8 torched off area
+		- 6x6 area from bottom right, structure placed in positive x,y,z direction
+		- floor of portal exit equals floor of ground where designating torches were placed
+		-
+	- save structure as an nbt
+		- needs to be location agnostic, radial symmetry
+	- dynamically locate soul torches after challenge replacement
+		- y -1 offeset structure placement
+	- after each temple reset:
+		- find soul torches
+		- save challengeExitPos and exitPortalPos and exitPortal
+		- places challenge_exit_00.nbt
+		- find soul torches again
+		- delete existing exit portal
+		- create new exit portal and save
+		- on server restart, ensure to reset challenge
+	- set challenge end portal dynamically
+	
+	- Add challenge_water - grants regeneration, protection, blast protection to those who recently completed a challenge
+	- Add challenge_button - stone button
+	- Add challenge_lamp - redstone lamp, always on
+	- Add challenge_piston/sticky - can only be broken with create wrench
+	- 
+
+	CHALLENGE SUBMISSION VERIFICATION
+	1. Challenge submission matches existing naming convention
+	2. Challenge submisison contains only 4 soul torches
+	3. 
+
+
+10. Add support for temple refresh on portal death
+---
+
+	- Establish hook to player death
+	- trigger challlenge rebuild on player death
+	- Define chest locations
+	- Create challenge_chest type that is not refilled on challenge reset
+	- Chests are reflled on challenge reset
+	- Challenge_chests are cleared on challenge reset after being opened
+
+
+11.
+---
+
+	Create Challenge class to store challenge metaData and settings
+
+	Challenge Info:
+		CHALLENGE_DB/CHALLENGE_TEMPLATE.json
+
+	ChallengeDB:
+	challenges.csv - input file, adding new challenge authors and names
+	challenges_updated.csv - db file containing real time file id of challenge.json, 
+	author and challenge common name, also binary indicating whether this challenge should be used
+
+	Challenge JSON:
+	"difficulty": "PEACEFUL | EASY | NORMAL | HARD | VERY HARD",	//0-4
+	"lootPool": "minor | standard | major | epic | lengendary",	//0-4
+
+	1. Update HBs foundation for new JSON loading functions
+	2. Complete loadChallenge method and handle exceptions
+	3. Create sample challengeJson files for 2x2 and 4x4 rooms
+	4. Create sample challengeJson for diamond and gold rooms
+	5. Create mappable enums to difficulty and loot pool strings
+	6. Ensure to save completed challengs to foundationDB, load on server start
+	7. Use size values to set loop for Challenge room s.t. we can parse for soul torches
+
+	8. Update gold and diamond rooms to include soul torches
+	9. test structure placement logic
+	10. Write portal placement logic
+
+	11. add new challenge blocks
+	12. add chest witholding logic
+	
+
+
 
 12. To do
 ---
@@ -75,29 +155,9 @@ Requirements
 	hbs_challenge_temple:challenge_room_4x4_00
 
 
-	- remodel 2x2 challenge temple
-	- build 4x4 challenge temple variant
-		- decide on ID, naming convention
-		- build gem variants
-		- id: challenge_000000.nbt
-		- hash author code + challenge_name
-
 hbs_challenge_temple:challenge_room_4x4_00
 - spawn 00, 00 contains 01-08, 
 - _08 can replace everything else
-
-	- Take player inventory when they travel to challenge dimension
- 		- remove armor
-		- remove potion effects
-
-	- ManagedTemple data effectively
-		- don't re-place portals
-		- intercept template pool logic to determine which was placed
-		- please don't rotate the pools
-		- delete portal on temple completion
-
-	- Build ManagedPlayer class to keep track of player data
-	- Keep track of shrine attempts, completions, deaths
 
 	- add Challenge blocks - stone bricks, glowstone, glass, wood, leaves
 	- use processor lists to edit structure NBT data
@@ -105,17 +165,8 @@ hbs_challenge_temple:challenge_room_4x4_00
 
 	- determine how to fix chests at runtime
 	- refill chests on player death
-	- create algorithm to reset structure on player death
-		- can use a pool for that
+
  
-- Save player inventory still having some issues with hb_foundation Managed Player save order
-Fabric: User is not loadeded in correct order, no Managed Challenger loaded with NBt data, skipped
-	- Login must be happening befor NBT read or something
-Forge: login happens before read, player constructed successfullly
-	- Corpse mod is destroying player graves on world reload, fail to return items
-
-b5b2ff24-9e23-373f-97d2-19884357bdea
-
 
 2148104148
 

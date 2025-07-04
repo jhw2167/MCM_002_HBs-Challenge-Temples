@@ -1,6 +1,5 @@
 package com.holybuckets.challengetemple.core;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.holybuckets.challengetemple.ChallengeTempleMain;
@@ -17,16 +16,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
-import org.antlr.v4.runtime.misc.MultiMap;
 
 import java.util.*;
 
@@ -38,11 +35,17 @@ public class ChallengeRoom {
 
     private final String challengeId;
     private final String chunkId;
+    private final Challenge challenge;
     private boolean roomLoaded;
     private boolean roomActive;
     private BlockEntity structureBlock;
     private StructureTemplate structureTemplate;
     private List<BlockPos> graveyardPositions = new ArrayList<>();
+
+    //challenge exit
+    private BlockPos challengeExitPos;
+    private BlockPos exitPortalPos;
+    private Entity exitPortal;      //exit portal on the floor, 2x2 in x,z direction
 
 
     //Statics
@@ -68,7 +71,8 @@ public class ChallengeRoom {
     ChallengeRoom(String chunkId)
     {
         this.chunkId = chunkId;
-        this.challengeId = Challenges.chooseChallengeId(null);
+        this.challenge = ChallengeDB.chooseChallenge(null);
+        this.challengeId = this.challenge.getChallengeId();
         this.roomLoaded = false;
         ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
     }
@@ -77,21 +81,28 @@ public class ChallengeRoom {
 
     static final String[] ids = {"00", "01", "02", "03", "04", "05", "06", "07", "08"};
     /**
-     * Loads the physical structure in challenge_dimension by trigering all structure blocks
+     * Loads the physical structure in challenge_dimension by triggering all structure blocks
      * to generate.
-     * @return true if strcuture was loaded successfully, false if any issues where encountered
+     * @return true if structure was loaded successfully, false if any issues where encountered
      */
     boolean loadStructure()
     {
         if( this.roomLoaded ) return false;
 
         this.roomLoaded = true;
+        int totalPieces = challenge.getTotalPieces();
+        for(int i = 0; i < totalPieces; i++) {
+            String id = String.format("%02d", i);
+            this.generateStructure(id, false);
+        }
+        /*
         Arrays.stream(ids).forEach(id -> {
             Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(id))];
             String msg = String.format("[%s] Loading structure with pos %s id: %s", this.chunkId, offset, id);
             LoggerProject.logDebug("007000", msg);
             this.generateStructure(id, false);
         });
+         */
 
         return true;
     }
@@ -133,6 +144,28 @@ public class ChallengeRoom {
     boolean refreshStructure() {
         this.roomLoaded = false;
         return this.loadStructure();
+    }
+
+    /**
+     * Load the challenge_exit nbt structure,
+     * delete the existing exitPortal,
+     * generate a new exitPortal
+     */
+    void loadChallengeExit() {
+        //1. Scan the entire structure linearly to find the 4 soul torches in 6x6 area
+
+    }
+
+    /**
+     * Generates the exit portal at the given position.
+     * portal is 2x2 in postive x,z direction
+     */
+    void generateExitPortal(BlockPos pos) {
+        if( this.exitPortal != null ) {
+            this.exitPortal.remove(Entity.RemovalReason.DISCARDED);
+        }
+
+        //this.exitPortal = ChallengeTempleMain.INSTANCE.inventoryApi;
     }
 
 

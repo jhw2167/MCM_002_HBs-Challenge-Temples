@@ -1,23 +1,31 @@
 package com.holybuckets.challengetemple.core;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.holybuckets.challengetemple.ChallengeTempleMain;
+import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.LoggerProject;
+import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.exception.NoDefaultConfig;
+import net.blay09.mods.balm.api.event.EventPriority;
 import net.blay09.mods.balm.api.event.server.ServerStartedEvent;
 import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.blay09.mods.balm.api.event.server.ServerStoppedEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Loads ChallengeData from the config file and uses it to filter, generate, and return challengeIds
@@ -33,12 +41,19 @@ public class ChallengeDB {
     //Initialize the classes static events
     public static void init(EventRegistrar reg) {
         //register onServerStart, onServerStop
-        reg.registerOnBeforeServerStarted(ChallengeDB::onServerStarting);
+        //reg.registerOnBeforeServerStarted(ChallengeDB::onServerStarting);
+        reg.registerOnServerStarted(ChallengeDB::onServerStarted, EventPriority.High);
         reg.registerOnServerStopped(ChallengeDB::onServerStop);
     }
 
-    final static String CHALLENGE_DB_PATH = "assets/hb_challenge_temple/challenges/";
-    static void onServerStarting(ServerStartingEvent event)
+    //final static String CHALLENGE_DB_PATH = "assets/hb_challenge_temple/challenges/";
+    final static ResourceLocation CHALLENGE_DB_PATH = new ResourceLocation(Constants.MOD_ID, "challenges");
+    final static String CHALLENGES_CSV = "challenges/challenges.csv";
+    final static String CHALLENGES_JSON = "challenges/json";
+    final static String CHALLENGES_DEFAULT_JSON = "challenges/json/challenge_template.json";
+
+    //static void onServerStarting(ServerStartingEvent event)
+    static void onServerStarted(ServerStartedEvent event)
     {
         //Load CHALLENGES from resources/assets/hb_challenge_temple/challenges/..
             //challenges.csv holds all challenge ids
@@ -46,11 +61,17 @@ public class ChallengeDB {
         CHALLENGE_IDS = new LinkedList<>();
         CHALLENGES = new LinkedList<>();
 
+        ResourceManager manager = GeneralConfig.getInstance()
+            .getServer().getResourceManager();
+
+
         //Open our challengeDb file
-        Path challengesCSV = Paths.get(CHALLENGE_DB_PATH + "challenges.csv");
+        Resource challengesCSV = manager.listResources(CHALLENGES_CSV, p -> true)
+        .get( new ResourceLocation(CHALLENGE_DB_PATH.getNamespace(), CHALLENGES_CSV) );
         String challengeDB = null;
-        try {
-            challengeDB = Files.readString(challengesCSV);
+
+        try(InputStream is = challengesCSV.open()) {
+            challengeDB = new String(is.readAllBytes());
         } catch (Exception e) {
             if(ChallengeTempleMain.DEBUG)
                 throw new RuntimeException("Failed to load challenge database from " + CHALLENGE_DB_PATH, e);
@@ -61,20 +82,45 @@ public class ChallengeDB {
 
         if(challengeDB == null || challengeDB.isEmpty()) return;
 
-        for (String line : challengeDB.split("\n"))
+        Map<ResourceLocation, Resource> jsonChallenges = manager.listResources("challenges/json", p -> true);
+        ResourceLocation defaultJsonLocation = new ResourceLocation(CHALLENGE_DB_PATH.getNamespace(),
+            CHALLENGES_DEFAULT_JSON);
+        String challengeDefaultJson = null;
+        try(InputStream is = jsonChallenges.get(defaultJsonLocation).open()) {
+            challengeDefaultJson = new String(is.readAllBytes());
+        } catch (IOException e) {
+            LoggerProject.logError("021003", "Failed to load default challenge json" + CHALLENGES_DEFAULT_JSON );
+            return;
+        }
+        String lineDelim = "\n";
+        if( challengeDB.contains("\r\n") )
+            lineDelim = "\r\n"; // Windows line endings
+        String[] dbLines = challengeDB.split(lineDelim);
+        for (int i = 0; i<dbLines.length; i++)
         {
-            try {
-                Cursor challengeLine = new Cursor(line);
-                if(!challengeLine.doUse) continue;
+            if(i==0) continue; // Skip header line
+            String line = dbLines[i].trim();
+            Cursor c = new Cursor(line);
+            CHALLENGE_IDS.add(c);
+            if(!c.doUse) continue;
 
-                Challenge c = loadChallenge(challengeLine);
-                CHALLENGES.add(c);
+            ResourceLocation locationWithId = new ResourceLocation(
+                CHALLENGE_DB_PATH.getNamespace(),
+                CHALLENGES_JSON + "/" + c.challengeId + ".json");
+           Resource challengeJson = jsonChallenges.get(locationWithId);
+            try(InputStream is = challengeJson.open())
+            {
+                Challenge challenge = loadChallenge(c, new String(is.readAllBytes()), challengeDefaultJson );
+                CHALLENGES.add(challenge);
             } catch (NoDefaultConfig  ndc) {
                 LoggerProject.logError("021001", "No default challenge json reference in: "
                 + CHALLENGE_DB_PATH );
                 break;
             } catch (IOException e) {
                 LoggerProject.logError("021002", "Failed to load json challenge with ID: "
+                + line + " from " + CHALLENGE_DB_PATH);
+            } catch (Exception e) {
+                LoggerProject.logError("021004", "Failed to load challenge with ID: "
                 + line + " from " + CHALLENGE_DB_PATH);
             }
 
@@ -83,14 +129,16 @@ public class ChallengeDB {
 
     }
         static final String DEFAULT_CHALLENGE_JSON = "CHALLENGE_DB_PATH.json";
-        static Challenge loadChallenge(Cursor c) throws NoDefaultConfig, IOException
+        static Challenge loadChallenge(Cursor c, String json, String defaultJson) throws NoDefaultConfig, IOException
         {
-            Path jsonPath = Paths.get(CHALLENGE_DB_PATH);
-            final File challengeFile = jsonPath.resolve("json/" + c.challengeId + ".json").toFile();
-            final File challengeDefault = jsonPath.resolve(DEFAULT_CHALLENGE_JSON).toFile();
+            //Path jsonPath = Paths.get(CHALLENGE_DB_PATH.getPath());
+            //final File challengeFile = jsonPath.resolve("json/" + c.challengeId + ".json").toFile();
+            //final File challengeDefault = jsonPath.resolve(DEFAULT_CHALLENGE_JSON).toFile();
+            final JsonObject challengeJson = new JsonParser().parse(json).getAsJsonObject();
+            final JsonObject challengeDefJson = new JsonParser().parse(defaultJson).getAsJsonObject();
 
-            JsonObject json = HBUtil.FileIO.loadJsonOrDefault(challengeFile, challengeDefault);
-            return Challenge.read(json);
+            JsonObject result = HBUtil.FileIO.loadJsonOrDefault(challengeJson, challengeDefJson);
+            return Challenge.read( result );
         }
 
     // Remember to save complete challenges before server stop
@@ -107,6 +155,9 @@ public class ChallengeDB {
      * @return
      */
     static Challenge chooseChallenge(@Nullable ChallengeFilter filter) {
+        if(CHALLENGES.isEmpty()) {
+            return null; // or throw an exception
+        }
         int rand = (int) (Math.random() * CHALLENGES.size());
         return CHALLENGES.get(rand);
     }
@@ -131,6 +182,7 @@ public class ChallengeDB {
             this.author = parts[1].trim();
             this.challengeName = parts[2].trim();
             this.doUse = Boolean.parseBoolean(parts[3].trim());
+            if(parts[3].trim().equals("1")) this.doUse = true;
         }
     }
 

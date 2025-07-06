@@ -1,0 +1,21 @@
+{
+	"challengeId": "000000439",
+	"author": "Holy_Buckets",
+	"challengeName": "Iron Challenge",
+	"difficulty": 0,
+	"size": "2x2",
+	"challengeRules": {
+		"playerMaxHearts": 10,
+		"maxDeaths": -1,
+		"resetBlocksOnPlayerDeath": true,
+		"resetChestsOnPlayerDeath": false,
+		"clearInventoryOnPlayerDeath": false,
+		"playerDropsInventoryOnDeath": true
+		
+	},
+	"lootRules": {
+		"lootPool": 0,
+		"specificLoot": ["minecraft:iron_sword"]
+	}
+
+}

@@ -20,12 +20,14 @@ def main():
         sys.exit(1)
 
     # Remove records/<ID> folder
+    """
     record_path = RECORDS_DIR / challenge_id
     if record_path.exists():
         shutil.rmtree(record_path)
         print(f"Removed folder: {record_path}")
     else:
         print(f"Warning: Folder {record_path} does not exist.")
+    """
 
     # Remove json/<ID>.json
     json_file = JSON_DIR / f"{challenge_id}.json"

@@ -6,6 +6,7 @@ import com.holybuckets.challengetemple.ChallengeTempleMain;
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.externalapi.InventoryApi;
+import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.datastore.DataStore;
@@ -16,18 +17,24 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.*;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
 import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
+import static com.holybuckets.challengetemple.core.TempleManager.P_HEIGHT;
+import static com.holybuckets.challengetemple.core.TempleManager.P_WIDTH;
 
 public class ChallengeRoom {
 
@@ -36,6 +43,8 @@ public class ChallengeRoom {
     private final String challengeId;
     private final String chunkId;
     private final Challenge challenge;
+    private final Vec3i overworldExitPos;
+    private final Level returnLevel;
     private boolean roomLoaded;
     private boolean roomActive;
     private BlockEntity structureBlock;
@@ -44,11 +53,12 @@ public class ChallengeRoom {
 
     //challenge exit
     private BlockPos challengeExitPos;
-    private BlockPos exitPortalPos;
+    private BlockPos exitStructurePos;
     private Entity exitPortal;      //exit portal on the floor, 2x2 in x,z direction
 
 
     //Statics
+    private static PortalApi PORTAL_API;
     static final int CHALLENGE_DIM_HEIGHT = 64;
     static final int MAX_GRAVES = 3;
     static final Map<String, ChallengeRoom> ACTIVE_ROOMS = new HashMap<>(); // Maps chunkId to ChallengeRoom
@@ -67,10 +77,14 @@ public class ChallengeRoom {
         new Vec3i(32, 48, 32), // 07
         new Vec3i(0, 0, 0) // 08
     };
+    private static BlockState EXIT_PORTAL_BLOCK;
 
-    ChallengeRoom(String chunkId)
+    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel)
     {
+
         this.chunkId = chunkId;
+        this.overworldExitPos = overworldExitPos;
+        this.returnLevel = returnLevel;
         this.challenge = ChallengeDB.chooseChallenge(null);
         this.challengeId = this.challenge.getChallengeId();
         this.roomLoaded = false;
@@ -79,7 +93,7 @@ public class ChallengeRoom {
 
     //** CORE
 
-    static final String[] ids = {"00", "01", "02", "03", "04", "05", "06", "07", "08"};
+
     /**
      * Loads the physical structure in challenge_dimension by triggering all structure blocks
      * to generate.
@@ -91,9 +105,10 @@ public class ChallengeRoom {
 
         this.roomLoaded = true;
         int totalPieces = challenge.getTotalPieces();
+        boolean succeeded = true;
         for(int i = 0; i < totalPieces; i++) {
             String id = String.format("%02d", i);
-            this.generateStructure(id, false);
+            succeeded = true && this.generateStructure(id, false);
         }
         /*
         Arrays.stream(ids).forEach(id -> {
@@ -104,37 +119,134 @@ public class ChallengeRoom {
         });
          */
 
-        return true;
+        return succeeded;
     }
 
 
-    //A challenge could be a 2x2 or 4x4 room
-    private static final String CHALLENGE_NAME = "challenge_<challengeId>_<pieceId>";
-    private static final String STRUCTURE_NAME = "challenge_room_4x4_";
-    private boolean generateStructure(String pieceId, boolean useTemplate)
+        //A challenge could be a 2x2 or 4x4 room
+        private static final String CHALLENGE_NAME = "challenge_<challengeId>_<pieceId>";
+        private static final String STRUCTURE_NAME = "challenge_room_4x4_";
+
+        /**
+         * Generates the individual structure pieces
+         * @param pieceId
+         * @param useTemplate
+         * @return
+         */
+        private boolean generateStructure(String pieceId, boolean useTemplate)
+        {
+            StructureTemplateManager manager =  CHALLENGE_LEVEL.getStructureManager();
+            String location = CHALLENGE_NAME.replace("<challengeId>", challengeId).replace("<pieceId>", pieceId);
+            //String location = STRUCTURE_NAME + pieceId;
+            ResourceLocation structure = new ResourceLocation(Constants.MOD_ID, location);
+            Optional<StructureTemplate> temp = manager.get(structure);
+            if(!temp.isPresent()) return false;
+
+            StructureTemplate template = temp.get();
+            Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(pieceId))];
+
+           boolean succeeded = template.placeInWorld(
+                CHALLENGE_LEVEL,                   // ServerLevel
+                this.getWorldPos().offset(offset),                // Position to place at
+                this.getWorldPos().offset(offset),                // ??
+                (useTemplate) ? TEMPLATE_SETTINGS : REAL_SETTINGS, // Settings for placement
+                CHALLENGE_LEVEL.getRandom(),
+                (useTemplate) ? 2 : 18                         // Block update flag
+            );
+
+            return succeeded;
+        }
+
+
+
+    /**
+     * 1. Parses entire structure for soul torches in a 6x6 area, using size from Challenge Obj
+     * 2. Builds exist structure in bottom left corner (min x, min z)
+     * 3. parses for soul torches in interior 4x4 area
+     * 4. builds exit portal if all soul torches are found
+     * @return
+     */
+    private boolean generateExitStructure()
     {
-        StructureTemplateManager manager =  CHALLENGE_LEVEL.getStructureManager();
-        String location = CHALLENGE_NAME.replace("<challengeId>", challengeId).replace("<pieceId>", pieceId);
-        //String location = STRUCTURE_NAME + pieceId;
-        ResourceLocation structure = new ResourceLocation(Constants.MOD_ID, location);
-        Optional<StructureTemplate> temp = manager.get(structure);
-        if(!temp.isPresent()) return false;
+        if( this.roomLoaded ) return false;
 
-        StructureTemplate template = temp.get();
-        Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(pieceId))];
+        if( this.exitPortal != null ) {
+            this.exitPortal.remove(Entity.RemovalReason.DISCARDED);
+        }
 
-        template.placeInWorld(
+        //1. Parse area for minecraft:soul_torch
+        Vec3i sz = challenge.getSize();
+        if( this.exitStructurePos != null )
+            sz = new Vec3i(0,0,0);
+
+        for(int x = 0; x < sz.getX(); x++) {
+            for(int y = 0; y < sz.getY(); y++) {
+                for (int z = 0; z < sz.getZ(); z++) {
+                    BlockPos pos = this.getWorldPos().offset(x, y, z);
+                    BlockState state = CHALLENGE_LEVEL.getBlockState(pos);
+                    if(state.equals(EXIT_PORTAL_BLOCK)) {
+                        this.exitStructurePos = pos.offset(0,-1,0); // Found the exit portal block
+                        break;
+                    }
+                }
+            }
+        }
+
+        //log error and return false if not found
+        if( this.exitStructurePos == null ) {
+            LoggerProject.logError("007005", "Exit portal block not found in challenge room at " + this.getWorldPos());
+            return false;
+        }
+
+        //1. Load the challenge_exit structure
+        ResourceLocation exitStructure = new ResourceLocation(Constants.MOD_ID, "challenge_exit_00");
+        StructureTemplateManager manager = CHALLENGE_LEVEL.getStructureManager();
+        Optional<StructureTemplate> temp = manager.get(exitStructure);
+        if(!temp.isPresent()) {
+            LoggerProject.logError(CLASS_ID, "Failed to load challenge exit structure: " + exitStructure);
+            return false;
+        }
+
+        //Place at exitPortalPos
+        this.structureTemplate = temp.get();
+        this.structureTemplate.placeInWorld(
             CHALLENGE_LEVEL,                   // ServerLevel
-            this.getWorldPos().offset(offset),                // Position to place at
-            this.getWorldPos().offset(offset),                // ??
-            (useTemplate) ? TEMPLATE_SETTINGS : REAL_SETTINGS, // Settings for placement
+            this.exitStructurePos,                // Position to place at
+            this.exitStructurePos,                // ??
+            REAL_SETTINGS,                      // Settings for placement
             CHALLENGE_LEVEL.getRandom(),
-            (useTemplate) ? 2 : 18                         // Block update flag
+            18                                  // Block update flag
         );
 
-        return true;
+        this.roomLoaded = true;
+
+        //2. Generate the exit portal
+        return this.generateExitPortal();
     }
 
+    private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(2, 1, 2); // Offset for the exit portal position
+    private boolean generateExitPortal()
+    {
+        BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_OFFSET);
+        //Check position for soul_torch - TBD
+        //BlockState state = CHALLENGE_LEVEL.getBlockState(portalTorchPos);
+        Vec3i portalPos = portalTorchPos.offset(1,0,1);
+
+        this.exitPortal = PORTAL_API.createPortal(
+            P_WIDTH, P_HEIGHT,
+            CHALLENGE_LEVEL,
+            returnLevel,
+            toVec3( overworldExitPos),
+            toVec3( portalPos ),
+            PortalApi.Direction.DOWN
+        );
+
+        return this.exitPortal != null;
+    }
+
+        private Vec3 toVec3(Vec3i pos) {
+            return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+        }
 
 
     /**
@@ -146,27 +258,10 @@ public class ChallengeRoom {
         return this.loadStructure();
     }
 
-    /**
-     * Load the challenge_exit nbt structure,
-     * delete the existing exitPortal,
-     * generate a new exitPortal
-     */
-    void loadChallengeExit() {
-        //1. Scan the entire structure linearly to find the 4 soul torches in 6x6 area
-
+    public void startChallenge() {
+       this.generateExitStructure();
     }
 
-    /**
-     * Generates the exit portal at the given position.
-     * portal is 2x2 in postive x,z direction
-     */
-    void generateExitPortal(BlockPos pos) {
-        if( this.exitPortal != null ) {
-            this.exitPortal.remove(Entity.RemovalReason.DISCARDED);
-        }
-
-        //this.exitPortal = ChallengeTempleMain.INSTANCE.inventoryApi;
-    }
 
 
     public BlockPos getWorldPos() {
@@ -260,8 +355,13 @@ public class ChallengeRoom {
     public static void init(EventRegistrar reg) {
         // Register the static event handler
         reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
+
+        PORTAL_API = ChallengeTempleMain.INSTANCE.portalApi;
     }
 
+    /**
+     * Loads after TempletManager loads
+     */
     public static void load() {
         DataStore ds = GeneralConfig.getInstance().getDataStore();
         LevelSaveData levelData = ds.getOrCreateLevelSaveData(Constants.MOD_ID, CHALLENGE_LEVEL);
@@ -274,7 +374,14 @@ public class ChallengeRoom {
         }
 
 
+
+        EXIT_PORTAL_BLOCK = HBUtil.BlockUtil
+            .blockNameToBlock("minecraft", "soul_torch")
+            .defaultBlockState();
+
     }
+
+
 
     private static void on120TicksClearGraves(ServerTickEvent event)
     {
@@ -347,5 +454,6 @@ public class ChallengeRoom {
         }
         ACTIVE_ROOMS.clear();
     }
+
 
 }

@@ -42,6 +42,7 @@ public class ManagedTemple {
 
     private static final Vec3i SOURCE_OFFSET = new Vec3i(0, -1, 1);
     private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 1);
+    private static final Vec3i SOURCE_EXIT_OFFSET = new Vec3i(0, 2, 2);
     private static final int CHALLENGE_DIM_HEIGHT = 64;
 
     /**
@@ -56,7 +57,6 @@ public class ManagedTemple {
         this.structurePos = pos.offset(STRUCTURE_OFFSET);
 
         this.templeId = HBUtil.ChunkUtil.getId(pos);
-        this.challengeRoom = new ChallengeRoom(this.templeId);
         this.isCompleted = false;
 
         this.activePlayers = new HashSet<>();
@@ -107,7 +107,8 @@ public class ManagedTemple {
         if( watchChallengersThread != null ) // Stop the previous thread if it's still running
             return;
 
-        this.challengeRoom.loadStructure();
+        if (this.challengeRoom != null)
+            this.challengeRoom.loadStructure();
         //We need to save this thread in a variable so we can interrupt it on shutdown
         this.watchChallengersThread = new Thread( this::threadWatchChallengers);
         this.watchChallengersThread.start();
@@ -145,7 +146,12 @@ public class ManagedTemple {
 
     public void buildChallenge() {
         if (this.challengeRoom != null)
-            this.challengeRoom.loadStructure();
+        {
+            Vec3i overworldExitPos = this.portalSourcePos.offset(SOURCE_EXIT_OFFSET);
+            this.challengeRoom = new ChallengeRoom(this.templeId,
+                 overworldExitPos, this.level);
+        }
+
     }
 
     public void playerTakeChallenge(ManagedChallenger player)
@@ -160,7 +166,7 @@ public class ManagedTemple {
             player.startChallenge(this);
         }
 
-        this.challengeRoom.setActive( true );
+        this.challengeRoom.startChallenge();
     }
 
     public void playerJoinedInChallenge(ServerPlayer p) {

@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import shutil
+import sys
 from pathlib import Path
 
 INPUT_CSV = "challenges.csv"
@@ -53,8 +54,8 @@ def main():
     forced_id = None
     if len(sys.argv) > 1:
         forced_id = sys.argv[1].strip()
-        if not forced_id.isdigit() or len(forced_id) != 9:
-            raise Exception(f"Provided ID must be a 9-digit number, got: {forced_id}")
+        if len(forced_id) < 9:
+            raise Exception(f"Provided ID must be a 9-digit string, got: {forced_id}")
             
     # Load existing IDs
     if Path(INPUT_CSV).exists():

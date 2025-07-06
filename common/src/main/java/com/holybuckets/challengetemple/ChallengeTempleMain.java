@@ -26,7 +26,7 @@ public class ChallengeTempleMain {
 
     public static ChallengeTempleMain INSTANCE;
 
-    PortalApi portalApi;
+    public PortalApi portalApi;
     public InventoryApi inventoryApi;
     TempleManager templeManager;
     ServerLevel challengeDimension;
@@ -34,8 +34,8 @@ public class ChallengeTempleMain {
     public ChallengeTempleMain()
     {
         super();
-        init();
         INSTANCE = this;
+        init();
         // LoggerProject.logInit( "001000", this.getClass().getName() ); // Uncomment if you have a logging system in place
     }
 
@@ -73,7 +73,7 @@ public class ChallengeTempleMain {
         if(level.isClientSide()) return;
 
         if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
-            this.templeManager = new TempleManager( (ServerLevel) level, portalApi);
+            this.templeManager = new TempleManager( (ServerLevel) level);
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             this.challengeDimension = (ServerLevel) level;
             TempleManager.setChallengeLevel( (ServerLevel) level);

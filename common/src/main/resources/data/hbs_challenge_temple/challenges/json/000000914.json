@@ -1,9 +1,9 @@
 {
-	"challengeId": "0000002x2",
+	"challengeId": "000000914",
 	"author": "Holy_Buckets",
-	"challengeName": "Template Small Temple",
-	"difficulty": 4,
-	"size": "2x2",
+	"challengeName": "Diamond Challenge",
+	"difficulty": 0,
+	"size": "4x4",
 	"challengeRules": {
 		"playerMaxHearts": 10,
 		"maxDeaths": -1,
@@ -14,7 +14,7 @@
 		
 	},
 	"lootRules": {
-		"lootPool": 4,
+		"lootPool": 0,
 		"specificLoot": ["minecraft:diamond_sword"]
 	}
 

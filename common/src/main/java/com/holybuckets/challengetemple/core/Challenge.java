@@ -42,10 +42,10 @@ public class Challenge {
     }
 
     public static class LootRules {
-        String lootPool;                
+        int lootPool;
         List<Item> specificLoot;
 
-        public String getLootPool() { return lootPool; }
+        public int getLootPool() { return lootPool; }
         public List<Item> getSpecificLoot() { return specificLoot; }
     }
 
@@ -89,8 +89,9 @@ public class Challenge {
         //Loot Rules
         LootRules l = new LootRules();
         c.lootRules = l;
-        l.lootPool = json.get("lootPool").getAsString();
-        c.setSpecificLoot(json.get("specificLoot"));
+        JsonObject lootRules = json.getAsJsonObject("lootRules");
+        l.lootPool = lootRules.get("lootPool").getAsInt();
+        c.setSpecificLoot(lootRules.get("specificLoot"));
 
         return c;
     }
@@ -120,8 +121,8 @@ public class Challenge {
 
         String[] items = lootArr.getAsString().split(",");
         for(String s : items) {
-            //Item item = HBUtil.ItemUtil.itemNameToItem(s.trim());
-            //if( item != null) loot.add(item);
+            Item item = HBUtil.ItemUtil.itemNameToItem(s.trim());
+            if( item != null) loot.add(item);
         }
 
     }

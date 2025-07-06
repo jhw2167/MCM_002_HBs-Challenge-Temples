@@ -1,0 +1,35 @@
+Folder Overview
+---
+json/ - folder containing json data of all challenges, all named after 9 digit id
+nbt/ - folder of all nbt structure data for each challenge, labled by id and room piece id
+records/ - a folder containing a record of subfolders, each folder is labled after the id of the challenge it represents
+	and renaming this folder to "addChallenge" would let you re-add it again
+
+addChallenge.py - add a new challenge to challlenges
+	- reads addChallenge/ folder for .json and .nbt files
+	- uses the author name and challenge name to hash into 9 digit id
+	- moves json, and nbt files
+	- adds new challenge info and id to challenges.csv
+
+genIds.py - generates new ids from challenges in challenges.py, RETIRED
+
+rmChallenge.py - removes a challenge from json and challenges.csv
+	- does not remove .nbt data, they will be overwritten
+	- does not remove from records, can still access old data
+
+copyChallenges.sh
+	- copies challenges.csv to common/main/resources/assets/challenges/challenges.csv
+	- copies json to common/main/resources/assets/challenges
+	- copies nbt to .../structures/ where all structure .nbt data goes
+
+
+Instructions
+---
+
+1. Create a CHALLENGE_TEMPLATE.json and personalize it with challenge data
+2. create addChallenge/ folder, add it to this directory
+3. include .nbt structure data based on 2x2 or 4x4 templates
+4. run addChallenge.py
+5. run copyChallenges.py
+6. Start repo and test
+

@@ -1,21 +1,21 @@
 {
-    "challengeId": "0000004x4",
+    "challengeId": "000000408",
     "author": "Holy_Buckets",
-    "challengeName": "Template Small Temple",
-    "difficulty": 4,
+    "challengeName": "Iron Challenge",
+    "difficulty": 0,
     "size": "2x2",
     "challengeRules": {
         "playerMaxHearts": 10,
         "maxDeaths": -1,
         "resetBlocksOnPlayerDeath": true,
-        "resetChestsOnPlayerDeath": true,
-        "clearInventoryOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": false,
+        "clearInventoryOnPlayerDeath": false,
         "playerDropsInventoryOnDeath": true
     },
     "lootRules": {
-        "lootPool": 4,
+        "lootPool": 0,
         "specificLoot": [
-            "minecraft:diamond_sword"
+            "minecraft:iron_sword"
         ]
     }
 }

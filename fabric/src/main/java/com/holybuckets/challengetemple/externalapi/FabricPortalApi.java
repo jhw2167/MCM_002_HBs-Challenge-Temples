@@ -32,6 +32,16 @@ public class FabricPortalApi implements PortalApi {
         }
         portal.axisH = new Vec3(0, 1, 0);
 
+        //Add support for "UP" and "DOWN" directions - portals in x,z plane,
+        // width is x, height is z
+        if (dir == Direction.UP) {
+            portal.axisW = new Vec3(1, 0, 0);
+            portal.axisH = new Vec3(0, 0, 1);
+        } else if (dir == Direction.DOWN) {
+            portal.axisW = new Vec3(-1, 0, 0);
+            portal.axisH = new Vec3(0, 0, -1);
+        }
+
         portal.width = width;
         portal.height = height;
 

@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.ChallengeTempleMain;
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
@@ -26,21 +27,22 @@ import static com.holybuckets.foundation.HBUtil.LevelUtil;
 
 public class TempleManager {
 
+
     public static String CLASS_ID = "005";
 
     static ServerLevel CHALLENGE_LEVEL;
     static Map<LevelAccessor, TempleManager> MANAGERS;
+    private static PortalApi PORTAL_API;
 
     private final ServerLevel level;
-    private final PortalApi portalApi;
+
     private final GeneralConfig generalConfig;
 
     private final Map<String, ManagedTemple> temples;
 
-    public TempleManager(ServerLevel level, PortalApi portalApi)
+    public TempleManager(ServerLevel level)
     {
         this.level = level;
-        this.portalApi = portalApi;
         this.generalConfig = GeneralConfig.getInstance();
 
         this.temples = new HashMap<>();
@@ -57,6 +59,8 @@ public class TempleManager {
         ChallengeRoom.init(reg);
 
         MANAGERS = new HashMap<>();
+
+        PORTAL_API = ChallengeTempleMain.INSTANCE.portalApi;
     }
 
     public void load() {
@@ -142,8 +146,8 @@ public class TempleManager {
      * Creates a portal using the portal API
      * @param temple
      */
-    private static final double P_HEIGHT = 2;
-    private static final double P_WIDTH = 2;
+    static final double P_HEIGHT = 2;
+    static final double P_WIDTH = 2;
 
     private static boolean DISABLE_PORTALS = false;
 
@@ -172,11 +176,13 @@ public class TempleManager {
 
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(temple.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3( temple.getPortalDest() );
-        temple.portalToChallenge = portalApi.createPortal(P_WIDTH, P_HEIGHT, level,
+        temple.portalToChallenge = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, level,
              this.CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
 
-        temple.portalToHome = portalApi.createPortal(P_WIDTH, P_HEIGHT, this.CHALLENGE_LEVEL,
+        temple.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, this.CHALLENGE_LEVEL,
             level, destination, sourcePos, PortalApi.Direction.NORTH);
+
+        temple.buildChallenge();
     }
 
     public static ManagedTemple handlePlayerJoinedInTemple( ServerPlayer p, Level templeLevel, String id )

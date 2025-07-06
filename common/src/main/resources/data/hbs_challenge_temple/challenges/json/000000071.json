@@ -1,21 +1,21 @@
 {
-	"challengeId": "0000002x2",
+	"challengeId": "000000071",
 	"author": "Holy_Buckets",
-	"challengeName": "Template Small Temple",
-	"difficulty": 4,
-	"size": "2x2",
+	"challengeName": "Gold Challenge",
+	"difficulty": 0,
+	"size": "4x4",
 	"challengeRules": {
 		"playerMaxHearts": 10,
 		"maxDeaths": -1,
-		"resetBlocksOnPlayerDeath": true,
+		"resetBlocksOnPlayerDeath": false,
 		"resetChestsOnPlayerDeath": true,
 		"clearInventoryOnPlayerDeath": true,
 		"playerDropsInventoryOnDeath": true
 		
 	},
 	"lootRules": {
-		"lootPool": 4,
-		"specificLoot": ["minecraft:diamond_sword"]
+		"lootPool": 0,
+		"specificLoot": ["minecraft:gold_sword"]
 	}
 
 }

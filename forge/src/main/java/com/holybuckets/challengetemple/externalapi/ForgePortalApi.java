@@ -10,6 +10,11 @@ import qouteall.imm_ptl.core.platform_specific.IPRegistry;
 public class ForgePortalApi implements PortalApi {
 
 
+    @Override
+    public boolean isPortal(Entity entity) {
+        return entity != null && entity.getType() == IPRegistry.PORTAL.get();
+    }
+
     public Entity createPortal(double width, double height, Level fromLevel, Level toLevel,
                                Vec3 sourcePos, Vec3 destPos, Direction dir)
     {

@@ -1,6 +1,8 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
+import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -9,14 +11,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.core.jmx.Server;
 
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
+import static com.holybuckets.challengetemple.core.TempleManager.PORTAL_API;
 
 public class ManagedTemple {
 
@@ -25,6 +29,8 @@ public class ManagedTemple {
     private final BlockPos entityPos;
     private final BlockPos structurePos;
     private final BlockPos portalSourcePos;
+    private final BlockPos overworldExitPos;
+    private SimpleBlockEntity templeEntity;
 
     private final Level level;
     private final String templeId;
@@ -50,17 +56,72 @@ public class ManagedTemple {
      * @param level
      * @param pos
      */
-    public ManagedTemple(Level level, BlockPos pos) {
+    public ManagedTemple(Level level, BlockPos pos)
+    {
         this.level = level;
         this.entityPos = pos;
         this.portalSourcePos = pos.offset(SOURCE_OFFSET);
         this.structurePos = pos.offset(STRUCTURE_OFFSET);
+        this.overworldExitPos = pos.offset(SOURCE_EXIT_OFFSET);
 
         this.templeId = HBUtil.ChunkUtil.getId(pos);
         this.isCompleted = false;
 
         this.activePlayers = new HashSet<>();
         this.nearPlayers = new HashSet<>();
+
+    }
+
+    public void readEntityData()
+    {
+        if(this.templeEntity != null ) return;
+
+        BlockEntity entity = level.getBlockEntity(this.entityPos);
+        if( entity == null )
+            return;
+
+        if( !(entity instanceof SimpleBlockEntity) )
+            return;
+
+        this.templeEntity = (SimpleBlockEntity) entity;
+        if( templeEntity.getProperty("hasPortal") == null )
+            return;
+
+        if( templeEntity.getProperty("hasPortal").equals("true") )
+        {
+            AABB aabb = new AABB(
+                this.portalSourcePos.getX() - 0.5, this.portalSourcePos.getY() - 0.5, this.portalSourcePos.getZ() - 0.5,
+                this.portalSourcePos.getX() + 0.5, this.portalSourcePos.getY() + 0.5, this.portalSourcePos.getZ() + 0.5
+            );
+            List<Entity> entities = level.getEntities((Entity) null, aabb, PORTAL_API::isPortal);
+
+            BlockPos destPos = this.getPortalDest();
+            AABB destAABB = new AABB(
+                destPos.getX() - 0.5, destPos.getY() - 0.5, destPos.getZ() - 0.5,
+                destPos.getX() + 0.5, destPos.getY() + 0.5, destPos.getZ() + 0.5
+            );
+            List<Entity> destEntities = CHALLENGE_LEVEL.getEntities((Entity) null, destAABB, PORTAL_API::isPortal);
+            if(entities.isEmpty() && destEntities.isEmpty() ) {
+                return;
+            }
+            if(!entities.isEmpty() && !destEntities.isEmpty() ) {
+                this.portalToChallenge = entities.get(0);
+                this.portalToHome = destEntities.get(0);
+            } else if(!entities.isEmpty()) {
+                entities.get(0).discard();
+            } else if(!destEntities.isEmpty()) {
+                destEntities.get(0).discard();
+            }
+
+            String challengeId = templeEntity.getProperty("challengeId");
+            if( (challengeId==null) || challengeId.isEmpty() ) return;
+
+            this.challengeRoom = new ChallengeRoom(templeId,
+                this.overworldExitPos,
+                this.level,
+                challengeId);
+            this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
+        }
 
     }
 
@@ -73,7 +134,7 @@ public class ManagedTemple {
     }
 
     public BlockPos getPortalDest() {
-        return challengeRoom.getWorldPos().offset(DEST_OFFSET);
+        return ChallengeRoom.getWorldPos(this.templeId).offset(DEST_OFFSET);
     }
 
     public BlockPos getEntityPos() { return entityPos; }
@@ -102,13 +163,11 @@ public class ManagedTemple {
 
     //** CORE
 
-    void startWatchChallengers()
+    public void startWatchChallengers()
     {
         if( watchChallengersThread != null ) // Stop the previous thread if it's still running
             return;
 
-        if (this.challengeRoom != null)
-            this.challengeRoom.loadStructure();
         //We need to save this thread in a variable so we can interrupt it on shutdown
         this.watchChallengersThread = new Thread( this::threadWatchChallengers);
         this.watchChallengersThread.start();
@@ -144,14 +203,14 @@ public class ManagedTemple {
 
     }
 
-    public void buildChallenge() {
-        if (this.challengeRoom != null)
-        {
-            Vec3i overworldExitPos = this.portalSourcePos.offset(SOURCE_EXIT_OFFSET);
-            this.challengeRoom = new ChallengeRoom(this.templeId,
-                 overworldExitPos, this.level);
+    public void buildChallenge()
+    {
+        if (this.challengeRoom == null) {
+            this.challengeRoom = new ChallengeRoom( this.templeId, overworldExitPos,
+                 this.level);
+            this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
         }
-
+        this.startWatchChallengers();
     }
 
     public void playerTakeChallenge(ManagedChallenger player)

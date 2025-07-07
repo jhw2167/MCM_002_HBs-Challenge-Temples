@@ -2,11 +2,16 @@ package com.holybuckets.challengetemple.core;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.foundation.HBUtil;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Stores settings and metadata specific to each challenge.
@@ -16,12 +21,17 @@ public class Challenge {
     private String challengeId;
     private String author;
     private String challengeName;
+    private Block replaceEntityBlock;
     private String difficulty;
     private Vec3i size;
     private int totalPieces;
 
     private ChallengeRules challengeRules;
     private LootRules lootRules;
+
+    public BlockState getReplaceEntityBlockState() {
+        return replaceEntityBlock.defaultBlockState();
+    }
 
 
     public static class ChallengeRules {
@@ -70,6 +80,12 @@ public class Challenge {
         Challenge c = new Challenge();
         c.challengeId = json.get("challengeId").getAsString();
         c.author = json.get("author").getAsString();
+        if(json.has("replaceEntityBlocksWith")) {
+            String blockName = json.get("replaceEntityBlocksWith").getAsString();
+            c.replaceEntityBlock = HBUtil.BlockUtil.blockNameToBlock(blockName);
+        } else {
+            c.replaceEntityBlock = ModBlocks.challengeBrick; // No block to replace entity
+        }
         c.challengeName = json.get("challengeName").getAsString();
         c.difficulty = json.get("difficulty").getAsString();
         c.setSize(json.get("size"));
@@ -115,14 +131,13 @@ public class Challenge {
 
     private void setSpecificLoot(JsonElement lootArr)
     {
-        List<Item> loot = List.of();
-        this.lootRules.specificLoot = loot;
+        this.lootRules.specificLoot = new ArrayList<>();
         if(lootArr.isJsonNull()) return;
 
         String[] items = lootArr.getAsString().split(",");
         for(String s : items) {
             Item item = HBUtil.ItemUtil.itemNameToItem(s.trim());
-            if( item != null) loot.add(item);
+            if( item != null) lootRules.specificLoot.add(item);
         }
 
     }

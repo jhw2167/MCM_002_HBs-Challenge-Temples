@@ -3,7 +3,7 @@
     "author": "Holy_Buckets",
     "challengeName": "Template Small Temple",
     "difficulty": 4,
-    "size": "2x2",
+    "size": "4x4",
     "challengeRules": {
         "playerMaxHearts": 10,
         "maxDeaths": -1,

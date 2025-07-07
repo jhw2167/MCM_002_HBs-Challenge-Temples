@@ -32,7 +32,7 @@ public class TempleManager {
 
     static ServerLevel CHALLENGE_LEVEL;
     static Map<LevelAccessor, TempleManager> MANAGERS;
-    private static PortalApi PORTAL_API;
+    static PortalApi PORTAL_API;
 
     private final ServerLevel level;
 
@@ -100,13 +100,13 @@ public class TempleManager {
     }
 
     //** CORE
+    private void workerThreadReadEntityData()
+    {
+        temples.values().stream()
+            .filter(t -> t.isFullyLoaded() )
+            .forEach(ManagedTemple::readEntityData);
+    }
 
-    /**
-     * Description: 1. Finds all temples in the world
-     * 2. Checks if the temple is in a loaded chunk
-     * 3. If so, builds portal
-     *
-     */
     private void workerThreadBuildPortal()
     {
         temples.values().stream()
@@ -114,6 +114,11 @@ public class TempleManager {
             .filter(t -> !t.hasPortal() )
             .filter(t -> t.playerInPortalRange() )
             .forEach( this::handleBuildPortal );
+
+        //activate startWatchChallengers for all temples with portals
+        temples.values().stream()
+            .filter(ManagedTemple::hasPortal)
+            .forEach(ManagedTemple::startWatchChallengers);
     }
 
     //* HANDLERS
@@ -161,25 +166,17 @@ public class TempleManager {
             return;
         }
 
-        BlockEntity entity = level.getBlockEntity(pos);
-        temple.startWatchChallengers();
-        if( entity == null ) return;
-        if( entity instanceof SimpleBlockEntity ) {
-            SimpleBlockEntity be = (SimpleBlockEntity) entity;
-            if( be.getProperty("hasPortal") == null ) {
-
-            } else if (be.getProperty("hasPortal").equals("true")) {
-                return;
-            }
-            be.setProperty("hasPortal", "true");
+        if( temple.hasPortal() ) {
+            LoggerProject.logDebug("005010", "Temple already has a portal: " + temple.getTempleId());
+            return;
         }
 
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(temple.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3( temple.getPortalDest() );
         temple.portalToChallenge = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, level,
-             this.CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
+             CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
 
-        temple.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, this.CHALLENGE_LEVEL,
+        temple.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
             level, destination, sourcePos, PortalApi.Direction.NORTH);
 
         temple.buildChallenge();
@@ -207,6 +204,7 @@ public class TempleManager {
     }
 
     private void handleOnServerTicks120() {
+        workerThreadReadEntityData();
         workerThreadBuildPortal();
     }
 
@@ -218,12 +216,11 @@ public class TempleManager {
         Level dimTo = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getToDim() );
         LoggerProject.logDebug("005010", "Player changed dimension from " + dimFrom + " to " + dimTo);
 
+        String chunkId = HBUtil.ChunkUtil.getId(event.getPlayer().getOnPos());
         if( dimFrom == CHALLENGE_LEVEL ) {
-            MANAGERS.get(dimTo).temples.values().stream()
-                .filter(mt -> mt.playerInChallenge(c))
-                .forEach(m -> m.playerEndChallenge(c));
+            MANAGERS.get(dimTo).temples.get(chunkId).playerEndChallenge(c);
         } else if( dimTo == CHALLENGE_LEVEL ) {
-            MANAGERS.get(dimFrom).temples.values().forEach(m -> m.playerTakeChallenge(c));
+            MANAGERS.get(dimFrom).temples.get(chunkId).playerTakeChallenge(c);
         }
 
     }

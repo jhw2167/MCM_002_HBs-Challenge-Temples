@@ -164,6 +164,12 @@ public class ChallengeDB {
 
 
     static class ChallengeFilter {
+        String challengeId;
+
+        public ChallengeFilter setChallengeId(String challengeId) {
+            this.challengeId = challengeId;
+            return this;
+        }
         // Filters for challenges based on chunkId, player data, etc.
     }
 

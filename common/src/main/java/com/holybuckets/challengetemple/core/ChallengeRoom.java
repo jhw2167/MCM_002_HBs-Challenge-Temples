@@ -32,17 +32,16 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
-import static com.holybuckets.challengetemple.core.TempleManager.P_HEIGHT;
-import static com.holybuckets.challengetemple.core.TempleManager.P_WIDTH;
+import static com.holybuckets.challengetemple.core.TempleManager.*;
+import static com.holybuckets.challengetemple.core.ChallengeDB.ChallengeFilter;
 
 public class ChallengeRoom {
 
     private static final String CLASS_ID = "007"; // Class ID for logging purposes
 
-    private final String challengeId;
-    private final String chunkId;
-    private final Challenge challenge;
+    private String challengeId;
+    private String chunkId;
+    private Challenge challenge;
     private final Vec3i overworldExitPos;
     private final Level returnLevel;
     private boolean roomLoaded;
@@ -52,13 +51,13 @@ public class ChallengeRoom {
     private List<BlockPos> graveyardPositions = new ArrayList<>();
 
     //challenge exit
+    private BlockPos worldPos;
     private BlockPos challengeExitPos;
     private BlockPos exitStructurePos;
     private Entity exitPortal;      //exit portal on the floor, 2x2 in x,z direction
 
 
     //Statics
-    private static PortalApi PORTAL_API;
     static final int CHALLENGE_DIM_HEIGHT = 64;
     static final int MAX_GRAVES = 3;
     static final Map<String, ChallengeRoom> ACTIVE_ROOMS = new HashMap<>(); // Maps chunkId to ChallengeRoom
@@ -79,16 +78,23 @@ public class ChallengeRoom {
     };
     private static BlockState EXIT_PORTAL_BLOCK;
 
-    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel)
+    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel, String challengeId)
     {
-
         this.chunkId = chunkId;
+        this.worldPos = ChallengeRoom.getWorldPos(chunkId);
         this.overworldExitPos = overworldExitPos;
         this.returnLevel = returnLevel;
-        this.challenge = ChallengeDB.chooseChallenge(null);
-        this.challengeId = this.challenge.getChallengeId();
+        this.setChallenge(challengeId);
         this.roomLoaded = false;
         ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
+
+        this.loadStructure();
+    }
+
+
+    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel)
+    {
+        this(chunkId, overworldExitPos, returnLevel, null);
     }
 
     //** CORE
@@ -154,6 +160,8 @@ public class ChallengeRoom {
                 (useTemplate) ? 2 : 18                         // Block update flag
             );
 
+            BlockState replaceEntityBlock = this.challenge.getReplaceEntityBlockState();
+            CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
             return succeeded;
         }
 
@@ -224,7 +232,7 @@ public class ChallengeRoom {
         return this.generateExitPortal();
     }
 
-    private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(2, 1, 2); // Offset for the exit portal position
+    private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(1, 1, 1); // Offset for the exit portal position
     private boolean generateExitPortal()
     {
         BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_OFFSET);
@@ -258,15 +266,12 @@ public class ChallengeRoom {
         return this.loadStructure();
     }
 
-    public void startChallenge() {
-       this.generateExitStructure();
+    BlockPos getWorldPos() {
+        return this.worldPos;
     }
 
-
-
-    public BlockPos getWorldPos() {
-        BlockPos pos = HBUtil.ChunkUtil.getWorldPos(chunkId);
-        return new BlockPos(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ());
+    public void startChallenge() {
+       this.generateExitStructure();
     }
 
     public String getChallengeId() {
@@ -277,6 +282,16 @@ public class ChallengeRoom {
         this.roomActive = isActive;
     }
 
+    public void setChallenge(String ChallengeId)
+    {
+        ChallengeFilter filter = new ChallengeFilter()
+            .setChallengeId(ChallengeId);
+        this.challenge = ChallengeDB.chooseChallenge(filter);
+        if(this.challenge == null)
+            this.challenge = ChallengeDB.chooseChallenge(null);
+
+        this.challengeId = this.challenge.getChallengeId();
+    }
 
 
     private static final Vec3i GRAVEYARD_START_OFFSET = new Vec3i(-4, 1, 1);
@@ -362,7 +377,8 @@ public class ChallengeRoom {
     /**
      * Loads after TempletManager loads
      */
-    public static void load() {
+    public static void load()
+    {
         DataStore ds = GeneralConfig.getInstance().getDataStore();
         LevelSaveData levelData = ds.getOrCreateLevelSaveData(Constants.MOD_ID, CHALLENGE_LEVEL);
 
@@ -373,14 +389,16 @@ public class ChallengeRoom {
             PROTECTED_GRAVE_POS.addAll( gravePos );
         }
 
-
-
         EXIT_PORTAL_BLOCK = HBUtil.BlockUtil
             .blockNameToBlock("minecraft", "soul_torch")
             .defaultBlockState();
 
     }
 
+    public static BlockPos getWorldPos(String chunkId) {
+        BlockPos pos = HBUtil.ChunkUtil.getWorldPos(chunkId);
+        return new BlockPos(pos.getX(), CHALLENGE_DIM_HEIGHT, pos.getZ());
+    }
 
 
     private static void on120TicksClearGraves(ServerTickEvent event)

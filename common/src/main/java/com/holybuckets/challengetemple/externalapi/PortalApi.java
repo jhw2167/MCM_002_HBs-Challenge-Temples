@@ -9,4 +9,11 @@ public interface PortalApi {
 
     Entity createPortal(double width, double height, Level fromLevel, Level toLevel,
                         Vec3 sourcePos, Vec3 destPos, Direction dir);
+
+    boolean isPortal(Entity entity);
+
+    default boolean deletePortal(Entity entity) {
+        entity.discard();
+        return true;
+    }
 }

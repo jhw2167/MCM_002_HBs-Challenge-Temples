@@ -142,6 +142,8 @@ Requirements
 	12. add chest witholding logic
 	
 
+	NEXT STEP - ensure portal exit structure builds on structure startup, wired up to
+	playerStartChallenge method
 
 
 12. To do

@@ -2,7 +2,7 @@
     "challengeId": "000000914",
     "author": "Holy_Buckets",
     "challengeName": "Diamond Challenge",
-    "replaceEntityBlocks": "diamond_block",
+    "replaceStructureBlocksWith": ["diamond_block", "air"],
     "difficulty": 0,
     "size": "4x4",
     "challengeRules": {

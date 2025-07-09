@@ -38,6 +38,14 @@ public class ForgePortalApi implements PortalApi {
         }
         portal.axisH = new Vec3(0, 1, 0);
 
+        if (dir == Direction.DOWN) {
+            portal.axisW = new Vec3(1, 0, 0);
+            portal.axisH = new Vec3(0, 0, 1);
+        } else if (dir == Direction.UP) {
+            portal.axisW = new Vec3(0, 0, 1);
+            portal.axisH = new Vec3(1, 0, 0);
+        }
+
         portal.width = width;
         portal.height = height;
 

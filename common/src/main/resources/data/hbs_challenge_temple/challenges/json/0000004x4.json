@@ -4,6 +4,7 @@
     "challengeName": "Template Small Temple",
     "difficulty": 4,
     "size": "4x4",
+    "replaceStructureBlocksWith": ["diamond_block", "air"],
     "challengeRules": {
         "playerMaxHearts": 10,
         "maxDeaths": -1,

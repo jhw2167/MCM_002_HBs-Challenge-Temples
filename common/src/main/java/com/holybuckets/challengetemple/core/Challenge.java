@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple.core;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.holybuckets.challengetemple.block.ModBlocks;
@@ -7,11 +8,10 @@ import com.holybuckets.foundation.HBUtil;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Stores settings and metadata specific to each challenge.
@@ -21,7 +21,7 @@ public class Challenge {
     private String challengeId;
     private String author;
     private String challengeName;
-    private Block replaceEntityBlock;
+    private List<Block> replaceEntityBlocks;
     private String difficulty;
     private Vec3i size;
     private int totalPieces;
@@ -29,8 +29,8 @@ public class Challenge {
     private ChallengeRules challengeRules;
     private LootRules lootRules;
 
-    public BlockState getReplaceEntityBlockState() {
-        return replaceEntityBlock.defaultBlockState();
+    public List<Block> getReplaceEntityBlocks() {
+        return replaceEntityBlocks;
     }
 
 
@@ -80,12 +80,7 @@ public class Challenge {
         Challenge c = new Challenge();
         c.challengeId = json.get("challengeId").getAsString();
         c.author = json.get("author").getAsString();
-        if(json.has("replaceEntityBlocksWith")) {
-            String blockName = json.get("replaceEntityBlocksWith").getAsString();
-            c.replaceEntityBlock = HBUtil.BlockUtil.blockNameToBlock(blockName);
-        } else {
-            c.replaceEntityBlock = ModBlocks.challengeBrick; // No block to replace entity
-        }
+        c.setReplaceEntityBlocks(json);
         c.challengeName = json.get("challengeName").getAsString();
         c.difficulty = json.get("difficulty").getAsString();
         c.setSize(json.get("size"));
@@ -110,6 +105,32 @@ public class Challenge {
         c.setSpecificLoot(lootRules.get("specificLoot"));
 
         return c;
+    }
+
+    private void setReplaceEntityBlocks(JsonObject json)
+    {
+        this.replaceEntityBlocks = new ArrayList<>();
+        if(json.has("replaceStructureBlocksWith"))
+        {
+            JsonArray blocks = json.get("replaceStructureBlocksWith").getAsJsonArray();
+            if(blocks.size() == 0) {
+                //nothing
+            } else if(blocks.size() == 1) {
+                Block block = HBUtil.BlockUtil.blockNameToBlock(blocks.get(0).getAsString());
+                if(block != null) this.replaceEntityBlocks.add(block);
+            } else {
+                for(JsonElement e : blocks) {
+                    Block block = HBUtil.BlockUtil.blockNameToBlock(e.getAsString());
+                    if(block != null) this.replaceEntityBlocks.add(block);
+                }
+            }
+        }
+
+        if(this.replaceEntityBlocks.size() < 1)
+            this.replaceEntityBlocks.add(ModBlocks.challengeBrick);
+
+        if(this.replaceEntityBlocks.size() < 2)
+            this.replaceEntityBlocks.add(Blocks.AIR);
     }
 
     private void setSize(JsonElement json)

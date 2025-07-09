@@ -1,6 +1,8 @@
 challengeId,author,challengeName,doUse
 000000071,Holy_Buckets,Gold Challenge Room,0
 000000439,Holy_Buckets,Iron Challenge Room,0
-0000002x2,Holy_Buckets,Template Small Temple,1
-0000004x4,Holy_Buckets,Template Large Temple,1
+0000002x2,Holy_Buckets,Template Small Temple,0
+0000004x4,Holy_Buckets,Template Large Temple,0
 000000914,Holy_Buckets,Diamond Challenge,1
+000000624,Holy_Buckets,Gold Challenge,1
+000000408,Holy_Buckets,Iron Challenge,1

@@ -1,14 +1,13 @@
 {
-    "challengeId": "000000914",
+    "challengeId": "000000624",
     "author": "Holy_Buckets",
-    "challengeName": "Diamond Challenge",
-    "replaceStructureBlocksWith": ["diamond_block", "air"],
+    "challengeName": "Gold Challenge",
     "difficulty": 0,
-    "size": "4x4",
+    "size": "2x2",
     "challengeRules": {
         "playerMaxHearts": 10,
         "maxDeaths": -1,
-        "resetBlocksOnPlayerDeath": true,
+        "resetBlocksOnPlayerDeath": false,
         "resetChestsOnPlayerDeath": true,
         "clearInventoryOnPlayerDeath": true,
         "playerDropsInventoryOnDeath": true
@@ -16,7 +15,7 @@
     "lootRules": {
         "lootPool": 0,
         "specificLoot": [
-            "minecraft:diamond_sword"
+            "minecraft:gold_sword"
         ]
     }
 }

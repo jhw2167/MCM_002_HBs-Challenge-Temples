@@ -1,22 +1,21 @@
 {
-    "challengeId": "000000914",
+    "challengeId": "000000408",
     "author": "Holy_Buckets",
-    "challengeName": "Diamond Challenge",
-    "replaceStructureBlocksWith": ["diamond_block", "air"],
+    "challengeName": "Iron Challenge",
     "difficulty": 0,
-    "size": "4x4",
+    "size": "2x2",
     "challengeRules": {
         "playerMaxHearts": 10,
         "maxDeaths": -1,
         "resetBlocksOnPlayerDeath": true,
-        "resetChestsOnPlayerDeath": true,
-        "clearInventoryOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": false,
+        "clearInventoryOnPlayerDeath": false,
         "playerDropsInventoryOnDeath": true
     },
     "lootRules": {
         "lootPool": 0,
         "specificLoot": [
-            "minecraft:diamond_sword"
+            "minecraft:iron_sword"
         ]
     }
 }

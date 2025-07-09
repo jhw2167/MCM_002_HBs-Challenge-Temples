@@ -3,7 +3,7 @@
 	"author": "Holy_Buckets",
 	"challengeName": "Gold Challenge",
 	"difficulty": 0,
-	"size": "4x4",
+	"size": "2x2",
 	"challengeRules": {
 		"playerMaxHearts": 10,
 		"maxDeaths": -1,

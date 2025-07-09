@@ -23,6 +23,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -160,8 +161,16 @@ public class ChallengeRoom {
                 (useTemplate) ? 2 : 18                         // Block update flag
             );
 
-            BlockState replaceEntityBlock = this.challenge.getReplaceEntityBlockState();
-            CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
+            //Need to replace structure blocks with actual blocks
+            List<Block> repl = challenge.getReplaceEntityBlocks();
+            if( pieceId.equals( "03" ) ) {
+                BlockState replaceEntityBlock = repl.get(0).defaultBlockState();
+                CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
+            } else if( pieceId.equals( "07" ) ) {
+                BlockState replaceEntityBlock = repl.get(1).defaultBlockState();
+                CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
+            }
+
             return succeeded;
         }
 
@@ -176,7 +185,6 @@ public class ChallengeRoom {
      */
     private boolean generateExitStructure()
     {
-        if( this.roomLoaded ) return false;
 
         if( this.exitPortal != null ) {
             this.exitPortal.remove(Entity.RemovalReason.DISCARDED);
@@ -194,6 +202,7 @@ public class ChallengeRoom {
                     BlockState state = CHALLENGE_LEVEL.getBlockState(pos);
                     if(state.equals(EXIT_PORTAL_BLOCK)) {
                         this.exitStructurePos = pos.offset(0,-1,0); // Found the exit portal block
+                        sz = new Vec3i(0,0,0);
                         break;
                     }
                 }
@@ -232,21 +241,21 @@ public class ChallengeRoom {
         return this.generateExitPortal();
     }
 
-    private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(1, 1, 1); // Offset for the exit portal position
+    private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(2, 1, 2); // Offset for the exit portal position
     private boolean generateExitPortal()
     {
         BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_OFFSET);
         //Check position for soul_torch - TBD
         //BlockState state = CHALLENGE_LEVEL.getBlockState(portalTorchPos);
-        Vec3i portalPos = portalTorchPos.offset(1,0,1);
+        Vec3i portalPos = portalTorchPos.offset(1,-1,1);
 
         this.exitPortal = PORTAL_API.createPortal(
             P_WIDTH, P_HEIGHT,
             CHALLENGE_LEVEL,
             returnLevel,
-            toVec3( overworldExitPos),
             toVec3( portalPos ),
-            PortalApi.Direction.DOWN
+            toVec3( overworldExitPos),
+            PortalApi.Direction.UP
         );
 
         return this.exitPortal != null;
@@ -344,6 +353,15 @@ public class ChallengeRoom {
      */
     void removeGravePos(BlockPos pos) {
         PROTECTED_GRAVE_POS.remove(pos); // Remove from protected graves
+    }
+
+    private void clearExitPortal() {
+        if (this.exitPortal != null) {
+            this.exitPortal.remove(Entity.RemovalReason.DISCARDED);
+            this.exitPortal = null;
+        }
+        this.exitStructurePos = null;
+        this.roomLoaded = false;
     }
 
     //* UTILITY
@@ -469,9 +487,12 @@ public class ChallengeRoom {
         //3. clear values
         for (ChallengeRoom room : ACTIVE_ROOMS.values()) {
             room.graveyardPositions.clear();
+            room.clearExitPortal();
         }
         ACTIVE_ROOMS.clear();
     }
+
+
 
 
 }

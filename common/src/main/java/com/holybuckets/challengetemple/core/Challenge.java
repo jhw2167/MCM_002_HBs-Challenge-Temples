@@ -7,11 +7,14 @@ import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.foundation.HBUtil;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Stores settings and metadata specific to each challenge.
@@ -53,10 +56,10 @@ public class Challenge {
 
     public static class LootRules {
         int lootPool;
-        List<Item> specificLoot;
+        List<ItemStack> specificLoot;
 
         public int getLootPool() { return lootPool; }
-        public List<Item> getSpecificLoot() { return specificLoot; }
+        public List<ItemStack> getSpecificLoot() { return specificLoot; }
     }
 
     // Public getters for main Challenge fields
@@ -155,10 +158,21 @@ public class Challenge {
         this.lootRules.specificLoot = new ArrayList<>();
         if(lootArr.isJsonNull()) return;
 
+        Map<Item, Integer> counts = new HashMap<>();
         String[] items = lootArr.getAsString().split(",");
         for(String s : items) {
             Item item = HBUtil.ItemUtil.itemNameToItem(s.trim());
-            if( item != null) lootRules.specificLoot.add(item);
+            if(item == null) continue;
+            if(counts.containsKey(item)) {
+                counts.put(item, counts.get(item) + 1);
+            } else {
+                counts.put(item, 1);
+            }
+        }
+
+        for(Map.Entry<Item, Integer> entry : counts.entrySet()) {
+            ItemStack stack = new ItemStack(entry.getKey(), entry.getValue());
+            this.lootRules.specificLoot.add(stack);
         }
 
     }

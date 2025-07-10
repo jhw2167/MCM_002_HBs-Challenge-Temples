@@ -218,7 +218,8 @@ public class TempleManager {
 
         String chunkId = HBUtil.ChunkUtil.getId(event.getPlayer().getOnPos());
         if( dimFrom == CHALLENGE_LEVEL ) {
-            MANAGERS.get(dimTo).temples.get(chunkId).playerEndChallenge(c);
+            ManagedTemple temple = c.getActiveTemple();
+            if(temple != null) temple.playerEndChallenge(c);
         } else if( dimTo == CHALLENGE_LEVEL ) {
             MANAGERS.get(dimFrom).temples.get(chunkId).playerTakeChallenge(c);
         }
@@ -245,9 +246,6 @@ public class TempleManager {
     }
 
 
-    public static void onPlayerLeave(Player p) {
-
-    }
 
     public void shutdown() {
         LoggerProject.logInfo("005999", "Shutting down TempleManager for level: " + this.level);

@@ -7,18 +7,27 @@ import com.holybuckets.foundation.console.Messager;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.modelInterface.IManagedPlayer;
 import com.holybuckets.foundation.player.ManagedPlayer;
+import net.blay09.mods.balm.api.event.BalmEvents;
 import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
+import net.blay09.mods.balm.api.event.UseBlockEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.holybuckets.challengetemple.core.ChallengeRoom.EXIT_PORTAL_BLOCK;
 import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
 import static com.holybuckets.foundation.player.ManagedPlayer.registerManagedPlayerData;
 
@@ -78,10 +87,14 @@ public class ManagedChallenger implements IManagedPlayer {
         Messager.getInstance().sendChat( (ServerPlayer) p, msg );
 
         //2. Clear Inventory
+        lastGravePos = managedTemple.getChallengeRoom().addGrave(this);
         new Thread(() -> challengerClearInventory(managedTemple)).start();
 
         //3. Set player spawn to inside the temple
 
+        //4. Collect data
+        challengesTaken.add(managedTemple.getChallengeRoom().getChallengeId());
+        templesEntered.add(managedTemple.getTempleId());
     }
 
         private void challengerClearInventory(ManagedTemple managedTemple)
@@ -93,13 +106,6 @@ public class ManagedChallenger implements IManagedPlayer {
             } catch (InterruptedException e) {
                 return;
             }
-
-            if (p.level() != CHALLENGE_LEVEL) {
-                LoggerProject.logDebug("000000", "Player in dimension " + p.level());
-            }
-
-
-            lastGravePos = managedTemple.getChallengeRoom().addGrave(this);
 
             //2. Clear the inventory multiple times, protecting against cheese
             final int TOTAL_CLEARS = 10;
@@ -115,9 +121,6 @@ public class ManagedChallenger implements IManagedPlayer {
 
             //3. Clear items on the ground around the player
 
-            //4. Collect data
-            challengesTaken.add(managedTemple.getChallengeRoom().getChallengeId());
-            templesEntered.add(managedTemple.getTempleId());
         }
 
     public void endChallenge(ManagedTemple managedTemple) {
@@ -129,7 +132,7 @@ public class ManagedChallenger implements IManagedPlayer {
 
     public void completedChallenge(ManagedTemple managedTemple) {
         challengesComplete.add(managedTemple.getChallengeRoom().getChallengeId());
-        this.endChallenge(managedTemple);
+        challengerClearInventory(managedTemple);
     }
 
     //** EVENTS
@@ -145,8 +148,46 @@ public class ManagedChallenger implements IManagedPlayer {
 
     }
 
+    /*
+    public static void onPlayerUsedBlock(UseBlockEvent e)
+    {
+        ///Check if this occured in challenge level or we dont care
+        if (e.getLevel() != CHALLENGE_LEVEL) return;
 
-   //** OVERRIDES
+        Player player = e.getPlayer();
+        if (player == null) return;
+
+        ManagedChallenger challenger = CHALLENGERS.get(player);
+        if (challenger == null) return;
+
+        if (challenger.activeTemple != null) {
+            challenger.onBlockUsed(e);
+        }
+    }
+
+    private void onBlockUsed(UseBlockEvent e)
+    {
+        //Handle block used in challenge temple
+        if (this.activeTemple == null) return;
+
+        InteractionHand hand = e.getHand();
+        ItemStack stack = this.p.getItemInHand(hand);
+        if (stack.isEmpty()) return;
+        Item exitPortalItem = EXIT_PORTAL_BLOCK.getBlock().asItem();
+        if( stack.getItem() == exitPortalItem) {
+            //If the player used the exit portal item, end the challenge
+            LoggerProject.logDebug("010014", "Player " + p.getDisplayName().getString() + " used exit portal item in challenge temple");
+            this.endChallenge(this.activeTemple);
+            e.setCanceled(true); //cancel the event to prevent placing the block
+        } else {
+            //Handle other blocks used in challenge temple
+            this.activeTemple.onBlockUsed(e);
+        }
+    }
+    */
+
+
+    //** OVERRIDES
 
     @Override
     public boolean isServerOnly() {
@@ -205,6 +246,10 @@ public class ManagedChallenger implements IManagedPlayer {
 
     public ServerPlayer getServerPlayer() {
         return (ServerPlayer) p;
+    }
+
+    public ManagedTemple getActiveTemple() {
+        return activeTemple;
     }
 
     @Override

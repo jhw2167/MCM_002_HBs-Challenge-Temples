@@ -21,6 +21,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -47,6 +49,7 @@ public class ChallengeRoom {
     private final Level returnLevel;
     private boolean roomLoaded;
     private boolean roomActive;
+    private boolean roomCompleted;
     private BlockEntity structureBlock;
     private StructureTemplate structureTemplate;
     private List<BlockPos> graveyardPositions = new ArrayList<>();
@@ -77,7 +80,7 @@ public class ChallengeRoom {
         new Vec3i(32, 48, 32), // 07
         new Vec3i(0, 0, 0) // 08
     };
-    private static BlockState EXIT_PORTAL_BLOCK;
+    static BlockState EXIT_PORTAL_BLOCK;
 
     ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel, String challengeId)
     {
@@ -87,6 +90,8 @@ public class ChallengeRoom {
         this.returnLevel = returnLevel;
         this.setChallenge(challengeId);
         this.roomLoaded = false;
+        this.roomActive = false;
+        this.roomCompleted = false;
         ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
 
         this.loadStructure();
@@ -238,33 +243,58 @@ public class ChallengeRoom {
         this.roomLoaded = true;
 
         //2. Generate the exit portal
-        return this.generateExitPortal();
-    }
-
-    private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(2, 1, 2); // Offset for the exit portal position
-    private boolean generateExitPortal()
-    {
-        BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_OFFSET);
-        //Check position for soul_torch - TBD
-        //BlockState state = CHALLENGE_LEVEL.getBlockState(portalTorchPos);
-        Vec3i portalPos = portalTorchPos.offset(1,-1,1);
-
-        this.exitPortal = PORTAL_API.createPortal(
-            P_WIDTH, P_HEIGHT,
-            CHALLENGE_LEVEL,
-            returnLevel,
-            toVec3( portalPos ),
-            toVec3( overworldExitPos),
-            PortalApi.Direction.UP
-        );
-
-        return this.exitPortal != null;
+        //return this.generateExitPortal(); triggered by player in managedChallenger
+        return true;
     }
 
         private Vec3 toVec3(Vec3i pos) {
             return new Vec3(pos.getX(), pos.getY(), pos.getZ());
         }
 
+
+    private static final Vec3i EXIT_PORTAL_MARKER_OFFSET = new Vec3i(1, 1, 1);
+    /**
+     * Tries to test if the room is complete by determining
+     * if all soul torches are present in the structure
+     * @return true if the challenge is completed
+     */
+    boolean testRoomCompleted()
+    {
+        if(this.exitStructurePos == null) return false; // No exit structure found
+
+          BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
+        BlockPos temp = portalTorchPos;
+        //** Check all 4 soul torches in the 4x4 area
+        BlockState state = CHALLENGE_LEVEL.getBlockState(temp);
+        for(int i =0; i<4; i++)
+        {
+            if(!state.equals(EXIT_PORTAL_BLOCK))  return false;
+            if(i == 0) temp = temp.offset(3, 0, 0); // Move to next torch
+            else if(i == 1) temp = temp.offset(0, 0, 3); // Move to next torch
+            else if(i == 2) temp = temp.offset(-3, 0, 0); // Move to next torch
+            state = CHALLENGE_LEVEL.getBlockState(temp);
+        }
+
+        this.roomCompleted = true;
+        return  generateExitPortal(portalTorchPos);
+    }
+
+
+        private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(2, -1, 2);
+        private boolean generateExitPortal(BlockPos portalTorchPos) {
+            Vec3i portalPos = portalTorchPos.offset(EXIT_PORTAL_OFFSET);
+
+            this.exitPortal = PORTAL_API.createPortal(
+                P_WIDTH, P_HEIGHT,
+                CHALLENGE_LEVEL,
+                returnLevel,
+                toVec3( portalPos ),
+                toVec3( overworldExitPos),
+                PortalApi.Direction.UP
+            );
+
+            return this.exitPortal != null;
+        }
 
     /**
      * Triggers a refresh of the structure by reloading all parts
@@ -279,8 +309,17 @@ public class ChallengeRoom {
         return this.worldPos;
     }
 
+    boolean isRoomCompleted() {
+        return this.roomCompleted;
+    }
+
     public void startChallenge() {
        this.generateExitStructure();
+       this.roomActive = true;
+    }
+
+    public List<ItemStack> getChallengeLoot() {
+        return this.challenge.getLootRules().getSpecificLoot();
     }
 
     public String getChallengeId() {
@@ -388,6 +427,7 @@ public class ChallengeRoom {
     public static void init(EventRegistrar reg) {
         // Register the static event handler
         reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
+        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ChallengeRoom::on20TicksTryExitPortal);
 
         PORTAL_API = ChallengeTempleMain.INSTANCE.portalApi;
     }
@@ -435,6 +475,12 @@ public class ChallengeRoom {
             MinecraftServer server = GeneralConfig.getInstance().getServer();
             ChallengeTempleMain.INSTANCE.inventoryApi.clearUnusedGraves(server);
         }
+    }
+
+    private static void on20TicksTryExitPortal(ServerTickEvent event) {
+        ACTIVE_ROOMS.values().stream()
+            .filter(room -> room.roomActive && room.exitPortal == null)
+            .forEach(r -> r.testRoomCompleted());
     }
 
     private static final StructurePlaceSettings TEMPLATE_SETTINGS = new StructurePlaceSettings()

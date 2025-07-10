@@ -9,9 +9,13 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -205,6 +209,7 @@ public class ManagedTemple {
 
     public void buildChallenge()
     {
+        this.templeEntity.setProperty("hasPortal", "true");
         if (this.challengeRoom == null) {
             this.challengeRoom = new ChallengeRoom( this.templeId, overworldExitPos,
                  this.level);
@@ -228,12 +233,21 @@ public class ManagedTemple {
         this.challengeRoom.startChallenge();
     }
 
+    /**
+     * Challenge marked as complete when player places the 4 soul torches
+     * @param p
+     */
+    public void playerCompleteChallenge(ServerPlayer p) {
+        this.isCompleted = true;
+    }
+
     public void playerJoinedInChallenge(ServerPlayer p) {
         nearPlayers.add(p);
         activePlayers.add(p);
         this.challengeRoom.setActive( true );
     }
 
+    private static Vec3i REWARDS_CHEST_OFFSET = new Vec3i(0, -1, 4);
     public void playerEndChallenge(ManagedChallenger player)
     {
         boolean containedPlayer = activePlayers.remove(player.getServerPlayer());
@@ -241,6 +255,13 @@ public class ManagedTemple {
         if( activePlayers.isEmpty() ) {
             this.challengeRoom.setActive( false );
         }
+
+        if(challengeRoom.isRoomCompleted()) {
+            this.playerCompleteChallenge(player.getServerPlayer());
+            player.completedChallenge(this);
+            loadRewardsChest();
+        }
+
         player.endChallenge(this);
         this.challengeRoom.removeGravePos(player.lastGravePos);
 
@@ -249,10 +270,32 @@ public class ManagedTemple {
         }
     }
 
+    public void loadRewardsChest()
+    {
+        BlockPos chestPos = this.entityPos.offset(REWARDS_CHEST_OFFSET);
+        BlockEntity chestEntity = level.getBlockEntity(chestPos);
+        if (chestEntity instanceof ChestBlockEntity) {
+            ChestBlockEntity chest = (ChestBlockEntity) chestEntity;
+            int i = 0;
+            for( ItemStack stack : challengeRoom.getChallengeLoot() ) {
+                chest.setItem(i++, stack);
+            }
+
+        } else {
+            //drop items on ground
+            Vec3 pos = toVec3(chestPos).add(0.5, 0.5, 0.5);
+            for( ItemStack stack: challengeRoom.getChallengeLoot() ) {
+                ItemEntity ent = new ItemEntity(level, pos.x, pos.y, pos.z, stack);
+                level.addFreshEntity(ent);
+            }
+        }
+
+    }
+
 
     //** UTILITY
     private static Vec3 toVec3(BlockPos pos) {
-        return ManagedTemple.toVec3(pos);
+        return HBUtil.BlockUtil.toVec3(pos);
     }
 
     public boolean isFullyLoaded() {

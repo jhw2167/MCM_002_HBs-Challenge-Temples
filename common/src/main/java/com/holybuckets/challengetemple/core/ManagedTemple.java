@@ -51,7 +51,7 @@ public class ManagedTemple {
     private static Vec3i STRUCTURE_OFFSET = new Vec3i(-4, -4, -2);
 
     private static final Vec3i SOURCE_OFFSET = new Vec3i(0, -1, 1);
-    private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 1);
+    private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 0);
     private static final Vec3i SOURCE_EXIT_OFFSET = new Vec3i(0, 1, 3);
     private static final int CHALLENGE_DIM_HEIGHT = 64;
 
@@ -224,6 +224,8 @@ public class ManagedTemple {
             return;
         }
 
+        new Thread(this::suspendPortals).start();
+
         if( nearPlayers.contains(player.getServerPlayer()) ) {
             if (activePlayers.contains(player.getServerPlayer())) return;
             activePlayers.add(player.getServerPlayer());
@@ -262,6 +264,8 @@ public class ManagedTemple {
             loadRewardsChest();
         }
 
+        new Thread(this::suspendPortals).start();
+
         player.endChallenge(this);
         this.challengeRoom.removeGravePos(player.lastGravePos);
 
@@ -282,13 +286,50 @@ public class ManagedTemple {
             }
 
         } else {
-            //drop items on ground
             Vec3 pos = toVec3(chestPos).add(0.5, 0.5, 0.5);
             for( ItemStack stack: challengeRoom.getChallengeLoot() ) {
                 ItemEntity ent = new ItemEntity(level, pos.x, pos.y, pos.z, stack);
                 level.addFreshEntity(ent);
             }
         }
+
+    }
+
+    /**
+     * Threaded method: moves portals into the sky for 3 seconds
+     * then returns them
+     */
+    public void suspendPortals()
+    {
+        Vec3 op1 = null;
+        if( this.portalToChallenge != null ) {
+            op1 = toVec3(this.portalToChallenge.blockPosition());
+            Vec3 pos = op1.add(0, 256, 0);
+            this.portalToChallenge.moveTo(pos);
+        }
+
+        Vec3 op2 = null;
+        if( this.portalToHome != null ) {
+            op2 = toVec3(this.portalToHome.blockPosition());
+            Vec3 pos = op2.add(0, 256, 0);
+            this.portalToHome.moveTo(pos);
+        }
+
+        try {
+            Thread.sleep(10000);
+        }
+        catch (InterruptedException e) {
+            return;
+        }
+
+        if( this.portalToChallenge != null ) {
+            this.portalToChallenge.moveTo(op1);
+        }
+
+        if( this.portalToHome != null ) {
+            this.portalToHome.moveTo(op2);
+        }
+
 
     }
 

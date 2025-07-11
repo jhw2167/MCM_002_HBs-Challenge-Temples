@@ -151,9 +151,6 @@ public class TempleManager {
      * Creates a portal using the portal API
      * @param temple
      */
-    static final double P_HEIGHT = 2;
-    static final double P_WIDTH = 2;
-
     private static boolean DISABLE_PORTALS = false;
 
     private void handleBuildPortal(ManagedTemple temple)
@@ -170,14 +167,6 @@ public class TempleManager {
             LoggerProject.logDebug("005010", "Temple already has a portal: " + temple.getTempleId());
             return;
         }
-
-        Vec3 sourcePos = HBUtil.BlockUtil.toVec3(temple.getPortalSourcePos());
-        Vec3 destination = HBUtil.BlockUtil.toVec3( temple.getPortalDest() );
-        temple.portalToChallenge = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, level,
-             CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
-
-        temple.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
-            level, destination, sourcePos, PortalApi.Direction.NORTH);
 
         temple.buildChallenge();
     }

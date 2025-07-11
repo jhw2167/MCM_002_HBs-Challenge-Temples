@@ -207,6 +207,23 @@ public class ManagedTemple {
 
     }
 
+    private static final double P_HEIGHT = 2;
+    private static final double P_WIDTH = 2;
+
+    public void createChallengePortal() {
+        Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
+        Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
+        this.portalToChallenge = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, level,
+            CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
+    }
+
+    public void createHomePortal() {
+        Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
+        Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
+        this.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
+            level, destination, sourcePos, PortalApi.Direction.NORTH);
+    }
+
     public void buildChallenge()
     {
         this.templeEntity.setProperty("hasPortal", "true");
@@ -215,6 +232,10 @@ public class ManagedTemple {
                  this.level);
             this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
         }
+        
+        createChallengePortal();
+        createHomePortal();
+        
         this.startWatchChallengers();
     }
 

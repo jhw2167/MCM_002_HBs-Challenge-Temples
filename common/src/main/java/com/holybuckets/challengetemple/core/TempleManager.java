@@ -5,7 +5,6 @@ import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
-import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
@@ -13,12 +12,9 @@ import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +29,7 @@ public class TempleManager {
     static ServerLevel CHALLENGE_LEVEL;
     static Map<LevelAccessor, TempleManager> MANAGERS;
     static PortalApi PORTAL_API;
+    static GeneralConfig CONFIG;
 
     private final ServerLevel level;
 
@@ -54,6 +51,7 @@ public class TempleManager {
         reg.registerOnChunkLoad(TempleManager::onChunkLoad);
         reg.registerOnChunkUnload(TempleManager::onChunkUnload);
         reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, TempleManager::onServerTick120 );
+        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, TempleManager::on20Ticks);
 
         //ManagedTemple.init();
         ChallengeRoom.init(reg);
@@ -61,6 +59,7 @@ public class TempleManager {
         MANAGERS = new HashMap<>();
 
         PORTAL_API = ChallengeTempleMain.INSTANCE.portalApi;
+        CONFIG = GeneralConfig.getInstance();
     }
 
     public void load() {
@@ -159,8 +158,8 @@ public class TempleManager {
 
         BlockPos pos = temple.getEntityPos();
         if( HBUtil.ChunkUtil.getId(pos).equals("0,0") ) {
-            System.out.println("no portal at 0,0: " );
-            return;
+            //System.out.println("no portal at 0,0: " );
+            //return;
         }
 
         if( temple.hasPortal() ) {
@@ -204,13 +203,15 @@ public class TempleManager {
         Level dimFrom = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getFromDim() );
         Level dimTo = LevelUtil.toLevel(LevelUtil.LevelNameSpace.SERVER, event.getToDim() );
         LoggerProject.logDebug("005010", "Player changed dimension from " + dimFrom + " to " + dimTo);
-
         String chunkId = HBUtil.ChunkUtil.getId(event.getPlayer().getOnPos());
         if( dimFrom == CHALLENGE_LEVEL ) {
             ManagedTemple temple = c.getActiveTemple();
             if(temple != null) temple.playerEndChallenge(c);
         } else if( dimTo == CHALLENGE_LEVEL ) {
-            MANAGERS.get(dimFrom).temples.get(chunkId).playerTakeChallenge(c);
+            if( MANAGERS.get(dimFrom) == null ) return;
+            ManagedTemple temple = MANAGERS.get(dimFrom).temples.get(chunkId);
+            if(temple != null) temple.playerTakeChallenge(c);
+
         }
 
     }
@@ -230,13 +231,29 @@ public class TempleManager {
         }
     }
 
+    //Iterate over all temples, all managers, if any time is markedForPortalCreation,
+    //call portalCreate methods
+    private static void on20Ticks(ServerTickEvent event) {
+        for(TempleManager manager : MANAGERS.values()) {
+            manager.temples.values().stream()
+                .filter(m -> m.isMarkedForPortalCreation(event.getTickCount()))
+                .forEach(m -> {
+                    m.createHomePortal();
+                    m.createChallengePortal();
+                    m.setMarkedForPortalCreationTime(Long.MAX_VALUE);
+                });
+        }
+
+    }
+
     private static void onServerTick120(ServerTickEvent e) {
         MANAGERS.values().forEach(TempleManager::handleOnServerTicks120);
     }
 
 
 
-    public void shutdown() {
+    public void shutdown()
+    {
         LoggerProject.logInfo("005999", "Shutting down TempleManager for level: " + this.level);
         temples.values().forEach(ManagedTemple::shutdown);
         temples.clear();

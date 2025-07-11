@@ -1,6 +1,5 @@
 package com.holybuckets.challengetemple.externalapi;
 
-import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.foundation.HBUtil;
 import de.maxhenkel.corpse.corelib.death.Death;
 import de.maxhenkel.corpse.entities.CorpseEntity;
@@ -10,13 +9,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.holybuckets.challengetemple.ChallengeTempleMain.CHALLENGE_DIM;
 
 // Simple InventoryApi interface (you must define in your common code)
 public class ForgeInventoryApi implements InventoryApi {
@@ -29,6 +28,16 @@ public class ForgeInventoryApi implements InventoryApi {
     private final List<CorpseEntity> allGraves = new LinkedList<>();
 
     private static Level CHALLENGE_LEVEL;
+
+    public static ForgeInventoryApi getInstance() {
+        return INSTANCE;
+    }
+
+    public static boolean shouldCancelCorpseSpawn(ServerPlayer player) {
+        return player.level().dimension().location().equals(CHALLENGE_DIM);
+    }
+
+
     @Override
     public void setChallengeLevel(ServerLevel level) {
         CHALLENGE_LEVEL = level;
@@ -39,8 +48,9 @@ public class ForgeInventoryApi implements InventoryApi {
         INSTANCE = (ForgeInventoryApi) api;
     }
 
-    public static ForgeInventoryApi getInstance() {
-        return INSTANCE;
+    @Override
+    public void initConfig() {
+        //nothing
     }
 
     @Override

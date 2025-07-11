@@ -11,7 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,9 +21,9 @@ import net.minecraft.world.phys.Vec3;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
-import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
-import static com.holybuckets.challengetemple.core.TempleManager.PORTAL_API;
+import static com.holybuckets.challengetemple.core.TempleManager.*;
 
 public class ManagedTemple {
 
@@ -42,6 +41,7 @@ public class ManagedTemple {
     public Entity portalToChallenge;
     public Entity portalToHome;
     private boolean isCompleted;
+    private volatile AtomicLong markForPortalCreation;
 
     Set<ServerPlayer> nearPlayers;  // players close enough to start challenge
     Set<ServerPlayer> activePlayers; //players taking challenge
@@ -51,7 +51,8 @@ public class ManagedTemple {
     private static Vec3i STRUCTURE_OFFSET = new Vec3i(-4, -4, -2);
 
     private static final Vec3i SOURCE_OFFSET = new Vec3i(0, -1, 1);
-    private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 0);
+    private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 1);
+    private static final Vec3i RESPAWN_OFFSET = new Vec3i(0, -1, 1);
     private static final Vec3i SOURCE_EXIT_OFFSET = new Vec3i(0, 1, 3);
     private static final int CHALLENGE_DIM_HEIGHT = 64;
 
@@ -74,6 +75,7 @@ public class ManagedTemple {
         this.activePlayers = new HashSet<>();
         this.nearPlayers = new HashSet<>();
 
+        this.markForPortalCreation = new AtomicLong(Long.MAX_VALUE);
     }
 
     public void readEntityData()
@@ -91,6 +93,11 @@ public class ManagedTemple {
         if( templeEntity.getProperty("hasPortal") == null )
             return;
 
+        if( templeEntity.getProperty("complete")==null)
+            this.isCompleted = false;
+        else
+            this.isCompleted = templeEntity.getProperty("complete").equals("true");
+
         if( templeEntity.getProperty("hasPortal").equals("true") )
         {
             AABB aabb = new AABB(
@@ -106,7 +113,7 @@ public class ManagedTemple {
             );
             List<Entity> destEntities = CHALLENGE_LEVEL.getEntities((Entity) null, destAABB, PORTAL_API::isPortal);
             if(entities.isEmpty() && destEntities.isEmpty() ) {
-                return;
+               if(this.isCompleted) return;
             }
             if(!entities.isEmpty() && !destEntities.isEmpty() ) {
                 this.portalToChallenge = entities.get(0);
@@ -116,6 +123,8 @@ public class ManagedTemple {
             } else if(!destEntities.isEmpty()) {
                 destEntities.get(0).discard();
             }
+
+            this.markForPortalCreation.set(0l);
 
             String challengeId = templeEntity.getProperty("challengeId");
             if( (challengeId==null) || challengeId.isEmpty() ) return;
@@ -141,6 +150,10 @@ public class ManagedTemple {
         return ChallengeRoom.getWorldPos(this.templeId).offset(DEST_OFFSET);
     }
 
+    public BlockPos getChallengeRespawnPos() {
+        return  this.getPortalDest().offset(RESPAWN_OFFSET);
+    }
+
     public BlockPos getEntityPos() { return entityPos; }
 
     public Level getLevel() {
@@ -151,18 +164,16 @@ public class ManagedTemple {
         return isCompleted;
     }
 
-    public void setCompleted() {
-        this.isCompleted = true;
-        this.portalToChallenge = null;
-        this.portalToHome = null;
-    }
-
     public String getTempleId() {
         return templeId;
     }
 
     public ChallengeRoom getChallengeRoom() {
         return challengeRoom;
+    }
+
+    public boolean isMarkedForPortalCreation(long totalTicks) {
+        return markForPortalCreation.get() < (totalTicks+1l);
     }
 
     //** CORE
@@ -207,25 +218,46 @@ public class ManagedTemple {
 
     }
 
-    private static final double P_HEIGHT = 2;
-    private static final double P_WIDTH = 2;
+    static final double P_HEIGHT = 2;
+    static final double P_WIDTH = 2;
 
-    public void createChallengePortal() {
+    public void createChallengePortal()
+    {
+        deleteChallengePortal();
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
         this.portalToChallenge = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, level,
             CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
     }
 
-    public void createHomePortal() {
+    public void deleteChallengePortal() {
+        if (this.portalToChallenge != null) {
+            this.portalToChallenge.discard();
+            this.portalToChallenge = null;
+        }
+    }
+
+    public void createHomePortal()
+    {
+        deleteHomePortal();
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
         this.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
             level, destination, sourcePos, PortalApi.Direction.NORTH);
     }
 
+    public void deleteHomePortal() {
+        if (this.portalToHome != null) {
+            this.portalToHome.discard();
+            this.portalToHome = null;
+        }
+    }
+
     public void buildChallenge()
     {
+        createChallengePortal();
+        createHomePortal();
+
         this.templeEntity.setProperty("hasPortal", "true");
         if (this.challengeRoom == null) {
             this.challengeRoom = new ChallengeRoom( this.templeId, overworldExitPos,
@@ -233,19 +265,21 @@ public class ManagedTemple {
             this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
         }
         
-        createChallengePortal();
-        createHomePortal();
-        
+
         this.startWatchChallengers();
     }
 
+    static final long PORTAL_COOLDOWN = 100l;
     public void playerTakeChallenge(ManagedChallenger player)
     {
         if( player == null || player.getServerPlayer() == null) {
             return;
         }
 
-        new Thread(this::suspendPortals).start();
+        this.deleteHomePortal();
+        this.deleteChallengePortal();
+        long currentTicks = CONFIG.getTotalTickCount();
+        this.markForPortalCreation.set(currentTicks + PORTAL_COOLDOWN);
 
         if( nearPlayers.contains(player.getServerPlayer()) ) {
             if (activePlayers.contains(player.getServerPlayer())) return;
@@ -256,12 +290,11 @@ public class ManagedTemple {
         this.challengeRoom.startChallenge();
     }
 
-    /**
-     * Challenge marked as complete when player places the 4 soul torches
-     * @param p
-     */
-    public void playerCompleteChallenge(ServerPlayer p) {
+    public void challengeComplete(ServerPlayer p) {
         this.isCompleted = true;
+        if(this.templeEntity != null)
+            this.templeEntity.setProperty("hasPortal", "true");
+        this.markForPortalCreation.set(Long.MAX_VALUE);
     }
 
     public void playerJoinedInChallenge(ServerPlayer p) {
@@ -279,13 +312,18 @@ public class ManagedTemple {
             this.challengeRoom.setActive( false );
         }
 
+        this.deleteHomePortal();
+        this.deleteChallengePortal();
+
         if(challengeRoom.isRoomCompleted()) {
-            this.playerCompleteChallenge(player.getServerPlayer());
+            this.challengeComplete(player.getServerPlayer());
             player.completedChallenge(this);
             loadRewardsChest();
+        } else {
+            long currentTicks = CONFIG.getTotalTickCount();
+            this.markForPortalCreation.set(currentTicks + PORTAL_COOLDOWN);
         }
 
-        new Thread(this::suspendPortals).start();
 
         player.endChallenge(this);
         this.challengeRoom.removeGravePos(player.lastGravePos);
@@ -316,44 +354,6 @@ public class ManagedTemple {
 
     }
 
-    /**
-     * Threaded method: moves portals into the sky for 3 seconds
-     * then returns them
-     */
-    public void suspendPortals()
-    {
-        Vec3 op1 = null;
-        if( this.portalToChallenge != null ) {
-            op1 = toVec3(this.portalToChallenge.blockPosition());
-            Vec3 pos = op1.add(0, 256, 0);
-            this.portalToChallenge.moveTo(pos);
-        }
-
-        Vec3 op2 = null;
-        if( this.portalToHome != null ) {
-            op2 = toVec3(this.portalToHome.blockPosition());
-            Vec3 pos = op2.add(0, 256, 0);
-            this.portalToHome.moveTo(pos);
-        }
-
-        try {
-            Thread.sleep(10000);
-        }
-        catch (InterruptedException e) {
-            return;
-        }
-
-        if( this.portalToChallenge != null ) {
-            this.portalToChallenge.moveTo(op1);
-        }
-
-        if( this.portalToHome != null ) {
-            this.portalToHome.moveTo(op2);
-        }
-
-
-    }
-
 
     //** UTILITY
     private static Vec3 toVec3(BlockPos pos) {
@@ -365,7 +365,7 @@ public class ManagedTemple {
     }
 
     public boolean hasPortal() {
-        return portalToChallenge != null;
+        return (this.isCompleted ||  this.challengeRoom != null);
     }
 
 
@@ -393,16 +393,27 @@ public class ManagedTemple {
         this.activePlayers.remove(p);
     }
 
-    void shutdown() {
+
+    void shutdown()
+    {
         if (watchChallengersThread != null && watchChallengersThread.isAlive()) {
             watchChallengersThread.interrupt();
         }
+
         if (challengeRoom != null) {
-            //challengeRoom.shutdown();
+            challengeRoom.roomShutdown();
         }
+
+        //clear portals
+        this.deleteHomePortal();
+        this.deleteChallengePortal();
+
         this.nearPlayers.clear();
         this.activePlayers.clear();
     }
 
 
+    public void setMarkedForPortalCreationTime(long l) {
+         markForPortalCreation.set(l);
+    }
 }

@@ -9,6 +9,8 @@ import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.LevelLoadingEvent;
+import net.blay09.mods.balm.api.event.server.ServerStartedEvent;
+import net.blay09.mods.balm.api.event.server.ServerStoppedEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -59,13 +61,19 @@ public class ChallengeTempleMain {
             ChallengeDB.init(registrar);
 
             //register events
+            registrar.registerOnServerStarted(this::onServerStarted);
             registrar.registerOnLevelLoad(this::onLevelLoad);
             registrar.registerOnLevelUnload(this::onLevelUnload);
+            registrar.registerOnServerStopped(this::onServerStopped);
+    }
+
+    private void onServerStarted(ServerStartedEvent e) {
+        this.inventoryApi.initConfig();
     }
 
 
-    private static final ResourceLocation CHALLENGE_DIM = new ResourceLocation(Constants.MOD_ID, "challenge_dimension");
-    private static final ResourceLocation OVERWORLD_DIM = new ResourceLocation("minecraft", "overworld");
+    public static final ResourceLocation CHALLENGE_DIM = new ResourceLocation(Constants.MOD_ID, "challenge_dimension");
+    public  static final ResourceLocation OVERWORLD_DIM = new ResourceLocation("minecraft", "overworld");
     private void onLevelLoad(LevelLoadingEvent event)
     {
         Constants.LOG.info("Level loaded: {}", event.getLevel() );
@@ -84,6 +92,7 @@ public class ChallengeTempleMain {
     private void onLevelUnload(LevelLoadingEvent.Unload event )
     {
         //Constants.LOG.info("Level unloaded: {}", event.getLevel() );
+        /*
         Level level = (Level) event.getLevel();
         if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
             if( this.templeManager != null )
@@ -92,7 +101,13 @@ public class ChallengeTempleMain {
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             int i = 0;
         }
+        */
+    }
 
+    private void onServerStopped(ServerStoppedEvent e) {
+        if(this.templeManager != null)
+            this.templeManager.shutdown();
+        this.templeManager = null;
     }
 
 

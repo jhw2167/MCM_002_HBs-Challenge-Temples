@@ -4,6 +4,8 @@ import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.foundation.GeneralConfig;
 import eu.pb4.graves.GravesApi;
 import eu.pb4.graves.GravesMod;
+import eu.pb4.graves.config.Config;
+import eu.pb4.graves.config.ConfigManager;
 import eu.pb4.graves.grave.Grave;
 import eu.pb4.graves.grave.GraveManager;
 import eu.pb4.graves.grave.GraveType;
@@ -23,6 +25,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.holybuckets.challengetemple.ChallengeTempleMain.CHALLENGE_DIM;
 
 /**
  * API for managing player inventory snapshots using UniversalGraves functionality
@@ -46,6 +50,16 @@ public class FabricInventoryApi implements InventoryApi {
     }
     public static FabricInventoryApi getInstance() {
         return INSTANCE;
+    }
+
+    /**
+     * Init GraveStone mod properly for this mod
+     *  - add CHALLENGE_DIM to blacklisted worlds for grave creation
+     */
+    @Override
+    public void initConfig() {
+        Config c = ConfigManager.getConfig();
+        c.placement.blacklistedWorlds.add(CHALLENGE_DIM);
     }
 
     /**

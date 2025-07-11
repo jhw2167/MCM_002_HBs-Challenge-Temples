@@ -18,6 +18,8 @@ public interface InventoryApi {
     void setChallengeLevel(ServerLevel level);
     void setInstance(InventoryApi ai);
 
+    void initConfig();
+
     /**
      * Creates a grave at the specified location containing the player's current inventory
      *

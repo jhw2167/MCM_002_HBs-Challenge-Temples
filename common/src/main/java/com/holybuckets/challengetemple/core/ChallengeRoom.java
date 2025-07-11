@@ -36,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 
 import static com.holybuckets.challengetemple.core.TempleManager.*;
+import static com.holybuckets.challengetemple.core.ManagedTemple.*;
 import static com.holybuckets.challengetemple.core.ChallengeDB.ChallengeFilter;
 
 public class ChallengeRoom {
@@ -192,7 +193,7 @@ public class ChallengeRoom {
     {
 
         if( this.exitPortal != null ) {
-            this.exitPortal.remove(Entity.RemovalReason.DISCARDED);
+            this.exitPortal.discard();
         }
 
         //1. Parse area for minecraft:soul_torch
@@ -277,6 +278,7 @@ public class ChallengeRoom {
 
         this.roomCompleted = true;
         return  generateExitPortal(portalTorchPos);
+        //return true;
     }
 
 
@@ -325,6 +327,8 @@ public class ChallengeRoom {
     public String getChallengeId() {
         return this.challengeId;
     }
+
+    public Challenge getChallenge() { return challenge; }
 
     public void setActive(boolean isActive) {
         this.roomActive = isActive;
@@ -396,7 +400,7 @@ public class ChallengeRoom {
 
     private void clearExitPortal() {
         if (this.exitPortal != null) {
-            this.exitPortal.remove(Entity.RemovalReason.DISCARDED);
+            this.exitPortal.discard();
             this.exitPortal = null;
         }
         this.exitStructurePos = null;
@@ -422,6 +426,14 @@ public class ChallengeRoom {
         System.out.println("Flags: " + flags);
     }
 
+
+    //** STATICS
+    void roomShutdown() {
+        if(this.exitPortal != null) {
+            this.exitPortal.discard();
+            this.exitPortal = null;
+        }
+    }
 
     //** STATICS
     public static void init(EventRegistrar reg) {
@@ -536,9 +548,9 @@ public class ChallengeRoom {
             room.clearExitPortal();
         }
         ACTIVE_ROOMS.clear();
+
+        //4. Clear portal
+
     }
-
-
-
 
 }

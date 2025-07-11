@@ -135,22 +135,20 @@ X	6. Ensure to save completed challengs to foundationDB, load on server start
 X	7. Use size values to set loop for Challenge room s.t. we can parse for soul torches
 
 X	8. Update gold and diamond rooms to include soul torches
-	9. test structure placement logic
-	10. Write portal placement logic
 
 	11. add new challenge blocks
 	12. add chest witholding logic
-	
+	13. set spawn position to front of temple
 
-	NEXT STEP - exit portal not constructing on the floor
-	Then:
-	- clear player inventory and status effects on leaving
-	- determine rewards
-	- store challenge complete data
+Blocks to map on startup:
+	- soul torches
+	- wool
+	- chests
+	- quantity_chest - player must place items in this chest, emits redstone signal
+	- challenge_chests - not refilled on death
+	- bed
+	- tanks
 
-	- deal with chest/challenge chest items logic
-
-	- test player settings, replace blocks work
 
 
 12. To do

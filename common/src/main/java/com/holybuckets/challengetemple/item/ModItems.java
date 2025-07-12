@@ -24,6 +24,7 @@ public class ModItems {
     private static ItemLike[] getItemLikeArray() {
         int i = 0;
         return new ItemLike[]{
+                ModBlocks.challengeBed,
                 ModBlocks.challengeBrick,
                 ModBlocks.challengeBrickSlab,
                 ModBlocks.challengeGlowstone,

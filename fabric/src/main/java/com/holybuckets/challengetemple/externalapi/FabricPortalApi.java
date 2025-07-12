@@ -15,6 +15,13 @@ public class FabricPortalApi implements PortalApi {
         return entity != null && entity.getType() == Portal.entityType;
     }
 
+    @Override
+    public boolean removePortal(Entity entity) {
+        if (!isPortal(entity)) return false;
+        entity.discard();
+        return true;
+    }
+
     public Entity createPortal(double width, double height, Level fromLevel, Level toLevel,
                                Vec3 sourcePos, Vec3 destPos, Direction dir)
     {

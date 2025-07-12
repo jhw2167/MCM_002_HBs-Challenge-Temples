@@ -18,4 +18,6 @@ public interface PortalApi {
         entity.discard();
         return true;
     }
+
+    boolean removePortal(Entity entity);
 }

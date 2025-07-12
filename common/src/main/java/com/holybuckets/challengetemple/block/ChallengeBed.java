@@ -7,19 +7,30 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RespawnAnchorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.PushReaction;
 
 public class ChallengeBed extends Block {
+    public static final IntegerProperty CHARGES = RespawnAnchorBlock.CHARGE;
+
     public ChallengeBed() {
         super(Properties.copy(Blocks.STONE_BRICKS)
             .destroyTime(-1f)
             .explosionResistance(3600000f)
             .pushReaction(PushReaction.IGNORE)
-            .requiresCorrectToolForDrops());
+            .requiresCorrectToolForDrops()
+            .lightLevel((state) -> state.getValue(CHARGES) * 3));
+        this.registerDefaultState(this.stateDefinition.any().setValue(CHARGES, Integer.valueOf(0)));
     }
 
     @Override
-    public int getLightBlock(BlockState $$0, BlockGetter $$1, BlockPos $$2) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(CHARGES);
+    }
+
+    @Override
+    public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
         return 0;
     }
 }

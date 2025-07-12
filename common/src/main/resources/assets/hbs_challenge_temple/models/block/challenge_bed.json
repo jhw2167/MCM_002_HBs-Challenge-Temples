@@ -1,8 +1,6 @@
 {
     "parent": "minecraft:block/bed",
     "textures": {
-        "particle": "minecraft:block/red_bed_top",
-        "top": "minecraft:block/red_bed_top",
-        "bottom": "minecraft:block/red_bed_bottom"
+        "all": "minecraft:block/bed"
     }
 }

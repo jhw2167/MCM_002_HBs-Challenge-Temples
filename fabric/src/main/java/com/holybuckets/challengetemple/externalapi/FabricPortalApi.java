@@ -50,6 +50,7 @@ public class FabricPortalApi implements PortalApi {
 
         portal.dimensionTo = toLevel.dimension();
         portal.setDestination(destPos);
+        portal.setPortalCooldown(PORTAL_COOLDOWN);
 
         McHelper.spawnServerEntity(portal);
         return portal;

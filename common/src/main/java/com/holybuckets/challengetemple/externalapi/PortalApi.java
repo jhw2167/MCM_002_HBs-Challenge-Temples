@@ -7,6 +7,8 @@ public interface PortalApi {
 
     enum Direction { NORTH, SOUTH, EAST, WEST, DOWN, UP }
 
+    static int PORTAL_COOLDOWN = 5000;
+
     Entity createPortal(double width, double height, Level fromLevel, Level toLevel,
                         Vec3 sourcePos, Vec3 destPos, Direction dir);
 

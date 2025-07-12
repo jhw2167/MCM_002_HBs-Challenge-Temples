@@ -1,7 +1,7 @@
 {
     "variants": {
         "": {
-            "model": "minecraft:block/bed"
+            "model": "hbs_challenge_temple:block/challenge_bed"
         }
     }
 }

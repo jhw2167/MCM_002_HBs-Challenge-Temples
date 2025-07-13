@@ -15,6 +15,7 @@ public class ModRenderers {
 
         renderers.setBlockRenderType(() -> ModBlocks.challengeInvisibleBrick, RenderType.cutout() );
         renderers.setBlockRenderType(() -> ModBlocks.challengeInvisibleBrick, RenderType.translucent() );
+
     }
 
 }

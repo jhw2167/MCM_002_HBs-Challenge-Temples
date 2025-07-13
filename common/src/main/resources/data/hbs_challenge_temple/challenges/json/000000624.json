@@ -9,7 +9,7 @@
         "maxDeaths": -1,
         "resetBlocksOnPlayerDeath": false,
         "resetChestsOnPlayerDeath": true,
-        "clearInventoryOnPlayerDeath": true,
+        "keepInventoryOnPlayerDeath": true,
         "playerDropsInventoryOnDeath": true
     },
     "lootRules": {

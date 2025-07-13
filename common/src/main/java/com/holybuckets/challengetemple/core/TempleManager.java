@@ -30,18 +30,14 @@ public class TempleManager {
     static Map<LevelAccessor, TempleManager> MANAGERS;
     static PortalApi PORTAL_API;
     static GeneralConfig CONFIG;
+    static String SPECIAL_TEMPLE = "0,0";
 
     private final ServerLevel level;
-
-    private final GeneralConfig generalConfig;
-
     private final Map<String, ManagedTemple> temples;
 
     public TempleManager(ServerLevel level)
     {
         this.level = level;
-        this.generalConfig = GeneralConfig.getInstance();
-
         this.temples = new HashMap<>();
         MANAGERS.put(level, this);
         this.load();
@@ -113,11 +109,6 @@ public class TempleManager {
             .filter(t -> !t.hasPortal() )
             .filter(t -> t.playerInPortalRange() )
             .forEach( this::handleBuildPortal );
-
-        //activate startWatchChallengers for all temples with portals
-        temples.values().stream()
-            .filter(ManagedTemple::hasPortal)
-            .forEach(ManagedTemple::startWatchChallengers);
     }
 
     //* HANDLERS
@@ -167,7 +158,8 @@ public class TempleManager {
             return;
         }
 
-        temple.buildChallenge();
+        //build an unspecified challenge
+        temple.buildChallenge(null);
     }
 
     public static ManagedTemple handlePlayerJoinedInTemple( ServerPlayer p, Level templeLevel, String id )
@@ -237,11 +229,7 @@ public class TempleManager {
         for(TempleManager manager : MANAGERS.values()) {
             manager.temples.values().stream()
                 .filter(m -> m.isMarkedForPortalCreation(event.getTickCount()))
-                .forEach(m -> {
-                    m.createHomePortal();
-                    m.createChallengePortal();
-                    m.setMarkedForPortalCreationTime(Long.MAX_VALUE);
-                });
+                .forEach(ManagedTemple::swapPortals);
         }
 
     }

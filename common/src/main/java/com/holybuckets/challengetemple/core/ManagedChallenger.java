@@ -2,6 +2,7 @@ package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.ChallengeTempleMain;
 import com.holybuckets.challengetemple.LoggerProject;
+import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.console.Messager;
 import com.holybuckets.foundation.event.EventRegistrar;
@@ -18,14 +19,20 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Interaction;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.core.jmx.Server;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,6 +55,7 @@ public class ManagedChallenger implements IManagedPlayer {
     BlockPos lastGravePos;  //last position of grave where items were stored
     BlockPos originalSpawnPos;
     BlockPos templeSpawnPos;
+    List<Pair<Integer,ItemStack>> holdInventory;
 
     static {
         registerManagedPlayerData(
@@ -65,6 +73,7 @@ public class ManagedChallenger implements IManagedPlayer {
 
     public static void init(EventRegistrar reg) {
         reg.registerOnPlayerChangedDimension(ManagedChallenger::onPlayerChangeDimension);
+        reg.registerOnUseBlock(ManagedChallenger::onPlayerUsedBlock);
     }
 
     //** CORE
@@ -79,9 +88,9 @@ public class ManagedChallenger implements IManagedPlayer {
             false); //skip spawn screen
 
         this.templeSpawnPos =  (setTempleSpawn) ? spawnPos : null;
-        Messager.getInstance().sendChat(sp, String.format("Spawn set to %s at %s",
-            challengeLevelKey.location().toString(),
-            spawnPos.toShortString()
+        Messager.getInstance().sendChat(sp, String.format("Spawn set" + (setTempleSpawn ? "" : ": %s:%s"),
+            challengeLevelKey.location(),
+            spawnPos
         ));
     }
 
@@ -102,7 +111,7 @@ public class ManagedChallenger implements IManagedPlayer {
 
         //2. Clear Inventory
         lastGravePos = managedTemple.getChallengeRoom().addGrave(this);
-        new Thread(() -> challengerClearInventory(managedTemple)).start();
+        new Thread(() -> challengerClearInventory()).start();
 
         //3. Set player spawn to inside the temple
         this.originalSpawnPos = sp.getRespawnPosition();
@@ -110,7 +119,7 @@ public class ManagedChallenger implements IManagedPlayer {
             this.originalSpawnPos = managedTemple.getLevel().getSharedSpawnPos();
         this.setPlayerSpawn(CHALLENGE_LEVEL.getLevel(),
              managedTemple.getChallengeRespawnPos(), true);
-        
+
         //4. Collect data
         challengesTaken.add(managedTemple.getChallengeRoom().getChallengeId());
         templesEntered.add(managedTemple.getTempleId());
@@ -134,7 +143,7 @@ public class ManagedChallenger implements IManagedPlayer {
 
     }
 
-        private void challengerClearInventory(ManagedTemple managedTemple)
+        private void challengerClearInventory()
         {
 
             //1. wait until player is in challegne dimension
@@ -162,11 +171,13 @@ public class ManagedChallenger implements IManagedPlayer {
 
     public void endChallenge(ManagedTemple managedTemple)
     {
-        this.setPlayerSpawn(managedTemple.getLevel(), this.originalSpawnPos, false);
-        challengerClearInventory(managedTemple);
-        ChallengeTempleMain.INSTANCE.inventoryApi.returnInventory((ServerPlayer) p, lastGravePos);
         this.activeTemple = null;
         this.activeTempleInfo = null;
+        this.holdInventory = null;
+
+        this.setPlayerSpawn(managedTemple.getLevel(), this.originalSpawnPos, false);
+        challengerClearInventory();
+        ChallengeTempleMain.INSTANCE.inventoryApi.returnInventory((ServerPlayer) p, lastGravePos);
     }
 
     public void completedChallenge(ManagedTemple managedTemple) {
@@ -187,14 +198,15 @@ public class ManagedChallenger implements IManagedPlayer {
     }
 
 
-    /*
+
     public static void onPlayerUsedBlock(UseBlockEvent e)
     {
         ///Check if this occured in challenge level or we dont care
         if (e.getLevel() != CHALLENGE_LEVEL) return;
 
         Player player = e.getPlayer();
-        if (player == null) return;
+        if (player == null || !(player instanceof  ServerPlayer)) return;
+        if (!e.getHand().equals(InteractionHand.MAIN_HAND)) return;
 
         ManagedChallenger challenger = CHALLENGERS.get(player);
         if (challenger == null) return;
@@ -209,21 +221,12 @@ public class ManagedChallenger implements IManagedPlayer {
         //Handle block used in challenge temple
         if (this.activeTemple == null) return;
 
-        InteractionHand hand = e.getHand();
-        ItemStack stack = this.p.getItemInHand(hand);
-        if (stack.isEmpty()) return;
-        Item exitPortalItem = EXIT_PORTAL_BLOCK.getBlock().asItem();
-        if( stack.getItem() == exitPortalItem) {
-            //If the player used the exit portal item, end the challenge
-            LoggerProject.logDebug("010014", "Player " + p.getDisplayName().getString() + " used exit portal item in challenge temple");
-            this.endChallenge(this.activeTemple);
-            e.setCanceled(true); //cancel the event to prevent placing the block
-        } else {
-            //Handle other blocks used in challenge temple
-            this.activeTemple.onBlockUsed(e);
-        }
+        BlockPos hitPos = e.getHitResult().getBlockPos();
+        BlockState hitBlockState = e.getLevel().getBlockState(hitPos);
+        if(hitBlockState.equals( ModBlocks.challengeBed.defaultBlockState() ))
+            this.setPlayerSpawn(CHALLENGE_LEVEL, hitPos.offset(0,1,0), true);
     }
-    */
+
 
 
     //** OVERRIDES
@@ -267,10 +270,45 @@ public class ManagedChallenger implements IManagedPlayer {
     }
 
     @Override
-    public void handlePlayerRespawn(Player player) {
+    public void handlePlayerRespawn(Player player)
+    {
         if(this.activeTemple == null) return;
-        //We are in a temple
+
         this.setPlayerSpawn(CHALLENGE_LEVEL, this.templeSpawnPos, true);
+
+        if(this.holdInventory == null) return;
+        ServerPlayer sp = (ServerPlayer) this.p;
+        Inventory inv = sp.getInventory();
+        this.holdInventory.stream().forEach( p -> { inv.setItem(p.getLeft(), p.getRight()); });
+
+    }
+
+    @Override
+    public void handlePlayerDeath(Player player)
+    {
+        if(this.activeTemple == null) return;
+
+        Challenge c = this.activeTemple.getChallengeRoom().getChallenge();
+
+        this.holdInventory = null;
+        if( c.getChallengeRules().playerDropsInventoryOnDeath ) {
+            this.p.getInventory().dropAll();
+        }
+        if(c.getChallengeRules().keepInventoryOnPlayerDeath)
+        {
+            Inventory inv = player.getInventory();
+            this.holdInventory = new ArrayList<>(512);
+            for (int i = 0; i < inv.getContainerSize(); i++) {
+                ItemStack stack = inv.getItem(i);
+                if ( stack == null || stack.isEmpty()) {
+
+                } else {
+                    this.holdInventory.add(Pair.of(i, stack.copy()));
+                }
+            }
+        } else {
+            this.p.getInventory().clearContent();
+        }
     }
 
     @Override

@@ -1,11 +1,14 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -13,8 +16,10 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -33,6 +38,7 @@ public class ManagedTemple {
     private final BlockPos structurePos;
     private final BlockPos portalSourcePos;
     private final BlockPos overworldExitPos;
+    private final long tickCreated;
     private SimpleBlockEntity templeEntity;
 
     private final Level level;
@@ -52,7 +58,7 @@ public class ManagedTemple {
 
     private static final Vec3i SOURCE_OFFSET = new Vec3i(0, -1, 1);
     private static final Vec3i DEST_OFFSET = new Vec3i(4, 2, 1);
-    private static final Vec3i RESPAWN_OFFSET = new Vec3i(0, -1, 1);
+    private static final Vec3i RESPAWN_OFFSET = new Vec3i(0, 0, 1);
     private static final Vec3i SOURCE_EXIT_OFFSET = new Vec3i(0, 1, 3);
     private static final int CHALLENGE_DIM_HEIGHT = 64;
 
@@ -76,11 +82,16 @@ public class ManagedTemple {
         this.nearPlayers = new HashSet<>();
 
         this.markForPortalCreation = new AtomicLong(Long.MAX_VALUE);
+        this.tickCreated = CONFIG.getTotalTickCount();
     }
 
     public void readEntityData()
     {
         if(this.templeEntity != null ) return;
+
+        if(this.templeId.equals( SPECIAL_TEMPLE)) {
+            int i = 0;
+        }
 
         BlockEntity entity = level.getBlockEntity(this.entityPos);
         if( entity == null )
@@ -90,15 +101,24 @@ public class ManagedTemple {
             return;
 
         this.templeEntity = (SimpleBlockEntity) entity;
-        if( templeEntity.getProperty("hasPortal") == null )
-            return;
+
+        //if property "hasPortal"
+        if(templeEntity.getProperty("hasPortals") != null) {
+            if(templeEntity.getProperty("hasPortals").equals("true"))
+                this.findPortals();
+        }
 
         if( templeEntity.getProperty("complete")==null)
             this.isCompleted = false;
         else
             this.isCompleted = templeEntity.getProperty("complete").equals("true");
 
-        if( templeEntity.getProperty("hasPortal").equals("true") )
+        String challengeId = templeEntity.getProperty("challengeId");
+        if( (challengeId==null) || challengeId.isEmpty() ) return;
+        this.buildChallenge(challengeId);
+    }
+
+        void findPortals()
         {
             AABB aabb = new AABB(
                 this.portalSourcePos.getX() - 0.5, this.portalSourcePos.getY() - 0.5, this.portalSourcePos.getZ() - 0.5,
@@ -113,30 +133,27 @@ public class ManagedTemple {
             );
             List<Entity> destEntities = CHALLENGE_LEVEL.getEntities((Entity) null, destAABB, PORTAL_API::isPortal);
             if(entities.isEmpty() && destEntities.isEmpty() ) {
-               if(this.isCompleted) return;
+                if(this.isCompleted) return;
             }
-            if(!entities.isEmpty() && !destEntities.isEmpty() ) {
-                this.portalToChallenge = entities.get(0);
-                this.portalToHome = destEntities.get(0);
-            } else if(!entities.isEmpty()) {
-                entities.get(0).discard();
-            } else if(!destEntities.isEmpty()) {
-                destEntities.get(0).discard();
+            //Assign the last value in the list to portalToHome and portalToChallenge, delete the rest
+            if (!entities.isEmpty()) {
+                this.portalToChallenge = entities.get(entities.size() - 1);
+                for (int i = 0; i < entities.size() - 1; i++) {
+                    PORTAL_API.removePortal(entities.get(i));
+                }
+            } else {
+                this.portalToChallenge = null;
             }
 
-            this.markForPortalCreation.set(0l);
-
-            String challengeId = templeEntity.getProperty("challengeId");
-            if( (challengeId==null) || challengeId.isEmpty() ) return;
-
-            this.challengeRoom = new ChallengeRoom(templeId,
-                this.overworldExitPos,
-                this.level,
-                challengeId);
-            this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
+            if (!destEntities.isEmpty()) {
+                this.portalToHome = destEntities.get(destEntities.size() - 1);
+                for (int i = 0; i < destEntities.size() - 1; i++) {
+                    PORTAL_API.removePortal(destEntities.get(i));
+                }
+            } else {
+                this.portalToHome = null;
+            }
         }
-
-    }
 
     public BlockPos getPortalSourcePos() {
         return this.portalSourcePos;
@@ -176,97 +193,112 @@ public class ManagedTemple {
         return markForPortalCreation.get() < (totalTicks+1l);
     }
 
+    public void setMarkedForPortalCreationTime() {
+        long l = CONFIG.getTotalTickCount();
+        markForPortalCreation.set(l+PORTAL_COOLDOWN);
+    }
+
     //** CORE
-
-    public void startWatchChallengers()
-    {
-        if( watchChallengersThread != null ) // Stop the previous thread if it's still running
-            return;
-
-        //We need to save this thread in a variable so we can interrupt it on shutdown
-        this.watchChallengersThread = new Thread( this::threadWatchChallengers);
-        this.watchChallengersThread.start();
-    }
-
-    //Add ServerPlayer to hashSet if he is 16u away from block entity pos
-    //keep while(1) loop, surround with try catch for interrupt, wait 100ms between loops
-    void threadWatchChallengers()
-    {
-        try {
-            while (true)
-            {
-                Vec3i p = entityPos;
-                nearPlayers.clear();
-                List<? extends Player> players = this.level.getNearbyPlayers(
-                    TargetingConditions.forNonCombat().range(16),
-                    null,
-                    new AABB(
-                        p.getX() - 8, p.getY() - 8, p.getZ() - 8,
-                        p.getX() + 8, p.getY() + 8, p.getZ() + 8
-                    )
-                );
-                players.stream()
-                    .filter(p1 -> p1 instanceof ServerPlayer)
-                    .map(p1 -> (ServerPlayer) p1)
-                    .forEach(nearPlayers::add);
-                Thread.sleep(100); // Sleep for 100 milliseconds
-            }
-        } catch (InterruptedException e) {
-            // Thread was interrupted, exit the loop
-    }
-
-
-    }
 
     static final double P_HEIGHT = 2;
     static final double P_WIDTH = 2;
 
     public void createChallengePortal()
     {
-        deleteChallengePortal();
+        if( this.portalToChallenge != null )  return;
+        deleteHomePortal();
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
         this.portalToChallenge = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, level,
             CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
+        brickInOut(true);
     }
 
     public void deleteChallengePortal() {
-        if (this.portalToChallenge != null) {
-            this.portalToChallenge.discard();
+        if (this.portalToChallenge != null)
+        {
+            PORTAL_API.removePortal(this.portalToChallenge);
             this.portalToChallenge = null;
         }
     }
 
     public void createHomePortal()
     {
-        deleteHomePortal();
+        //deleteHomePortal();
+        if(this.portalToHome != null) return;
+        deleteChallengePortal();
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
         this.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
             level, destination, sourcePos, PortalApi.Direction.NORTH);
+        brickInOut(false);
     }
 
     public void deleteHomePortal() {
         if (this.portalToHome != null) {
-            this.portalToHome.discard();
+            PORTAL_API.removePortal(this.portalToHome);
             this.portalToHome = null;
         }
     }
 
-    public void buildChallenge()
-    {
-        createChallengePortal();
-        createHomePortal();
+        private static final List<Vec3i> BRICK_OFFSETS = List.of(
+        new Vec3i(-1,0, -1)
+        , new Vec3i(0,0, -1)
+        , new Vec3i(-1,-1, -1)
+        , new Vec3i(0,-1, -1)
+        );
 
-        this.templeEntity.setProperty("hasPortal", "true");
+        private void brickInOut(boolean brickIn) {
+            BlockPos start = this.getPortalDest();
+            BlockState b = (brickIn) ? ModBlocks.challengeBrick.defaultBlockState()
+            : Blocks.AIR.defaultBlockState();
+            for( Vec3i offset : BRICK_OFFSETS) {
+                CHALLENGE_LEVEL.setBlock( start.offset(offset), b, 18);
+            }
+        }
+
+    public void buildChallenge(String challengeId)
+    {
+
+        if(templeId.equals( SPECIAL_TEMPLE)) {
+            int i = 0;
+        }
+
+        if(this.isCompleted) return;
+
+        createChallengePortal();
+
         if (this.challengeRoom == null) {
             this.challengeRoom = new ChallengeRoom( this.templeId, overworldExitPos,
-                 this.level);
+                 this.level, challengeId);
             this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
         }
-        
 
-        this.startWatchChallengers();
+    }
+
+    public void swapPortals()
+    {
+        if( this.portalToHome != null ) {
+            this.createChallengePortal();
+            this.markForPortalCreation.set(Long.MAX_VALUE);
+        } else if( this.portalToChallenge != null ) {
+            this.createHomePortal();
+            this.markForPortalCreation.set(Long.MAX_VALUE);
+        }
+
+        this.findPortals();
+        //If both portals are not null
+            //if the challenge is active, remove portalToChallenge, else remove PortalToHome
+        if( this.portalToHome != null && this.portalToChallenge != null)
+        {
+            if( this.activePlayers.isEmpty() ) {
+                this.deleteChallengePortal();
+            } else {
+                this.deleteHomePortal();
+            }
+
+        }
+
     }
 
     static final long PORTAL_COOLDOWN = 100l;
@@ -276,24 +308,25 @@ public class ManagedTemple {
             return;
         }
 
-        this.deleteHomePortal();
-        this.deleteChallengePortal();
-        long currentTicks = CONFIG.getTotalTickCount();
-        this.markForPortalCreation.set(currentTicks + PORTAL_COOLDOWN);
+        //this.deleteHomePortal();
+        //this.deleteChallengePortal();
 
-        if( nearPlayers.contains(player.getServerPlayer()) ) {
-            if (activePlayers.contains(player.getServerPlayer())) return;
-            activePlayers.add(player.getServerPlayer());
-            player.startChallenge(this);
-        }
+        this.setMarkedForPortalCreationTime();
 
-        this.challengeRoom.startChallenge();
+        if (activePlayers.contains(player.getServerPlayer())) return;
+        player.startChallenge(this);
+
+        if( activePlayers.size() == 0)
+            this.challengeRoom.startChallenge();
+        activePlayers.add(player.getServerPlayer());
     }
 
-    public void challengeComplete(ServerPlayer p) {
+    public void challengeComplete(ServerPlayer p)
+    {
+        this.deleteHomePortal();
+        this.deleteChallengePortal();
+
         this.isCompleted = true;
-        if(this.templeEntity != null)
-            this.templeEntity.setProperty("hasPortal", "true");
         this.markForPortalCreation.set(Long.MAX_VALUE);
     }
 
@@ -303,7 +336,7 @@ public class ManagedTemple {
         this.challengeRoom.setActive( true );
     }
 
-    private static Vec3i REWARDS_CHEST_OFFSET = new Vec3i(0, -1, 4);
+    private static Vec3i REWARDS_CHEST_OFFSET = new Vec3i(0, 0, 4);
     public void playerEndChallenge(ManagedChallenger player)
     {
         boolean containedPlayer = activePlayers.remove(player.getServerPlayer());
@@ -312,25 +345,26 @@ public class ManagedTemple {
             this.challengeRoom.setActive( false );
         }
 
-        this.deleteHomePortal();
-        this.deleteChallengePortal();
+        //this.deleteHomePortal();
+        //this.deleteChallengePortal();
 
         if(challengeRoom.isRoomCompleted()) {
             this.challengeComplete(player.getServerPlayer());
             player.completedChallenge(this);
             loadRewardsChest();
         } else {
-            long currentTicks = CONFIG.getTotalTickCount();
-            this.markForPortalCreation.set(currentTicks + PORTAL_COOLDOWN);
+           this.setMarkedForPortalCreationTime();
         }
 
 
         player.endChallenge(this);
         this.challengeRoom.removeGravePos(player.lastGravePos);
 
+        /*
         if (watchChallengersThread == null || !watchChallengersThread.isAlive()) {
             startWatchChallengers();
         }
+        */
     }
 
     public void loadRewardsChest()
@@ -373,12 +407,6 @@ public class ManagedTemple {
     {
         HBUtil.TripleInt source = new HBUtil.TripleInt(this.entityPos);
         boolean isClose = this.level.hasNearbyAlivePlayer(source.x, source.y, source.z, 128);
-        if (!isClose) {
-            if( this.watchChallengersThread != null && this.watchChallengersThread.isAlive())
-                this.watchChallengersThread.interrupt();
-            this.watchChallengersThread = null;
-        }
-
         return isClose;
     }
 
@@ -405,15 +433,13 @@ public class ManagedTemple {
         }
 
         //clear portals
-        this.deleteHomePortal();
-        this.deleteChallengePortal();
+        //this.deleteHomePortal();
+        //this.deleteChallengePortal();
 
         this.nearPlayers.clear();
         this.activePlayers.clear();
     }
 
 
-    public void setMarkedForPortalCreationTime(long l) {
-         markForPortalCreation.set(l);
-    }
+
 }

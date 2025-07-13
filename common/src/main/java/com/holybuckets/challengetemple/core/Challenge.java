@@ -16,21 +16,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static  com.holybuckets.challengetemple.core.ChallengeDB.ChallengeFilter;
+
 /**
  * Stores settings and metadata specific to each challenge.
  */
 public class Challenge {
 
-    private String challengeId;
-    private String author;
-    private String challengeName;
-    private List<Block> replaceEntityBlocks;
-    private String difficulty;
-    private Vec3i size;
-    private int totalPieces;
+    String challengeId;
+    String author;
+    String challengeName;
+    List<Block> replaceEntityBlocks;
+    String difficulty;
+    Vec3i size;
+    int totalPieces;
 
-    private ChallengeRules challengeRules;
-    private LootRules lootRules;
+    ChallengeRules challengeRules;
+    LootRules lootRules;
 
     public List<Block> getReplaceEntityBlocks() {
         return replaceEntityBlocks;
@@ -42,7 +44,7 @@ public class Challenge {
         int maxDeaths;                     
         boolean resetBlocksOnPlayerDeath;  
         boolean resetChestsOnPlayerDeath;  
-        boolean clearInventoryOnPlayerDeath; 
+        boolean keepInventoryOnPlayerDeath; 
         boolean playerDropsInventoryOnDeath; 
 
         // Public getters
@@ -50,7 +52,7 @@ public class Challenge {
         public int getMaxDeaths() { return maxDeaths; }
         public boolean isResetBlocksOnPlayerDeath() { return resetBlocksOnPlayerDeath; }
         public boolean isResetChestsOnPlayerDeath() { return resetChestsOnPlayerDeath; }
-        public boolean isClearInventoryOnPlayerDeath() { return clearInventoryOnPlayerDeath; }
+        public boolean isClearInventoryOnPlayerDeath() { return keepInventoryOnPlayerDeath; }
         public boolean isPlayerDropsInventoryOnDeath() { return playerDropsInventoryOnDeath; }
     }
 
@@ -96,7 +98,7 @@ public class Challenge {
         r.maxDeaths = rules.get("maxDeaths").getAsInt();
         r.resetBlocksOnPlayerDeath = rules.get("resetBlocksOnPlayerDeath").getAsBoolean();
         r.resetChestsOnPlayerDeath = rules.get("resetChestsOnPlayerDeath").getAsBoolean();
-        r.clearInventoryOnPlayerDeath = rules.get("clearInventoryOnPlayerDeath").getAsBoolean();
+        r.keepInventoryOnPlayerDeath = rules.get("keepInventoryOnPlayerDeath").getAsBoolean();
         r.playerDropsInventoryOnDeath = rules.get("playerDropsInventoryOnDeath").getAsBoolean();
 
 
@@ -110,7 +112,7 @@ public class Challenge {
         return c;
     }
 
-    private void setReplaceEntityBlocks(JsonObject json)
+    void setReplaceEntityBlocks(JsonObject json)
     {
         this.replaceEntityBlocks = new ArrayList<>();
         if(json.has("replaceStructureBlocksWith"))
@@ -136,7 +138,7 @@ public class Challenge {
             this.replaceEntityBlocks.add(Blocks.AIR);
     }
 
-    private void setSize(JsonElement json)
+    void setSize(JsonElement json)
     {
         if(json.isJsonNull()) return;
         String sz = json.getAsString();
@@ -153,7 +155,7 @@ public class Challenge {
         }
     }
 
-    private void setSpecificLoot(JsonElement lootArr)
+    void setSpecificLoot(JsonElement lootArr)
     {
         this.lootRules.specificLoot = new ArrayList<>();
         if(lootArr.isJsonNull()) return;

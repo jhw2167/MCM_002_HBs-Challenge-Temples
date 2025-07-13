@@ -85,6 +85,9 @@ public class ChallengeRoom {
 
     ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel, String challengeId)
     {
+        if(chunkId.equals( SPECIAL_TEMPLE)) {
+            int i = 0;
+        }
         this.chunkId = chunkId;
         this.worldPos = ChallengeRoom.getWorldPos(chunkId);
         this.overworldExitPos = overworldExitPos;

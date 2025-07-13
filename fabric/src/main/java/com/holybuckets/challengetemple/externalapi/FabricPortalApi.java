@@ -1,11 +1,13 @@
 package com.holybuckets.challengetemple.externalapi;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import qouteall.imm_ptl.core.McHelper;
 import qouteall.imm_ptl.core.portal.Portal;
+import qouteall.imm_ptl.core.portal.global_portals.GlobalPortalStorage;
 
 public class FabricPortalApi implements PortalApi {
 
@@ -18,7 +20,8 @@ public class FabricPortalApi implements PortalApi {
     @Override
     public boolean removePortal(Entity entity) {
         if (!isPortal(entity)) return false;
-        entity.discard();
+        Portal portal = (Portal) entity;
+        GlobalPortalStorage.get((ServerLevel) portal.level()).removePortal(portal);
         return true;
     }
 

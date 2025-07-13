@@ -154,12 +154,22 @@ public class ChallengeDB {
      * @param filter filters acceptable list of challenges, may be null
      * @return
      */
-    static Challenge chooseChallenge(@Nullable ChallengeFilter filter) {
-        if(CHALLENGES.isEmpty()) {
-            return null; // or throw an exception
+    static Challenge chooseChallenge(@Nullable ChallengeFilter filter)
+    {
+        if(CHALLENGES.isEmpty()) return null;
+
+        List<Challenge> filteredChallenges = CHALLENGES;
+        if( filter != null)
+        {
+            filteredChallenges = CHALLENGES.stream()
+                .filter(challenge -> ChallengeFilter.filter(challenge, filter))
+                .toList();
+            if(filteredChallenges.isEmpty())  return null;
         }
+
         int rand = (int) (Math.random() * CHALLENGES.size());
-        return CHALLENGES.get(rand);
+        return filteredChallenges.get(rand);
+
     }
 
 
@@ -171,6 +181,30 @@ public class ChallengeDB {
             return this;
         }
         // Filters for challenges based on chunkId, player data, etc.
+
+        static boolean filter(Challenge challenge, ChallengeFilter filter) {
+            if(filter == null) return true; //no filter, accept all
+
+            boolean isValid = true;
+            if(!test(challenge.challengeId, filter.challengeId))
+                return false;
+        /*
+        if(!test(this.author, filter.author)) {
+            return false;
+        }
+        if(!test(this.challengeName, filter.challengeName)) {
+            return false;
+        }
+        */
+
+            // Add more filters as needed
+            return true;
+        }
+
+        private static boolean test(Object filterField, Object value) {
+            if(filterField == null || value == null) return true;
+            return filterField.equals(value);
+        }
     }
 
     //Each line of the challenge db csv contains

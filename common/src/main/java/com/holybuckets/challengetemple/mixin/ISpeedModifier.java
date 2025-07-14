@@ -15,3 +15,16 @@ public interface ISpeedModifier {
     }
 }
 
+package com.holybuckets.challengetemple.mixin;
+
+import com.holybuckets.challengetemple.block.ModBlocks;
+import net.minecraft.world.level.block.state.BlockState;
+
+public interface ISpeedModifier {
+    default float modifySpeed(float originalSpeed, BlockState state) {
+        if (ModBlocks.MINEABLE.contains(state) && originalSpeed > 1.0f) {
+            return Math.min(originalSpeed, ModBlocks.MINEABLE_SPEED);
+        }
+        return originalSpeed;
+    }
+}

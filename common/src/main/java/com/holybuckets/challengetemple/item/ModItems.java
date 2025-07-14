@@ -42,6 +42,7 @@ public class ModItems {
                 ModBlocks.challengeGlassPane,
                 //ModBlocks.challengeWood,
                 ModBlocks.challengeStone,
+                ModBlocks.challengeCobble,
                 ModBlocks.challengeFauxBrick,
                 ModBlocks.challengeInvisibleBrick
         };

@@ -18,7 +18,8 @@ public class ChallengeLog extends Block {
 
     static Properties PROPERTIES = Properties.copy(Blocks.SPRUCE_LOG)
         .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
-        .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES_BLASTABLE);
+        .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES_BLASTABLE)
+        .requiresCorrectToolForDrops();
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {

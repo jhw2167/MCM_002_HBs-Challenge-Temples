@@ -29,4 +29,7 @@ public class ChallengeLog extends Block {
     public boolean dropFromExplosion(Explosion explosion) {
         return false;
     }
+
+
+
 }

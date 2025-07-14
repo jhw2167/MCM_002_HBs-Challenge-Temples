@@ -10,8 +10,4 @@ public class ChallengeChestBlockEntity extends ChestBlockEntity {
         super(pos, state);
     }
 
-    @Override
-    public AABB getRenderBoundingBox() {
-        return new AABB(worldPosition.offset(-1, 0, -1), worldPosition.offset(2, 2, 2));
-    }
 }

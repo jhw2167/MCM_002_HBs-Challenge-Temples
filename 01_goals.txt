@@ -200,6 +200,14 @@ Create additional challenge block variants
 	- break any blocks in the startup area
 	- don't let anyone place blocks in the real world or drop items there
 
+16.
+---
+
+Give player home button that can use to go to original temple spawn!!
+
+17.
+---
+
 keep notes
 ---
 

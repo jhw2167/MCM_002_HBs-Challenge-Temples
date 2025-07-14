@@ -28,6 +28,8 @@ public class ModBlocks {
     public static float CHALLENGE_BLOCK_EXPL_RES = 1f;
     public static float CHALLENGE_BLOCK_EXPL_RES_BLASTABLE = 0.7f;
 
+    public static float MINEABLE_SPEED = 100f;
+
 
     public static Block challengeBed;
     public static Block challengeBrick;

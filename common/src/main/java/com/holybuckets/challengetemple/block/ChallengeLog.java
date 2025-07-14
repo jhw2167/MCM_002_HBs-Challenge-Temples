@@ -17,15 +17,15 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import org.jetbrains.annotations.Nullable;
 
 public class ChallengeLog extends RotatedPillarBlock {
-    public ChallengeLog() {
-        super(PROPERTIES);
-        this.registerDefaultState(this.stateDefinition.any().setValue(AXIS, Direction.Axis.Y));
-    }
-
     private static final Properties PROPERTIES = BlockBehaviour.Properties.copy(Blocks.SPRUCE_LOG)
         .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
         .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES_BLASTABLE)
         .requiresCorrectToolForDrops();
+
+    public ChallengeLog() {
+        super(PROPERTIES);
+        registerDefaultState(defaultBlockState().setValue(AXIS, Direction.Axis.Y));
+    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

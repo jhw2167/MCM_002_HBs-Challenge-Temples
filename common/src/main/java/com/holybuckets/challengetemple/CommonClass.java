@@ -1,6 +1,7 @@
 package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
+import com.holybuckets.challengetemple.block.be.ModBlockEntities;
 import com.holybuckets.challengetemple.client.ModRenderers;
 import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
 import com.holybuckets.challengetemple.platform.Services;
@@ -30,6 +31,7 @@ public class CommonClass {
         BalmEventRegister.registerEvents();
         BalmEventRegister.registerCommands();
         ModBlocks.initialize(Balm.getBlocks());
+        ModBlockEntities.initialize(Balm.getBlockEntities());
         ModItems.initialize(Balm.getItems());
 
         isInitialized = true;

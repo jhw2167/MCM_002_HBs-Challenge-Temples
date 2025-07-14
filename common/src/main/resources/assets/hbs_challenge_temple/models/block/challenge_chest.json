@@ -1,3 +1,6 @@
 {
-    "parent": "minecraft:block/chest"
+    "parent": "minecraft:block/cube_all",
+    "textures": {
+        "all": "minecraft:entity/chest/normal"
+    }
 }

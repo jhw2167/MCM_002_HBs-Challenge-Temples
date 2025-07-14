@@ -25,8 +25,4 @@ public class ChallengeChestBlock extends ChestBlock {
         return new ChallengeChestBlockEntity(pos, state);
     }
 
-    @Override
-    public ChestBlockEntity getContainer(ChallengeChestBlock block, BlockState state, Level level, BlockPos pos, boolean ignoreBlocked) {
-        return super.getContainer(block, state, level, pos, ignoreBlocked);
-    }
 }

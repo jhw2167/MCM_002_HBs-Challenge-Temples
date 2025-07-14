@@ -9,6 +9,7 @@ import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
+import net.blay09.mods.balm.api.event.EventPriority;
 import net.blay09.mods.balm.api.event.LevelLoadingEvent;
 import net.blay09.mods.balm.api.event.server.ServerStartedEvent;
 import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
@@ -68,7 +69,7 @@ public class ChallengeTempleMain {
             registrar.registerOnBeforeServerStarted(this::onServerStarting);
             registrar.registerOnLevelLoad(this::onLevelLoad);
             registrar.registerOnLevelUnload(this::onLevelUnload);
-            registrar.registerOnServerStopped(this::onServerStopped);
+            registrar.registerOnServerStopped(this::onServerStopped, EventPriority.Highest);
     }
 
     private void onServerStarting(ServerStartingEvent e) {

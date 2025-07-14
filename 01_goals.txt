@@ -281,7 +281,36 @@ Make Your own maze- navigate through a maze with invisible brick
 RewardsClass: normal, rare, epic, none
 SpecificRewards: specify items guaranteed to be in the rewards chest
 keepChest - new item added by the mod, any item in this chest will be kept by the player after they exit the shrine, config takes a list of items to put in the chest.
+---
 
+
+How To Create a Block Entity and renderer
+
+1. You need ChallengeChestBlockEntity extends (some block entity) and a constructor
+
+public class ChallengeChestBlockEntity extends ChestBlockEntity {
+    public ChallengeChestBlockEntity(BlockPos pos, BlockState state) {
+        super( ModBlockEntities.challengeChest.get(), pos, state);
+    }
+}
+
+2. We need a ModBlockEntities class to initialize the block entity:
+
+public class ModBlockEntities {
+
+    public static DeferredObject<BlockEntityType<BlockEntity>> challengeChest;
+
+    public static void initialize(BalmBlockEntities blockEntities) {
+        challengeChest = blockEntities.registerBlockEntity( id("challenge_chest"), ChallengeChestBlockEntity::new,
+            () -> new Block[]{ModBlocks.challengeChest} );
+    }
+    
+    private static ResourceLocation id(String name) {
+        return new ResourceLocation(Constants.MOD_ID, name);
+    }
+}
+
+	initialize from... CommonClass.init methods
 
 
 

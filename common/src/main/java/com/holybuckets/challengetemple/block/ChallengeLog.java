@@ -1,7 +1,7 @@
 package com.holybuckets.challengetemple.block;
 
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.core.BlockPos;
@@ -22,11 +22,10 @@ public class ChallengeLog extends RotatedPillarBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(AXIS, Direction.Axis.Y));
     }
 
-    private static final Properties PROPERTIES = BlockBehaviour.Properties.of()
+    private static final Properties PROPERTIES = BlockBehaviour.Properties.copy(Blocks.SPRUCE_LOG)
         .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
         .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES_BLASTABLE)
-        .requiresCorrectToolForDrops()
-        .sound(SoundType.WOOD);
+        .requiresCorrectToolForDrops();
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

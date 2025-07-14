@@ -6,7 +6,8 @@
     "compatibilityLevel": "JAVA_17",
     "mixins": [
     "CorpseEntityMixin",
-    "DeathEventsMixin"
+    "DeathEventsMixin",
+    "ItemMixin"
     ],
     "client": [
     ],

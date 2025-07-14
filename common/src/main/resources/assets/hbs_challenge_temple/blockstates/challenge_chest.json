@@ -1,8 +1,8 @@
 {
     "variants": {
-        "facing=north": { "model": "minecraft:block/chest" },
-        "facing=south": { "model": "minecraft:block/chest", "y": 180 },
-        "facing=west":  { "model": "minecraft:block/chest", "y": 270 },
-        "facing=east":  { "model": "minecraft:block/chest", "y": 90 }
+        "facing=north": { "model": "hbs_challenge_temple:block/challenge_chest" },
+        "facing=south": { "model": "hbs_challenge_temple:block/challenge_chest", "y": 180 },
+        "facing=west":  { "model": "hbs_challenge_temple:block/challenge_chest", "y": 270 },
+        "facing=east":  { "model": "hbs_challenge_temple:block/challenge_chest", "y": 90 }
     }
 }

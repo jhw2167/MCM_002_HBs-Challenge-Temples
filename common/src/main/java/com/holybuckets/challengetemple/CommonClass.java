@@ -9,6 +9,7 @@ import com.holybuckets.challengetemple.item.ModItems;
 import com.holybuckets.foundation.event.BalmEventRegister;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.client.BalmClient;
+import net.blay09.mods.balm.api.client.rendering.BalmRenderers;
 
 
 public class CommonClass {
@@ -34,11 +35,13 @@ public class CommonClass {
         ModBlockEntities.initialize(Balm.getBlockEntities());
         ModItems.initialize(Balm.getItems());
 
+
         isInitialized = true;
     }
 
     public static void initClient() {
         ModRenderers.clientInitialize(BalmClient.getRenderers());
+        //ModItems.clientInit();
     }
 
     /**

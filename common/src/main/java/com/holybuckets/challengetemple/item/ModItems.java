@@ -3,6 +3,8 @@ package com.holybuckets.challengetemple.item;
 
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.block.ModBlocks;
+import com.holybuckets.challengetemple.block.be.ModBlockEntities;
+import com.holybuckets.challengetemple.client.ChallengeItemBlockRenderer;
 import net.blay09.mods.balm.api.item.BalmItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -19,6 +21,13 @@ public class ModItems {
             //com.holybuckets.foundation.item.ModItems.FOUNDATIONS_TAB);
         items.registerCreativeModeTab(() -> new ItemStack(ModBlocks.challengeBrick), id("creative_tab"));
         items.addToCreativeModeTab(id("creative_tab"), ModItems::getItemLikeArray);
+    }
+
+    public static void clientInit() {
+        ChallengeItemBlockRenderer.CHEST_RENDERER = new ChallengeItemBlockRenderer(
+                ModBlockEntities.challengeChest.get(),
+                ModBlocks.challengeChest.defaultBlockState()
+        );
     }
 
     private static ItemLike[] getItemLikeArray() {

@@ -1,6 +1,7 @@
 package com.holybuckets.challengetemple.block;
 
 import com.holybuckets.challengetemple.Constants;
+import com.holybuckets.challengetemple.item.ChallengeChestItem;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.DeferredObject;
 import net.blay09.mods.balm.api.block.BalmBlocks;
@@ -48,7 +49,9 @@ public class ModBlocks {
 
         //DeferredObject<Block> registerBlock(Function<ResourceLocation, Block> supplier, ResourceLocation identifier);
         //challengeChest = blocks.registerBlock( loc -> new ChallengeChestBlock()  , id("challenge_chest"));
-        blocks.register(() -> challengeChest = new ChallengeChestBlock(), () -> itemBlock(challengeChest), id("challenge_chest"));
+        blocks.register(() -> challengeChest = new ChallengeChestBlock(),
+            () -> new ChallengeChestItem(challengeChest, new Properties()),
+            id("challenge_chest"));
 
     }
 

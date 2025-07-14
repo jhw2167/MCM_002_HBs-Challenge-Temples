@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
 import com.holybuckets.challengetemple.core.ChallengeDB;
 import com.holybuckets.challengetemple.core.ManagedChallenger;
 import com.holybuckets.challengetemple.core.TempleManager;
@@ -10,6 +11,7 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.LevelLoadingEvent;
 import net.blay09.mods.balm.api.event.server.ServerStartedEvent;
+import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.blay09.mods.balm.api.event.server.ServerStoppedEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -28,6 +30,7 @@ public class ChallengeTempleMain {
 
     public static ChallengeTempleMain INSTANCE;
     public static boolean DEV_MODE = true;
+    public static ChallengeTempleConfig CONFIG;
 
     public PortalApi portalApi;
     public InventoryApi inventoryApi;
@@ -62,13 +65,15 @@ public class ChallengeTempleMain {
             ChallengeDB.init(registrar);
 
             //register events
-            registrar.registerOnServerStarted(this::onServerStarted);
+            registrar.registerOnBeforeServerStarted(this::onServerStarting);
             registrar.registerOnLevelLoad(this::onLevelLoad);
             registrar.registerOnLevelUnload(this::onLevelUnload);
             registrar.registerOnServerStopped(this::onServerStopped);
     }
 
-    private void onServerStarted(ServerStartedEvent e) {
+    private void onServerStarting(ServerStartingEvent e) {
+        CONFIG = Balm.getConfig().getActiveConfig(ChallengeTempleConfig.class);
+        this.DEV_MODE = CONFIG.devMode;
         this.inventoryApi.initConfig();
     }
 

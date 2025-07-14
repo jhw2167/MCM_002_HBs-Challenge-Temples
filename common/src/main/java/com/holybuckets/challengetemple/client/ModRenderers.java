@@ -3,6 +3,8 @@ package com.holybuckets.challengetemple.client;
 import com.holybuckets.challengetemple.block.ModBlocks;
 import net.blay09.mods.balm.api.client.rendering.BalmRenderers;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.ChestRenderer;
+
 
 public class ModRenderers {
 

@@ -1,0 +1,57 @@
+# Custom Minecraft Chest Implementation Guide
+
+## Required Components
+
+1. Block Entity (TE) Implementation:
+- Extend ChestBlockEntity
+- Override getRenderBoundingBox() for proper rendering
+- Handle inventory and interaction logic
+- See: VariantChestBlockEntity.java
+
+2. Block Implementation:
+- Extend ChestBlock
+- Implement custom interfaces (IZetaBlock, IVariantChest)
+- Override newBlockEntity()
+- Handle block properties and behavior
+- See: VariantChestBlock.java
+
+3. Module/Registration System:
+- Register BlockEntityType
+- Register Block instances
+- Handle client-side rendering
+- Register models and textures
+- See: VariantChestsModule.java
+
+4. Required Resources:
+assets/
+  yourmod/
+    blockstates/
+      your_chest.json
+    models/
+      block/
+        your_chest.json
+    textures/
+      block/
+        your_chest/
+          normal.png
+          trapped.png
+
+5. Key Features:
+- Double chest detection/connection
+- Inventory handling
+- Custom rendering
+- Structure generation integration
+- Creative tab placement
+
+## Advanced Features
+- Structure replacement system
+- Trapped chest variants
+- Creative tab organization
+- Client-side rendering setup
+- Horse chest integration
+
+## Minimum Requirements
+1. BlockEntity class extending ChestBlockEntity
+2. Block class extending ChestBlock
+3. Registration system
+4. Basic model/texture assets

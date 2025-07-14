@@ -2,13 +2,12 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.client.ModRenderers;
+import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
 import com.holybuckets.challengetemple.platform.Services;
 import com.holybuckets.challengetemple.item.ModItems;
 import com.holybuckets.foundation.event.BalmEventRegister;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.client.BalmClient;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.Items;
 
 
 public class CommonClass {
@@ -26,6 +25,7 @@ public class CommonClass {
             Constants.LOG.info("Hello to " + Constants.MOD_NAME + "!");
         }
 
+        Balm.getConfig().registerConfig(ChallengeTempleConfig.class);
         ChallengeTempleMain.INSTANCE = new ChallengeTempleMain();
         BalmEventRegister.registerEvents();
         BalmEventRegister.registerCommands();

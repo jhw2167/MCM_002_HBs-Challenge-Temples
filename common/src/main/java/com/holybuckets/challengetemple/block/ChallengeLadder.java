@@ -11,7 +11,8 @@ public class ChallengeLadder extends LadderBlock {
                 .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
                 .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES)
                 .sound(SoundType.LADDER)
-                .noCollission()  // This is crucial for climbability
-                .noOcclusion());
+                .noCollission()
+                .noOcclusion()
+                .dynamicShape());  // This helps with collision detection
     }
 }

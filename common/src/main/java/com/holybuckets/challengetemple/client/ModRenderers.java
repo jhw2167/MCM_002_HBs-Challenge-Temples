@@ -27,6 +27,8 @@ public class ModRenderers {
         renderers.setBlockRenderType(() -> ModBlocks.challengeInvisibleBrick, RenderType.cutout() );
         renderers.setBlockRenderType(() -> ModBlocks.challengeInvisibleBrick, RenderType.translucent() );
 
+        renderers.setBlockRenderType(() -> ModBlocks.challengeLadder, RenderType.cutout() );
+
         //default <T extends BlockEntity > void registerBlockEntityRenderer(ResourceLocation identifier, Supplier<BlockEntityType<T>> type,
         // BlockEntityRendererProvider<? super T> provider) {
         renderers.registerBlockEntityRenderer( id("challenge_chest"),

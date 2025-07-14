@@ -43,6 +43,7 @@ public class ModItems {
                 //ModBlocks.challengeWood,
                 ModBlocks.challengeStone,
                 ModBlocks.challengeCobble,
+                ModBlocks.challengeLog,
                 ModBlocks.challengeFauxBrick,
                 ModBlocks.challengeInvisibleBrick
         };

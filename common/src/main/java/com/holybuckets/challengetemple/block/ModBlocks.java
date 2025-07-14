@@ -30,6 +30,7 @@ public class ModBlocks {
     public static Block challengeWood;
     public static Block challengeStone;
     public static Block challengeCobble;
+    public static Block challengeLog;
     public static Block challengeFauxBrick;
     public static Block challengeInvisibleBrick;
 
@@ -48,6 +49,7 @@ public class ModBlocks {
         //blocks.register(() -> challengeWood = new ChallengeWood(), () -> itemBlock(challengeWood), id("challenge_wood"));
         blocks.register(() -> challengeStone = new ChallengeStone(), () -> itemBlock(challengeStone), id("challenge_stone"));
         blocks.register(() -> challengeCobble = new ChallengeCobble(), () -> itemBlock(challengeCobble), id("challenge_cobble"));
+        blocks.register(() -> challengeLog = new ChallengeLog(), () -> itemBlock(challengeLog), id("challenge_log"));
         blocks.register(() -> challengeFauxBrick = new ChallengeFauxBrick(), () -> itemBlock(challengeFauxBrick), id("challenge_faux_brick"));
         blocks.register(() -> challengeInvisibleBrick = new ChallengeInvisibleBrick(), () -> itemBlock(challengeInvisibleBrick), id("challenge_invisible_brick"));
 

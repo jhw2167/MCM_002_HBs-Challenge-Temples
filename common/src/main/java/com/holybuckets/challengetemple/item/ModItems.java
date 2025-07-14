@@ -26,6 +26,7 @@ public class ModItems {
         return new ItemLike[]{
                 ModBlocks.challengeBed,
                 ModBlocks.challengeBrick,
+                ModBlocks.challengeChest,
                 ModBlocks.challengeBrickSlab,
                 ModBlocks.challengeGlowstone,
                 ModBlocks.challengeGlass,

@@ -2,23 +2,31 @@ package com.holybuckets.challengetemple.block;
 
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.item.ChallengeChestItem;
+import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.DeferredObject;
 import net.blay09.mods.balm.api.block.BalmBlocks;
+import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ModBlocks {
 
     public static float CHALLENGE_BLOCK_STRENGTH = 1000000f;
-    public static float CHALLENGE_BLOCK_STRENGTH_MINEABLE = 1000f;
+    public static float CHALLENGE_BLOCK_STRENGTH_MINEABLE = 200f;
     public static float CHALLENGE_BLOCK_EXPL_RES = 1f;
-    public static float CHALLENGE_BLOCK_EXPL_RES_BLASTABLE = 0.5f;
+    public static float CHALLENGE_BLOCK_EXPL_RES_BLASTABLE = 0.7f;
 
 
     public static Block challengeBed;
@@ -27,12 +35,13 @@ public class ModBlocks {
     public static Block challengeGlowstone;
     public static Block challengeGlass;
     public static Block challengeGlassPane;
+    public static Block challengeFauxBrick;
+    public static Block challengeInvisibleBrick;
+
     public static Block challengeWood;
     public static Block challengeStone;
     public static Block challengeCobble;
     public static Block challengeLog;
-    public static Block challengeFauxBrick;
-    public static Block challengeInvisibleBrick;
 
     //public static DeferredObject<Block> challengeChest;
     public static Block challengeChest;
@@ -47,11 +56,13 @@ public class ModBlocks {
         blocks.register(() -> challengeGlass = new ChallengeGlass(), () -> itemBlock(challengeGlass), id("challenge_glass"));
         blocks.register(() -> challengeGlassPane = new ChallengeGlassPane(), () -> itemBlock(challengeGlassPane), id("challenge_glass_pane"));
         //blocks.register(() -> challengeWood = new ChallengeWood(), () -> itemBlock(challengeWood), id("challenge_wood"));
+
+        blocks.register(() -> challengeFauxBrick = new ChallengeFauxBrick(), () -> itemBlock(challengeFauxBrick), id("challenge_faux_brick"));
+        blocks.register(() -> challengeInvisibleBrick = new ChallengeInvisibleBrick(), () -> itemBlock(challengeInvisibleBrick), id("challenge_invisible_brick"));
+
         blocks.register(() -> challengeStone = new ChallengeStone(), () -> itemBlock(challengeStone), id("challenge_stone"));
         blocks.register(() -> challengeCobble = new ChallengeCobble(), () -> itemBlock(challengeCobble), id("challenge_cobble"));
         blocks.register(() -> challengeLog = new ChallengeLog(), () -> itemBlock(challengeLog), id("challenge_log"));
-        blocks.register(() -> challengeFauxBrick = new ChallengeFauxBrick(), () -> itemBlock(challengeFauxBrick), id("challenge_faux_brick"));
-        blocks.register(() -> challengeInvisibleBrick = new ChallengeInvisibleBrick(), () -> itemBlock(challengeInvisibleBrick), id("challenge_invisible_brick"));
 
         //DeferredObject<Block> registerBlock(Function<ResourceLocation, Block> supplier, ResourceLocation identifier);
         //challengeChest = blocks.registerBlock( loc -> new ChallengeChestBlock()  , id("challenge_chest"));
@@ -67,6 +78,18 @@ public class ModBlocks {
 
     private static ResourceLocation id(String name) {
         return new ResourceLocation(Constants.MOD_ID, name);
+    }
+
+
+    public static void init(EventRegistrar reg) {
+        reg.registerOnBeforeServerStarted(ModBlocks::initSpecialProperties);
+    }
+
+    public static Set<BlockState> MINEABLE = new HashSet<>();
+    public static void initSpecialProperties(ServerStartingEvent e) {
+        FireBlock fire = (FireBlock) Blocks.FIRE;
+        MINEABLE = new HashSet<>();
+        MINEABLE.add(ModBlocks.challengeCobble.defaultBlockState());
     }
 
 }

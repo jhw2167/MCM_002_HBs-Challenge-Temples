@@ -45,6 +45,7 @@ public class ModBlocks {
 
     //public static DeferredObject<Block> challengeChest;
     public static Block challengeChest;
+    public static Block challengeLadder;
 
 
 
@@ -69,6 +70,10 @@ public class ModBlocks {
         blocks.register(() -> challengeChest = new ChallengeChestBlock(),
             () -> new ChallengeChestItem(challengeChest, new Properties()),
             id("challenge_chest"));
+            
+        blocks.register(() -> challengeLadder = new ChallengeLadder(),
+            () -> itemBlock(challengeLadder),
+            id("challenge_ladder"));
 
     }
 

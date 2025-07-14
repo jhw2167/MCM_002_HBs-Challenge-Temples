@@ -45,7 +45,8 @@ public class ModItems {
                 ModBlocks.challengeCobble,
                 ModBlocks.challengeLog,
                 ModBlocks.challengeFauxBrick,
-                ModBlocks.challengeInvisibleBrick
+                ModBlocks.challengeInvisibleBrick,
+                ModBlocks.challengeLadder
         };
     }
 

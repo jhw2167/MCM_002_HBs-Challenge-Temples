@@ -193,13 +193,108 @@ hbs_challenge_temple:challenge_room_4x4_00
 keep notes
 ---
 
+CHALLENGES
+---
 
-TempleCleanUp()
-- cleanupLoot - removes loot on the floor
-- cleanupEntities - kills and respawns entities
-- cleanupBlocks - removes all blocks
-- cleanupChests - cleans and refills chests
-- cleanPlayer - reset hearts, remove effects, remove loot
+
+Tutorial temple always first
+Maze in lava with wooden planks
+Short hop - place blocks as you land tech
+Water bucket clutch 
+Train goes around in circles, get in, get out
+Frost Walker boots
+Parkool boots
+Skinny bridge + skeletons
+1D parkour
+
+Challenges:
+Redstone Basics I - build T flip flop
+Redstone Basics II - build alternating signal with pistons
+RBIII - 1x2, 2x2, 3x3 piston door
+Use arrows to shoot through the doors!
+
+Skeleton run I, II, III
+Creeper run - dig down through dirt with creepers, then stone
+Spider run - climb ladders 
+Zombie run - flat area with holes in it, give zombies knock back swords,
+
+Create mechanics:
+Belts
+Maximize stress units
+
+Need custom script capabilities
+Need ability to make alternate shrines for same theme
+
+Dog park - make a cute lil dog park, have to kill a dog for the key, he is sitting on wooden pressure plate, other dogs get mad at you
+
+Mans best friend - dog travels in parallel track, defend him from mobs with arrows
+
+Bar brawl - design a cute tavern with a bunch of wacky characters that all fight each other 
+
+Can we make challenge gravel slide on ice like sand falls?
+
+Chat GPT auto generate me pokemon style puzzles
+
+Four swords - choose between four elemental swords, progress between four elemental challenges
+- fire, knockback, frost?, bane of arth
+
+Temple run - run straight, portals teleport you so you run in a straight line
+
+Farm hand
+- sheer sheep in a mountain themed temple, with goats
+- milk cows 
+- kill pigs - cooked pork chops worth 2
+- automated farm hand, build create contraption to automate milk
+- egg cannon
+
+
+Junkyard - give the player completely random items, see if they can make it to the top
+- Or give them existing create machines that must be repirposed
+
+Angry birds - kill zombies, create gantry shaft and vanilla TnT cannon, wireless redstone, pressure plates
+
+Mountain miner - build create railroad that breaks blocks, follows track
+- put deployers on their train
+- put drills
+- hop off train to flip switch
+- use dispensers to shoot arrows
+
+
+Early Game speed run
+
+Target practice - just arrows and floating targets, wireless redstone
+
+End chest to transfer items to yourself
+
+Make Your own maze- navigate through a maze with invisible brick
+
+RewardsClass: normal, rare, epic, none
+SpecificRewards: specify items guaranteed to be in the rewards chest
+keepChest - new item added by the mod, any item in this chest will be kept by the player after they exit the shrine, config takes a list of items to put in the chest.
+
+Challenge blocks:
+Challenge_brick - cannot be broken, moved, blasted
+ altered or destroyed, bedrock with stone brick skin
+Challenge_glass - cannot be altered, glass textured
+Challenge stone - cannot be broken, but can be blasted or moved
+Challenge_wood - can be blasted or burned
+Challenge_leaves - can be burned, not broken by hand
+
+Challenge_tank - emits redstone signal when filled with sufficient fluid
+Challenge_chest - emits redstone signal when filled with sufficient items
+
+challenge_cobble - can be mined, does not drop anything
+challenge_ladder - cannot be mined, or exploded
+challenge_door
+faux brick not burnable
+
+
+
+
+
+CUT PASTE
+---
+
 
 //cut
     public void startWatchChallengers()

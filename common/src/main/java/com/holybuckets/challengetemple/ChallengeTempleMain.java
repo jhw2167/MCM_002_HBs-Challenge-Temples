@@ -27,6 +27,7 @@ public class ChallengeTempleMain {
     public static final Boolean DEBUG = true;
 
     public static ChallengeTempleMain INSTANCE;
+    public static boolean DEV_MODE = true;
 
     public PortalApi portalApi;
     public InventoryApi inventoryApi;

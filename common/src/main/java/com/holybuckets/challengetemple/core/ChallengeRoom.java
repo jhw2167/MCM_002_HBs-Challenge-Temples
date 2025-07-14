@@ -35,6 +35,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
+import static com.holybuckets.challengetemple.ChallengeTempleMain.DEV_MODE;
 import static com.holybuckets.challengetemple.core.TempleManager.*;
 import static com.holybuckets.challengetemple.core.ManagedTemple.*;
 import static com.holybuckets.challengetemple.core.ChallengeDB.ChallengeFilter;
@@ -117,6 +118,7 @@ public class ChallengeRoom {
      */
     boolean loadStructure()
     {
+        if( DEV_MODE ) return  true;
         if( this.roomLoaded ) return false;
 
         this.roomLoaded = true;

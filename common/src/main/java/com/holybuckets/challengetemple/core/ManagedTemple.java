@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.holybuckets.challengetemple.ChallengeTempleMain.DEV_MODE;
 import static com.holybuckets.challengetemple.core.TempleManager.*;
 
 public class ManagedTemple {
@@ -264,6 +265,7 @@ public class ManagedTemple {
             int i = 0;
         }
 
+        if( DEV_MODE ) this.isCompleted = true;
         if(this.isCompleted) return;
 
         createChallengePortal();

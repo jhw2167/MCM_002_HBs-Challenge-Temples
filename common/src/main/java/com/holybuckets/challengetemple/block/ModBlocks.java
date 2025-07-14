@@ -16,7 +16,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 public class ModBlocks {
 
     public static float CHALLENGE_BLOCK_STRENGTH = 1000000f;
+    public static float CHALLENGE_BLOCK_STRENGTH_MINEABLE = 1000f;
     public static float CHALLENGE_BLOCK_EXPL_RES = 1f;
+    public static float CHALLENGE_BLOCK_EXPL_RES_BLASTABLE = 0.5f;
 
 
     public static Block challengeBed;

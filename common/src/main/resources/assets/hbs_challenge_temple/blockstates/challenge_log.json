@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
+    "axis=y": {
       "model": "hbs_challenge_temple:block/challenge_log"
+    },
+    "axis=z": {
+      "model": "hbs_challenge_temple:block/challenge_log",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "hbs_challenge_temple:block/challenge_log",
+      "x": 90,
+      "y": 90
     }
   }
 }

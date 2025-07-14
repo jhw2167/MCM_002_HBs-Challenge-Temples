@@ -15,7 +15,7 @@ public class ChallengeChestBlock extends ChestBlock {
             .destroyTime(-1f)
             .explosionResistance(3600000f)
             .pushReaction(PushReaction.IGNORE), 
-            () -> null); // BlockEntityType will be set after registration
+            () -> ModBlockEntityTypes.CHALLENGE_CHEST.get());
     }
 
     @Override

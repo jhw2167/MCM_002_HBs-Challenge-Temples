@@ -7,7 +7,11 @@ import net.minecraft.world.phys.AABB;
 
 public class ChallengeChestBlockEntity extends ChestBlockEntity {
     public ChallengeChestBlockEntity(BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(ModBlockEntityTypes.CHALLENGE_CHEST.get(), pos, state);
     }
 
+    @Override
+    public AABB getRenderBoundingBox() {
+        return new AABB(worldPosition.offset(-1, 0, -1), worldPosition.offset(2, 2, 2));
+    }
 }

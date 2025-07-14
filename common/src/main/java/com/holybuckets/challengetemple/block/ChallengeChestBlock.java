@@ -1,7 +1,9 @@
 package com.holybuckets.challengetemple.block;
 
 import com.holybuckets.challengetemple.block.be.ChallengeChestBlockEntity;
+import com.holybuckets.challengetemple.block.be.ModBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
@@ -11,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class ChallengeChestBlock extends ChestBlock {
     public ChallengeChestBlock() {
-        super(Properties.copy(ModBlocks.challengeBrick)
+        super(Properties.copy(Blocks.CHEST)
             .destroyTime(-1f)
             .explosionResistance(3600000f)
-            .pushReaction(PushReaction.IGNORE), 
-            () -> ModBlockEntityTypes.CHALLENGE_CHEST.get());
+            .pushReaction(PushReaction.IGNORE),
+            () -> ModBlockEntities.challengeChest.get() );
     }
 
     @Override

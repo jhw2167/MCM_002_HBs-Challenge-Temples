@@ -9,7 +9,8 @@
         "MixinPoolElementStructurePiece",
         "MixinListPoolElement",
         "MixinSinglePoolElement",
-        "StructureTemplateMixin"
+        "StructureTemplateMixin",
+        "PickaxeItemMixin"
     ],
     "client": [
     ],

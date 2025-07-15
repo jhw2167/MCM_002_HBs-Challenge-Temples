@@ -74,6 +74,7 @@ public class ManagedChallenger implements IManagedPlayer {
     public static void init(EventRegistrar reg) {
         reg.registerOnPlayerChangedDimension(ManagedChallenger::onPlayerChangeDimension);
         reg.registerOnUseBlock(ManagedChallenger::onPlayerUsedBlock);
+        reg.registerOnServerTick( EventRegistrar.TickType.ON_20_TICKS, );
     }
 
     public static boolean isActiveChallenger(Player p) {

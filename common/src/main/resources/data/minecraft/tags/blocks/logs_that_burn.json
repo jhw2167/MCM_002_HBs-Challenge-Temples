@@ -1,5 +1,6 @@
 {
+  "replace": false,
   "values": [
-    "#hbs_challenge_temple:challenge_log"
+    "hbs_challenge_temple:challenge_log"
   ]
 }

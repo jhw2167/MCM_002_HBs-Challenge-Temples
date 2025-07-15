@@ -76,6 +76,12 @@ public class ManagedChallenger implements IManagedPlayer {
         reg.registerOnUseBlock(ManagedChallenger::onPlayerUsedBlock);
     }
 
+    public static boolean isActiveChallenger(Player p) {
+        if (p == null || !(p instanceof ServerPlayer)) return false;
+        if(! CHALLENGERS.containsKey(p)) return false;
+        return CHALLENGERS.get(p).activeTemple != null;
+    }
+
     //** CORE
     public void setPlayerSpawn(Level level, BlockPos spawnPos, boolean setTempleSpawn)
     {

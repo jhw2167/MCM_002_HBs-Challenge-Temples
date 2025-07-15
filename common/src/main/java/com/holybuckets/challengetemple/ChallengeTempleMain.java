@@ -2,6 +2,7 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
+import com.holybuckets.challengetemple.core.ChallengeBlockBehavior;
 import com.holybuckets.challengetemple.core.ChallengeDB;
 import com.holybuckets.challengetemple.core.ManagedChallenger;
 import com.holybuckets.challengetemple.core.TempleManager;
@@ -62,7 +63,7 @@ public class ChallengeTempleMain {
         inventoryApi.setInstance(inventoryApi);
 
             EventRegistrar registrar = EventRegistrar.getInstance();
-            ModBlocks.init(registrar);
+            ChallengeBlockBehavior.init(registrar);
 
             TempleManager.init(registrar);
             ManagedChallenger.init(registrar);

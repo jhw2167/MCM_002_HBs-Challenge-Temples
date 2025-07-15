@@ -3,19 +3,15 @@ package com.holybuckets.challengetemple.block;
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.item.ChallengeChestItem;
 import com.holybuckets.foundation.event.EventRegistrar;
-import net.blay09.mods.balm.api.Balm;
-import net.blay09.mods.balm.api.DeferredObject;
 import net.blay09.mods.balm.api.block.BalmBlocks;
 import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.piston.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashSet;
@@ -24,12 +20,9 @@ import java.util.Set;
 public class ModBlocks {
 
     public static float CHALLENGE_BLOCK_STRENGTH = 1000000f;
-    public static float CHALLENGE_BLOCK_STRENGTH_MINEABLE = 100f;
-    public static float CHALLENGE_BLOCK_EXPL_RES = 1f;
+    public static float CHALLENGE_BLOCK_STRENGTH_MINEABLE = 0.5f;
+    public static float CHALLENGE_BLOCK_EXPL_RES = 1000000f;
     public static float CHALLENGE_BLOCK_EXPL_RES_BLASTABLE = 0.7f;
-
-    public static float MINEABLE_SPEED = 100f;
-
 
     public static Block challengeBed;
     public static Block challengeBrick;
@@ -88,15 +81,6 @@ public class ModBlocks {
     }
 
 
-    public static void init(EventRegistrar reg) {
-        reg.registerOnBeforeServerStarted(ModBlocks::initSpecialProperties);
-    }
 
-    public static Set<BlockState> MINEABLE = new HashSet<>();
-    public static void initSpecialProperties(ServerStartingEvent e) {
-        FireBlock fire = (FireBlock) Blocks.FIRE;
-        MINEABLE = new HashSet<>();
-        MINEABLE.add(ModBlocks.challengeCobble.defaultBlockState());
-    }
 
 }

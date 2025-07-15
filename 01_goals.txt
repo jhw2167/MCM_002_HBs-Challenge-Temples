@@ -191,6 +191,7 @@ Create additional challenge block variants
 	challenge_ladder - cannot be mined, or exploded
 	challenge_door - copy of an iron door
 
+"all": "minecraft:block/glass"
 
 15.
 ---
@@ -205,8 +206,15 @@ Create additional challenge block variants
 
 Give player home button that can use to go to original temple spawn!!
 
+
 17.
 ---
+
+- joining in progress causes temple reload
+- joining in progress causes duplicate portals
+- joining in progress causes portals in wrong order
+- joining in progress missses item return
+
 
 keep notes
 ---

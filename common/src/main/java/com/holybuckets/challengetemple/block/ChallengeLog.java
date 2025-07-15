@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ChallengeLog extends RotatedPillarBlock {
     private static final Properties PROPERTIES = BlockBehaviour.Properties.copy(Blocks.SPRUCE_LOG)
-        .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
+        .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH_MINEABLE)
         .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES_BLASTABLE)
         .requiresCorrectToolForDrops();
 

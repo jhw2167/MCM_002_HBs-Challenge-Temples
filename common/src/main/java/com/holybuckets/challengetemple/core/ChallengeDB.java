@@ -19,12 +19,8 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -167,7 +163,7 @@ public class ChallengeDB {
             if(filteredChallenges.isEmpty())  return null;
         }
 
-        int rand = (int) (Math.random() * CHALLENGES.size());
+        int rand = (int) (Math.random() * filteredChallenges.size());
         return filteredChallenges.get(rand);
 
     }

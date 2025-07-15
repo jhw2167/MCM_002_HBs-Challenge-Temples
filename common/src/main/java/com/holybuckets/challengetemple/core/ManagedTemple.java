@@ -264,7 +264,7 @@ public class ManagedTemple {
         if(templeId.equals( SPECIAL_TEMPLE)) {
             int i = 0;
         }
-        
+
         if( DEV_MODE ) this.isCompleted = true;
         if(this.isCompleted) return;
 

@@ -3,7 +3,7 @@ package com.holybuckets.challengetemple.block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.Blocks;
 
 public class ChallengeLadder extends LadderBlock {
     public ChallengeLadder() {
@@ -14,5 +14,9 @@ public class ChallengeLadder extends LadderBlock {
                 .noCollission()
                 .noOcclusion()
                 .dynamicShape());  // This helps with collision detection
+    }
+
+    boolean isClimbable() {
+        return true;  // Ensure the ladder is climbable
     }
 }

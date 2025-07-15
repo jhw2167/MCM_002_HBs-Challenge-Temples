@@ -24,7 +24,7 @@ import java.util.Set;
 public class ModBlocks {
 
     public static float CHALLENGE_BLOCK_STRENGTH = 1000000f;
-    public static float CHALLENGE_BLOCK_STRENGTH_MINEABLE = 200f;
+    public static float CHALLENGE_BLOCK_STRENGTH_MINEABLE = 100f;
     public static float CHALLENGE_BLOCK_EXPL_RES = 1f;
     public static float CHALLENGE_BLOCK_EXPL_RES_BLASTABLE = 0.7f;
 

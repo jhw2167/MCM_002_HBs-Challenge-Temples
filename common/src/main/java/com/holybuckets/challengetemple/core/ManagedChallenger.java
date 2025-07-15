@@ -74,7 +74,7 @@ public class ManagedChallenger implements IManagedPlayer {
     public static void init(EventRegistrar reg) {
         reg.registerOnPlayerChangedDimension(ManagedChallenger::onPlayerChangeDimension);
         reg.registerOnUseBlock(ManagedChallenger::onPlayerUsedBlock);
-        reg.registerOnServerTick( EventRegistrar.TickType.ON_20_TICKS, );
+        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ManagedChallenger::onServerTick);
     }
 
     public static boolean isActiveChallenger(Player p) {
@@ -221,6 +221,20 @@ public class ManagedChallenger implements IManagedPlayer {
         if (challenger.activeTemple != null) {
             challenger.onBlockUsed(e);
         }
+    }
+
+    public static void onServerTick() {
+        // Process all active challengers every 20 ticks
+        CHALLENGERS.values().stream()
+            .filter(challenger -> challenger.activeTemple != null)
+            .forEach(challenger -> {
+                try {
+                    challenger.activeTemple.onTick();
+                } catch (Exception e) {
+                    LoggerProject.logError("010014", "Error processing challenger tick: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            });
     }
 
     private void onBlockUsed(UseBlockEvent e)

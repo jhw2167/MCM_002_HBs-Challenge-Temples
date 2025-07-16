@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "color=white": { "model": "hbs_challenge_temple:block/white_building_block" },
+    "color=orange": { "model": "hbs_challenge_temple:block/orange_building_block" },
+    "color=magenta": { "model": "hbs_challenge_temple:block/magenta_building_block" },
+    "color=light_blue": { "model": "hbs_challenge_temple:block/light_blue_building_block" },
+    "color=yellow": { "model": "hbs_challenge_temple:block/yellow_building_block" },
+    "color=lime": { "model": "hbs_challenge_temple:block/lime_building_block" },
+    "color=pink": { "model": "hbs_challenge_temple:block/pink_building_block" },
+    "color=gray": { "model": "hbs_challenge_temple:block/gray_building_block" },
+    "color=light_gray": { "model": "hbs_challenge_temple:block/light_gray_building_block" },
+    "color=cyan": { "model": "hbs_challenge_temple:block/cyan_building_block" },
+    "color=purple": { "model": "hbs_challenge_temple:block/purple_building_block" },
+    "color=blue": { "model": "hbs_challenge_temple:block/blue_building_block" },
+    "color=brown": { "model": "hbs_challenge_temple:block/brown_building_block" },
+    "color=green": { "model": "hbs_challenge_temple:block/green_building_block" },
+    "color=red": { "model": "hbs_challenge_temple:block/red_building_block" },
+    "color=black": { "model": "hbs_challenge_temple:block/black_building_block" }
+  }
+}

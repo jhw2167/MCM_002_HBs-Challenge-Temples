@@ -16,3 +16,7 @@
 
   "block.hbs_challenge_temple.challenge_chest": "Challenge Chest"
 }
+{
+    "block.hbs_challenge_temple.challenge_door": "Challenge Door",
+    "block.hbs_challenge_temple.building_block": "Building Block"
+}

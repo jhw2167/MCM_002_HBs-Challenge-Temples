@@ -48,11 +48,15 @@ public class ChallengeBlockBehavior {
 
     }
 
+    /**
+     *
+     * @return Map<Block, Pair<ignitChance, burnTime>>
+     */
     public static Map<Block, Pair<Integer, Integer>> getFlammable() {
         Map<Block, Pair<Integer, Integer>> flammableBlocks = new HashMap<>();
-        // Add flammable blocks with their encouragement and flammability values
-        flammableBlocks.put(ModBlocks.challengeLog, Pair.of(5, 5));
-        // Add more blocks as needed
+        //IGNITE CHANCE - 60 -> 0, burn time: 100 -> 0
+        flammableBlocks.put(ModBlocks.challengeLog, Pair.of(25, 15));
+
         return flammableBlocks;
     }
 

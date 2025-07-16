@@ -210,11 +210,17 @@ Give player home button that can use to go to original temple spawn!!
 17.
 ---
 
+- need to buffer buildChallenge time to allow players to join in or near challenges
+
+
 - joining in progress causes temple reload
 - joining in progress causes duplicate portals
 - joining in progress causes portals in wrong order
 - joining in progress missses item return
 
+hbs foundation
+- handles to Overworld, Nether, end
+- getTicksInSession
 
 keep notes
 ---

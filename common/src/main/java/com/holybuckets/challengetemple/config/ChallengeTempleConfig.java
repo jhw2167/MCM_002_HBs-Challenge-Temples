@@ -10,7 +10,7 @@ import net.blay09.mods.balm.api.config.reflection.Config;
 public class ChallengeTempleConfig {
 
     @Comment("devMode==true disables portal spawns so the player can build and save new challenges")
-    public boolean devMode = true;
+    public boolean devMode = false;
     @Comment("Where the loot rules json configuration can be found. This file determines what loot is available in each level of pool")
     public String lootRulesConfig = "config/challengeTempleslootRules.json";
 

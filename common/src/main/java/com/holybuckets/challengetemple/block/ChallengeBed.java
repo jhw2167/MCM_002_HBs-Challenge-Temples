@@ -16,11 +16,9 @@ public class ChallengeBed extends Block {
 
     public ChallengeBed() {
         super(Properties.copy(Blocks.STONE_BRICKS)
-            .destroyTime(-1f)
-            .explosionResistance(3600000f)
-            .pushReaction(PushReaction.IGNORE)
-            .requiresCorrectToolForDrops()
-            .lightLevel((state) -> state.getValue(CHARGES) * 3));
+            .destroyTime(ModBlocks.CHALLENGE_BLOCK_STRENGTH_MINEABLE)
+            .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES)
+            .pushReaction(PushReaction.IGNORE));
         this.registerDefaultState(this.stateDefinition.any().setValue(CHARGES, Integer.valueOf(0)));
     }
 
@@ -28,6 +26,7 @@ public class ChallengeBed extends Block {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(CHARGES);
     }
+
 
     @Override
     public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {

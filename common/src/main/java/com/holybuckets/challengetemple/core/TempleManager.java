@@ -16,6 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +33,8 @@ public class TempleManager {
     static PortalApi PORTAL_API;
     static GeneralConfig CONFIG;
     static String SPECIAL_TEMPLE = "0,0";
+    static final long PROCESSING_BUFFER_TICKS = 400;  //time for existing temples and portals to load before manager starts loading more temples
+    static long PROCESSING_BUFFER_START_TICK;  //time for existing temples and portals to load before manager starts loading more temples
 
     private final ServerLevel level;
     private final Map<String, ManagedTemple> temples;
@@ -58,8 +62,10 @@ public class TempleManager {
         CONFIG = GeneralConfig.getInstance();
     }
 
+    private long processing_buffer_start_tick;
     public void load() {
         LoggerProject.logInfo("005000", "Loading TempleManager for level: " + this.level);
+        processing_buffer_start_tick = CONFIG.getTotalTickCount() + PROCESSING_BUFFER_TICKS;
     }
 
     //** UTILITY
@@ -75,6 +81,10 @@ public class TempleManager {
 
     public ManagedTemple getTemple(String id) {
         return temples.get(id);
+    }
+
+    public Collection<ManagedTemple> getTemples() {
+        return Collections.unmodifiableCollection(temples.values());
     }
 
     public void clear() {
@@ -104,6 +114,11 @@ public class TempleManager {
 
     private void workerThreadBuildPortal()
     {
+        if( CONFIG.getTotalTickCount() < processing_buffer_start_tick ) {
+            LoggerProject.logDebug("005010", "Skipping portal creation, waiting for buffer to fill");
+            return;
+        }
+
         temples.values().stream()
             .filter(t -> t.isFullyLoaded() )
             .filter(t -> !t.hasPortal() )
@@ -249,6 +264,5 @@ public class TempleManager {
         ChallengeRoom.shutdown();
         MANAGERS.remove(this.level);
     }
-
 
 }

@@ -4,6 +4,8 @@ import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
+import com.holybuckets.foundation.event.EventRegistrar;
+import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -29,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.holybuckets.challengetemple.ChallengeTempleMain.DEV_MODE;
+import static com.holybuckets.challengetemple.ChallengeTempleMain.OVERWORLD_DIM;
 import static com.holybuckets.challengetemple.core.TempleManager.*;
 
 public class ManagedTemple {
@@ -268,11 +271,19 @@ public class ManagedTemple {
         if( DEV_MODE ) this.isCompleted = true;
         if(this.isCompleted) return;
 
-        createChallengePortal();
+        if(this.activePlayers.isEmpty())
+            createChallengePortal();
+        else
+            createHomePortal();
 
-        if (this.challengeRoom == null) {
+        if (this.challengeRoom == null)
+        {
             this.challengeRoom = new ChallengeRoom( this.templeId, overworldExitPos,
                  this.level, challengeId);
+
+            if(this.activePlayers.isEmpty())
+                this.challengeRoom.loadStructure(); // don't reload if player is inside
+
             this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
         }
 
@@ -337,6 +348,15 @@ public class ManagedTemple {
         activePlayers.add(p);
         this.challengeRoom.setActive( true );
     }
+
+    public void playerDiedInChallenge(ManagedChallenger c) {
+        challengeRoom.onChallengerDeath(c);
+        if( challengeRoom.isChallengerFailed(c) )
+            this.kickChallenger(c);
+    }
+        private void kickChallenger(ManagedChallenger c) {
+
+        }
 
     private static Vec3i REWARDS_CHEST_OFFSET = new Vec3i(0, 0, 4);
     public void playerEndChallenge(ManagedChallenger player)
@@ -434,14 +454,39 @@ public class ManagedTemple {
             challengeRoom.roomShutdown();
         }
 
-        //clear portals
-        //this.deleteHomePortal();
-        //this.deleteChallengePortal();
+        this.findPortals();
+        this.deleteHomePortal();
+        this.deleteChallengePortal();
 
         this.nearPlayers.clear();
         this.activePlayers.clear();
     }
 
 
+    //** Statics
+    static void init(EventRegistrar reg) {
+        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ManagedTemple::onServer20Ticks);
+    }
 
+    static void onServer20Ticks(ServerTickEvent event) {
+        Level overworld = HBUtil.LevelUtil.toLevel(HBUtil.LevelUtil.LevelNameSpace.SERVER, OVERWORLD_DIM);
+        for (ManagedTemple temple : MANAGERS.get(overworld).getTemples() ) {
+            if (temple.isFullyLoaded()) {
+                temple.onTick();
+            }
+        }
+    }
+
+        void onTick() {
+            int i = 0;
+        }
+
+
+    public void playerQuitChallenge(ManagedChallenger managedChallenger) {
+        //Teleport the serverPlayer to the templeDestPos
+        ServerPlayer sp = managedChallenger.getServerPlayer();
+        if (sp == null) return;
+        BlockPos p = this.getPortalDest();
+        sp.teleportTo(p.getX() + 0.5, p.getY() - 0.5, p.getZ() + 0.5);
+    }
 }

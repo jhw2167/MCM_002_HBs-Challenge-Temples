@@ -6,29 +6,23 @@ import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.console.Messager;
 import com.holybuckets.foundation.event.EventRegistrar;
+import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import com.holybuckets.foundation.modelInterface.IManagedPlayer;
-import com.holybuckets.foundation.player.ManagedPlayer;
-import net.blay09.mods.balm.api.event.BalmEvents;
-import net.blay09.mods.balm.api.event.LivingDeathEvent;
-import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
-import net.blay09.mods.balm.api.event.UseBlockEvent;
+import net.blay09.mods.balm.api.event.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Interaction;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -74,8 +68,11 @@ public class ManagedChallenger implements IManagedPlayer {
     public static void init(EventRegistrar reg) {
         reg.registerOnPlayerChangedDimension(ManagedChallenger::onPlayerChangeDimension);
         reg.registerOnUseBlock(ManagedChallenger::onPlayerUsedBlock);
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ManagedChallenger::onServerTick);
+        reg.registerOnBreakBlock(ManagedChallenger::onPlayerBreakBlock);
+        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ManagedChallenger::onServer20Ticks );
     }
+
+
 
     public static boolean isActiveChallenger(Player p) {
         if (p == null || !(p instanceof ServerPlayer)) return false;
@@ -176,6 +173,29 @@ public class ManagedChallenger implements IManagedPlayer {
 
         }
 
+    private void onChallengerBlockUsed(UseBlockEvent e)
+    {
+        //Handle block used in challenge temple
+        if (this.activeTemple == null) return;
+
+        BlockPos hitPos = e.getHitResult().getBlockPos();
+        BlockState hitBlockState = e.getLevel().getBlockState(hitPos);
+        if(hitBlockState.equals( ModBlocks.challengeBed.defaultBlockState() ))
+            this.setPlayerSpawn(CHALLENGE_LEVEL, hitPos.offset(0,1,0), true);
+    }
+
+    private void onChallengerBlockBreak(BreakBlockEvent e)
+    {
+        //Handle block used in challenge temple
+        if (this.activeTemple == null) return;
+
+        BlockState hitBlockState = e.getState();
+        if(hitBlockState.equals( ModBlocks.challengeBed.defaultBlockState() ))
+            this.activeTemple.playerQuitChallenge(this); //quit challenge if bed is broken
+    }
+
+
+
     public void endChallenge(ManagedTemple managedTemple)
     {
         this.activeTemple = null;
@@ -204,6 +224,10 @@ public class ManagedChallenger implements IManagedPlayer {
 
     }
 
+    public static void onServer20Ticks(ServerTickEvent event) {
+        int i = 0;  //just for debugging
+    }
+
 
 
     public static void onPlayerUsedBlock(UseBlockEvent e)
@@ -219,35 +243,24 @@ public class ManagedChallenger implements IManagedPlayer {
         if (challenger == null) return;
 
         if (challenger.activeTemple != null) {
-            challenger.onBlockUsed(e);
+            challenger.onChallengerBlockUsed(e);
         }
     }
 
-    public static void onServerTick() {
-        // Process all active challengers every 20 ticks
-        CHALLENGERS.values().stream()
-            .filter(challenger -> challenger.activeTemple != null)
-            .forEach(challenger -> {
-                try {
-                    challenger.activeTemple.onTick();
-                } catch (Exception e) {
-                    LoggerProject.logError("010014", "Error processing challenger tick: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            });
-    }
 
-    private void onBlockUsed(UseBlockEvent e)
+    private static void onPlayerBreakBlock(BreakBlockEvent breakBlockEvent)
     {
-        //Handle block used in challenge temple
-        if (this.activeTemple == null) return;
+        if( breakBlockEvent.getLevel() != CHALLENGE_LEVEL) return;
 
-        BlockPos hitPos = e.getHitResult().getBlockPos();
-        BlockState hitBlockState = e.getLevel().getBlockState(hitPos);
-        if(hitBlockState.equals( ModBlocks.challengeBed.defaultBlockState() ))
-            this.setPlayerSpawn(CHALLENGE_LEVEL, hitPos.offset(0,1,0), true);
+        Player player = breakBlockEvent.getPlayer();
+        if (player == null || !(player instanceof ServerPlayer)) return;
+        if (!CHALLENGERS.containsKey(player)) return;
+
+        ManagedChallenger challenger = CHALLENGERS.get(player);
+        if (challenger.activeTemple != null) {
+           challenger.onChallengerBlockBreak(breakBlockEvent);
+        }
     }
-
 
 
     //** OVERRIDES
@@ -330,6 +343,18 @@ public class ManagedChallenger implements IManagedPlayer {
         } else {
             this.p.getInventory().clearContent();
         }
+
+        this.activeTemple.playerDiedInChallenge(this);
+    }
+
+    @Override
+    public void handlePlayerAttack(Player player, Entity entity) {
+        //nothing
+    }
+
+    @Override
+    public void handlePlayerDigSpeed(Player player, float v, Float aFloat) {
+        //nothing
     }
 
     @Override

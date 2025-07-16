@@ -99,13 +99,52 @@ public class ChallengeRoom {
         this.roomCompleted = false;
         ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
 
-        this.loadStructure();
     }
 
 
     ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel)
     {
         this(chunkId, overworldExitPos, returnLevel, null);
+    }
+
+
+    //** GETTERS
+    BlockPos getWorldPos() {
+        return this.worldPos;
+    }
+
+    boolean isRoomCompleted() {
+        return this.roomCompleted;
+    }
+
+    public void startChallenge() {
+        this.generateExitStructure();
+        this.roomActive = true;
+    }
+
+    public List<ItemStack> getChallengeLoot() {
+        return this.challenge.getLootRules().getSpecificLoot();
+    }
+
+    public String getChallengeId() {
+        return this.challengeId;
+    }
+
+    public Challenge getChallenge() { return challenge; }
+
+    public void setActive(boolean isActive) {
+        this.roomActive = isActive;
+    }
+
+    public void setChallenge(String ChallengeId)
+    {
+        ChallengeFilter filter = new ChallengeFilter()
+            .setChallengeId(ChallengeId);
+        this.challenge = ChallengeDB.chooseChallenge(filter);
+        if(this.challenge == null)
+            this.challenge = ChallengeDB.chooseChallenge(null);
+
+        this.challengeId = this.challenge.getChallengeId();
     }
 
     //** CORE
@@ -128,62 +167,54 @@ public class ChallengeRoom {
             String id = String.format("%02d", i);
             succeeded = true && this.generateStructure(id, false);
         }
-        /*
-        Arrays.stream(ids).forEach(id -> {
-            Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(id))];
-            String msg = String.format("[%s] Loading structure with pos %s id: %s", this.chunkId, offset, id);
-            LoggerProject.logDebug("007000", msg);
-            this.generateStructure(id, false);
-        });
-         */
 
         return succeeded;
     }
 
 
-        //A challenge could be a 2x2 or 4x4 room
-        private static final String CHALLENGE_NAME = "challenge_<challengeId>_<pieceId>";
-        private static final String STRUCTURE_NAME = "challenge_room_4x4_";
+    //A challenge could be a 2x2 or 4x4 room
+    private static final String CHALLENGE_NAME = "challenge_<challengeId>_<pieceId>";
+    private static final String STRUCTURE_NAME = "challenge_room_4x4_";
 
-        /**
-         * Generates the individual structure pieces
-         * @param pieceId
-         * @param useTemplate
-         * @return
-         */
-        private boolean generateStructure(String pieceId, boolean useTemplate)
-        {
-            StructureTemplateManager manager =  CHALLENGE_LEVEL.getStructureManager();
-            String location = CHALLENGE_NAME.replace("<challengeId>", challengeId).replace("<pieceId>", pieceId);
-            //String location = STRUCTURE_NAME + pieceId;
-            ResourceLocation structure = new ResourceLocation(Constants.MOD_ID, location);
-            Optional<StructureTemplate> temp = manager.get(structure);
-            if(!temp.isPresent()) return false;
+    /**
+     * Generates the individual structure pieces
+     * @param pieceId
+     * @param useTemplate
+     * @return
+     */
+    private boolean generateStructure(String pieceId, boolean useTemplate)
+    {
+        StructureTemplateManager manager =  CHALLENGE_LEVEL.getStructureManager();
+        String location = CHALLENGE_NAME.replace("<challengeId>", challengeId).replace("<pieceId>", pieceId);
+        //String location = STRUCTURE_NAME + pieceId;
+        ResourceLocation structure = new ResourceLocation(Constants.MOD_ID, location);
+        Optional<StructureTemplate> temp = manager.get(structure);
+        if(!temp.isPresent()) return false;
 
-            StructureTemplate template = temp.get();
-            Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(pieceId))];
+        StructureTemplate template = temp.get();
+        Vec3i offset = STRUCTURE_BLOCK_PIECE_OFFSETS[(Integer.parseInt(pieceId))];
 
-           boolean succeeded = template.placeInWorld(
-                CHALLENGE_LEVEL,                   // ServerLevel
-                this.getWorldPos().offset(offset),                // Position to place at
-                this.getWorldPos().offset(offset),                // ??
-                (useTemplate) ? TEMPLATE_SETTINGS : REAL_SETTINGS, // Settings for placement
-                CHALLENGE_LEVEL.getRandom(),
-                (useTemplate) ? 2 : 18                         // Block update flag
-            );
+       boolean succeeded = template.placeInWorld(
+            CHALLENGE_LEVEL,                   // ServerLevel
+            this.getWorldPos().offset(offset),                // Position to place at
+            this.getWorldPos().offset(offset),                // ??
+            (useTemplate) ? TEMPLATE_SETTINGS : REAL_SETTINGS, // Settings for placement
+            CHALLENGE_LEVEL.getRandom(),
+            (useTemplate) ? 2 : 18                         // Block update flag
+        );
 
-            //Need to replace structure blocks with actual blocks
-            List<Block> repl = challenge.getReplaceEntityBlocks();
-            if( pieceId.equals( "03" ) ) {
-                BlockState replaceEntityBlock = repl.get(0).defaultBlockState();
-                CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
-            } else if( pieceId.equals( "07" ) ) {
-                BlockState replaceEntityBlock = repl.get(1).defaultBlockState();
-                CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
-            }
-
-            return succeeded;
+        //Need to replace structure blocks with actual blocks
+        List<Block> repl = challenge.getReplaceEntityBlocks();
+        if( pieceId.equals( "03" ) ) {
+            BlockState replaceEntityBlock = repl.get(0).defaultBlockState();
+            CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
+        } else if( pieceId.equals( "07" ) ) {
+            BlockState replaceEntityBlock = repl.get(1).defaultBlockState();
+            CHALLENGE_LEVEL.setBlock( getWorldPos().offset(offset), replaceEntityBlock, 18 );
         }
+
+        return succeeded;
+    }
 
 
 
@@ -258,33 +289,33 @@ public class ChallengeRoom {
         }
 
 
-    private static final Vec3i EXIT_PORTAL_MARKER_OFFSET = new Vec3i(1, 1, 1);
-    /**
-     * Tries to test if the room is complete by determining
-     * if all soul torches are present in the structure
-     * @return true if the challenge is completed
-     */
-    boolean testRoomCompleted()
-    {
-        if(this.exitStructurePos == null) return false; // No exit structure found
-
-          BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
-        BlockPos temp = portalTorchPos;
-        //** Check all 4 soul torches in the 4x4 area
-        BlockState state = CHALLENGE_LEVEL.getBlockState(temp);
-        for(int i =0; i<4; i++)
+        private static final Vec3i EXIT_PORTAL_MARKER_OFFSET = new Vec3i(1, 1, 1);
+        /**
+         * Tries to test if the room is complete by determining
+         * if all soul torches are present in the structure
+         * @return true if the challenge is completed
+         */
+        boolean testRoomCompleted()
         {
-            if(!state.equals(EXIT_PORTAL_BLOCK))  return false;
-            if(i == 0) temp = temp.offset(3, 0, 0); // Move to next torch
-            else if(i == 1) temp = temp.offset(0, 0, 3); // Move to next torch
-            else if(i == 2) temp = temp.offset(-3, 0, 0); // Move to next torch
-            state = CHALLENGE_LEVEL.getBlockState(temp);
-        }
+            if(this.exitStructurePos == null) return false; // No exit structure found
 
-        this.roomCompleted = true;
-        return  generateExitPortal(portalTorchPos);
-        //return true;
-    }
+              BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
+            BlockPos temp = portalTorchPos;
+            //** Check all 4 soul torches in the 4x4 area
+            BlockState state = CHALLENGE_LEVEL.getBlockState(temp);
+            for(int i =0; i<4; i++)
+            {
+                if(!state.equals(EXIT_PORTAL_BLOCK))  return false;
+                if(i == 0) temp = temp.offset(3, 0, 0); // Move to next torch
+                else if(i == 1) temp = temp.offset(0, 0, 3); // Move to next torch
+                else if(i == 2) temp = temp.offset(-3, 0, 0); // Move to next torch
+                state = CHALLENGE_LEVEL.getBlockState(temp);
+            }
+
+            this.roomCompleted = true;
+            return  generateExitPortal(portalTorchPos);
+            //return true;
+        }
 
 
         private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(2, -1, 2);
@@ -312,44 +343,29 @@ public class ChallengeRoom {
         return this.loadStructure();
     }
 
-    BlockPos getWorldPos() {
-        return this.worldPos;
+
+    //** CORE CHALLENGER
+
+    /**
+     * Triggers processing after challenger dies during the challenge.
+     * @param c
+     *
+     */
+    public void onChallengerDeath(ManagedChallenger c) {
+        this.refreshStructure();
     }
 
-    boolean isRoomCompleted() {
-        return this.roomCompleted;
+    /**
+     * isChallengerFailed checks if the challenger has failed challenge
+     * either by total deaths or some other method
+     * @param c
+     * @return true if challenger has failed, false otherwise
+     */
+    public boolean isChallengerFailed(ManagedChallenger c) {
+        return false;
     }
 
-    public void startChallenge() {
-       this.generateExitStructure();
-       this.roomActive = true;
-    }
-
-    public List<ItemStack> getChallengeLoot() {
-        return this.challenge.getLootRules().getSpecificLoot();
-    }
-
-    public String getChallengeId() {
-        return this.challengeId;
-    }
-
-    public Challenge getChallenge() { return challenge; }
-
-    public void setActive(boolean isActive) {
-        this.roomActive = isActive;
-    }
-
-    public void setChallenge(String ChallengeId)
-    {
-        ChallengeFilter filter = new ChallengeFilter()
-            .setChallengeId(ChallengeId);
-        this.challenge = ChallengeDB.chooseChallenge(filter);
-        if(this.challenge == null)
-            this.challenge = ChallengeDB.chooseChallenge(null);
-
-        this.challengeId = this.challenge.getChallengeId();
-    }
-
+    //* UTILITY
 
     private static final Vec3i GRAVEYARD_START_OFFSET = new Vec3i(-4, 1, 1);
     private static final int GRVYRD_MAX_Z = 64; // max z position for graveyard, resets at 0
@@ -412,27 +428,6 @@ public class ChallengeRoom {
         this.roomLoaded = false;
     }
 
-    //* UTILITY
-
-    //* MIXIN
-    public static void placeInWorld(
-        ServerLevelAccessor world,
-        BlockPos pos,
-        BlockPos offset,
-        StructurePlaceSettings settings,
-        RandomSource random,
-        int flags
-    ) {
-        System.out.println("=== StructureTemplate.placeInWorld called ===");
-        System.out.println("World: " + world);
-        System.out.println("Position: " + pos);
-        System.out.println("Offset: " + offset);
-        System.out.println("Settings: " + settings);
-        System.out.println("Flags: " + flags);
-    }
-
-
-    //** STATICS
     void roomShutdown() {
         if(this.exitPortal != null) {
             this.exitPortal.discard();
@@ -441,6 +436,7 @@ public class ChallengeRoom {
     }
 
     //** STATICS
+
     public static void init(EventRegistrar reg) {
         // Register the static event handler
         reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
@@ -558,4 +554,21 @@ public class ChallengeRoom {
 
     }
 
+
+    //* MIXIN
+    public static void placeInWorld(
+        ServerLevelAccessor world,
+        BlockPos pos,
+        BlockPos offset,
+        StructurePlaceSettings settings,
+        RandomSource random,
+        int flags
+    ) {
+        System.out.println("=== StructureTemplate.placeInWorld called ===");
+        System.out.println("World: " + world);
+        System.out.println("Position: " + pos);
+        System.out.println("Offset: " + offset);
+        System.out.println("Settings: " + settings);
+        System.out.println("Flags: " + flags);
+    }
 }

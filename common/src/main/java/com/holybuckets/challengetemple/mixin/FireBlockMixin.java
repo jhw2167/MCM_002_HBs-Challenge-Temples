@@ -1,8 +1,14 @@
 package com.holybuckets.challengetemple.mixin;
 
 import com.holybuckets.challengetemple.core.ChallengeBlockBehavior;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,14 +18,19 @@ import java.util.Map;
 
 @Mixin(FireBlock.class)
 public class FireBlockMixin {
-    
-    @Inject(method = "bootstrap", at = @At("TAIL"))
-    private static void onBootstrap(CallbackInfo ci) {
-        FireBlock fireBlock = (FireBlock) Block.byItem(net.minecraft.world.item.Items.FIRE.asItem());
+
+    @Shadow @Final @Mutable
+    private Object2IntMap<Block> igniteOdds;
+    @Shadow @Final @Mutable
+    private Object2IntMap<Block> burnOdds;
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void hbs$afterConstructor(BlockBehaviour.Properties properties, CallbackInfo ci) {
         Map<Block, Pair<Integer, Integer>> flammableBlocks = ChallengeBlockBehavior.getFlammable();
-        
         for (Map.Entry<Block, Pair<Integer, Integer>> entry : flammableBlocks.entrySet()) {
-            fireBlock.setFlammable(entry.getKey(), entry.getValue().getLeft(), entry.getValue().getRight());
+            Pair p = entry.getValue();
+            igniteOdds.put(entry.getKey(), (Integer) p.getLeft());
+            burnOdds.put(entry.getKey(), (Integer) p.getRight());
         }
     }
 }

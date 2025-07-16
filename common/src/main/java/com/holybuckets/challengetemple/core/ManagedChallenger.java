@@ -147,12 +147,16 @@ public class ManagedChallenger implements IManagedPlayer {
 
     }
 
+        public synchronized void enqueueClearInventory() {
+            new Thread(() -> challengerClearInventory()).start();
+        }
+
         private void challengerClearInventory()
         {
 
             //1. wait until player is in challegne dimension
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 return;
             }
@@ -203,7 +207,7 @@ public class ManagedChallenger implements IManagedPlayer {
         this.holdInventory = null;
 
         this.setPlayerSpawn(managedTemple.getLevel(), this.originalSpawnPos, false);
-        challengerClearInventory();
+        //challengerClearInventory();
         ChallengeTempleMain.INSTANCE.inventoryApi.returnInventory((ServerPlayer) p, lastGravePos);
     }
 

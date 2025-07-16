@@ -58,7 +58,8 @@ public class ModItems {
                 ModBlocks.challengeCobble,
                 ModBlocks.challengeLog,
 
-                ModBlocks.challengeLadder
+                ModBlocks.challengeLadder,
+                ModBlocks.challengeDoor
 
         );
 

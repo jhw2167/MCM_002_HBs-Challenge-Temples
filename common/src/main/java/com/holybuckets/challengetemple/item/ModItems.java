@@ -46,7 +46,9 @@ public class ModItems {
                 ModBlocks.challengeLog,
                 ModBlocks.challengeFauxBrick,
                 ModBlocks.challengeInvisibleBrick,
-                ModBlocks.challengeLadder
+                ModBlocks.challengeLadder,
+                // Add all building block variants
+                ModBlocks.BUILDING_BLOCKS.values().toArray(new ItemLike[0])
         };
     }
 

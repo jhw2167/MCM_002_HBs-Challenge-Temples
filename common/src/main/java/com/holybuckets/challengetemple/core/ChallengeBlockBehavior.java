@@ -36,6 +36,8 @@ public class ChallengeBlockBehavior {
     {
         CHALLENGE_MINEABLE = new HashSet<>();
         CHALLENGE_MINEABLE.add(ModBlocks.challengeCobble);
+        // Add all building blocks as mineable
+        ModBlocks.BUILDING_BLOCKS.values().forEach(CHALLENGE_MINEABLE::add);
 
         CHALLENGE_UNMINEABLE = new HashSet<>();
         CHALLENGE_UNMINEABLE.add(ModBlocks.challengeLog);

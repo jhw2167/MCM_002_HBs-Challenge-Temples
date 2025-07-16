@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.piston.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.DyeColor;
+import java.util.EnumMap;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,6 +43,7 @@ public class ModBlocks {
     //public static DeferredObject<Block> challengeChest;
     public static Block challengeChest;
     public static Block challengeLadder;
+    public static final EnumMap<DyeColor, Block> BUILDING_BLOCKS = new EnumMap<>(DyeColor.class);
 
 
 
@@ -69,6 +72,16 @@ public class ModBlocks {
         blocks.register(() -> challengeLadder = new ChallengeLadder(),
             () -> itemBlock(challengeLadder),
             id("challenge_ladder"));
+
+        // Register building blocks for each color
+        for (DyeColor color : DyeColor.values()) {
+            String colorName = color.getName();
+            blocks.register(
+                () -> BUILDING_BLOCKS.put(color, new ChallengeBuildingBlock(color)),
+                () -> itemBlock(BUILDING_BLOCKS.get(color)),
+                id(colorName + "_building_block")
+            );
+        }
 
     }
 

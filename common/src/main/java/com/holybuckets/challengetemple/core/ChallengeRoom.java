@@ -339,8 +339,9 @@ public class ChallengeRoom {
      * @return
      */
     boolean refreshStructure() {
-        this.roomLoaded = false;
-        return this.loadStructure();
+        if( this.loadStructure() )
+            return this.generateExitStructure();
+        return false;
     }
 
 

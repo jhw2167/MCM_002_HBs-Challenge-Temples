@@ -1,13 +1,13 @@
 {
-    "challengeId": "000000624",
+    "challengeId": "000000582",
     "author": "Holy_Buckets",
-    "challengeName": "Gold Challenge",
+    "challengeName": "Tutorial Challenge",
     "difficulty": 0,
     "size": "2x2",
     "challengeRules": {
         "playerMaxHearts": 10,
         "maxDeaths": -1,
-        "resetBlocksOnPlayerDeath": false,
+        "resetBlocksOnPlayerDeath": true,
         "resetChestsOnPlayerDeath": true,
         "keepInventoryOnPlayerDeath": true,
         "playerDropsInventoryOnDeath": false
@@ -15,7 +15,7 @@
     "lootRules": {
         "lootPool": 0,
         "specificLoot": [
-            "minecraft:gold_sword"
+            "minecraft:lodestone_compass"
         ]
     }
 }

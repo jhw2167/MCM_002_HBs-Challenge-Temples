@@ -190,6 +190,18 @@ Create additional challenge block variants
 	challenge_cobble - can be mined, does not drop anything
 	challenge_ladder - cannot be mined, or exploded
 	challenge_door - copy of an iron door
+	challenge_plate - clears inventory
+	add sheers for wrench -
+
+
+	lava that kills faster
+	chest blast resistent
+	signs blast resistent
+	move temple template over
+	delete the second button
+	
+	
+
 
 "all": "minecraft:block/glass"
 

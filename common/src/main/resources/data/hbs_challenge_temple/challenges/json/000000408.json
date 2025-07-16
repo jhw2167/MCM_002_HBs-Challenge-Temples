@@ -10,7 +10,7 @@
         "resetBlocksOnPlayerDeath": true,
         "resetChestsOnPlayerDeath": false,
         "keepInventoryOnPlayerDeath": false,
-        "playerDropsInventoryOnDeath": true
+        "playerDropsInventoryOnDeath": false
     },
     "lootRules": {
         "lootPool": 0,

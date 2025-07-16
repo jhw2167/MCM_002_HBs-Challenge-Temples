@@ -145,8 +145,6 @@ public class ManagedTemple {
                 for (int i = 0; i < entities.size() - 1; i++) {
                     PORTAL_API.removePortal(entities.get(i));
                 }
-            } else {
-                this.portalToChallenge = null;
             }
 
             if (!destEntities.isEmpty()) {
@@ -154,8 +152,6 @@ public class ManagedTemple {
                 for (int i = 0; i < destEntities.size() - 1; i++) {
                     PORTAL_API.removePortal(destEntities.get(i));
                 }
-            } else {
-                this.portalToHome = null;
             }
         }
 
@@ -291,25 +287,16 @@ public class ManagedTemple {
 
     public void swapPortals()
     {
-        if( this.portalToHome != null ) {
+        this.findPortals();
+        this.deleteChallengePortal();
+        this.deleteHomePortal();
+
+        if( this.activePlayers.isEmpty() ) {
             this.createChallengePortal();
             this.markForPortalCreation.set(Long.MAX_VALUE);
-        } else if( this.portalToChallenge != null ) {
+        } else  {
             this.createHomePortal();
             this.markForPortalCreation.set(Long.MAX_VALUE);
-        }
-
-        this.findPortals();
-        //If both portals are not null
-            //if the challenge is active, remove portalToChallenge, else remove PortalToHome
-        if( this.portalToHome != null && this.portalToChallenge != null)
-        {
-            if( this.activePlayers.isEmpty() ) {
-                this.deleteChallengePortal();
-            } else {
-                this.deleteHomePortal();
-            }
-
         }
 
     }
@@ -328,6 +315,7 @@ public class ManagedTemple {
 
         if (activePlayers.contains(player.getServerPlayer())) return;
         player.startChallenge(this);
+        brickInOut(true);
 
         if( activePlayers.size() == 0)
             this.challengeRoom.startChallenge();
@@ -365,6 +353,7 @@ public class ManagedTemple {
         if(!containedPlayer) return;
         if( activePlayers.isEmpty() ) {
             this.challengeRoom.setActive( false );
+            this.deleteHomePortal();
         }
 
         //this.deleteHomePortal();
@@ -488,5 +477,6 @@ public class ManagedTemple {
         if (sp == null) return;
         BlockPos p = this.getPortalDest();
         sp.teleportTo(p.getX() + 0.5, p.getY() - 0.5, p.getZ() + 0.5);
+        this.challengeRoom.refreshStructure();
     }
 }

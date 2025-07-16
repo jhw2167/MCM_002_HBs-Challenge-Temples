@@ -78,7 +78,8 @@ public class ChallengeTempleMain {
 
     private void onServerStarting(ServerStartingEvent e) {
         CONFIG = Balm.getConfig().getActiveConfig(ChallengeTempleConfig.class);
-        this.DEV_MODE = CONFIG.devMode;
+        //this.DEV_MODE = CONFIG.devMode;
+        this.DEV_MODE = false;
         this.inventoryApi.initConfig();
     }
 

@@ -1,14 +1,18 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.block.ChallengeBuildingBlock;
 import com.holybuckets.challengetemple.block.ChallengeLog;
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.foundation.event.EventRegistrar;
+import net.blay09.mods.balm.api.event.UseBlockEvent;
 import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
@@ -25,6 +29,7 @@ public class ChallengeBlockBehavior {
 
     public static void init(EventRegistrar reg) {
         reg.registerOnBeforeServerStarted(ChallengeBlockBehavior::initSpecialProperties);
+        reg.registerOnUseBlock(ChallengeBlockBehavior::onUseBlock);
     }
 
     public static float MINEABLE_SPEED = 10f;
@@ -82,6 +87,21 @@ public class ChallengeBlockBehavior {
         return originalSpeed;
     }
 
+    /** if its a building block, change color
+     * @param e UseBlockEvent
+     */
+    public static void onUseBlock(UseBlockEvent e) {
+        Level level = e.getLevel();
+        BlockState state = level.getBlockState(  e.getHitResult().getBlockPos() );
+        if (state.getBlock() instanceof ChallengeBuildingBlock)
+        {
+            ItemStack heldItem = e.getPlayer().getMainHandItem();
+            if(heldItem.isEmpty()) {
+                ChallengeBuildingBlock.changeColor(level, e.getHitResult().getBlockPos(), state);
+                e.setCanceled(true);
+            }
+        }
+    }
 
 
 }

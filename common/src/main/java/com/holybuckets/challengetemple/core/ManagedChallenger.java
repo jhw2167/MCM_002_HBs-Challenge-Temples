@@ -16,12 +16,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -56,11 +58,14 @@ public class ManagedChallenger implements IManagedPlayer {
         );
     }
 
+    private boolean pendingInventoryReturn;
+
     public ManagedChallenger(Player player) {
         this.p = player;
         this.challengesTaken = new LinkedHashSet<>();
         this.templesEntered = new LinkedHashSet<>();
         this.challengesComplete = new LinkedHashSet<>();
+        this.pendingInventoryReturn = false;
     }
 
     public static void init(EventRegistrar reg) {
@@ -114,7 +119,7 @@ public class ManagedChallenger implements IManagedPlayer {
 
         //2. Clear Inventory
         lastGravePos = managedTemple.getChallengeRoom().addGrave(this);
-        new Thread(() -> challengerClearInventory()).start();
+        this.enqueueClearInventory();
 
         //3. Set player spawn to inside the temple
         this.originalSpawnPos = sp.getRespawnPosition();
@@ -146,27 +151,30 @@ public class ManagedChallenger implements IManagedPlayer {
 
     }
 
+    private static int CLEAR_RATE = 5;
     public synchronized void enqueueClearInventory() {
         // Add 40 clear inventory operations to the queue
-        for (int i = 0; i < 40; i++) {
-            clearInventoryQueue.offer(true);
+        for (int i = 0; i < 41; i++) {
+            clearInventoryQueue.offer(i % CLEAR_RATE == 0);
         }
     }
 
     private void challengerClearInventory() {
-        if (!(p instanceof ServerPlayer)) return;
-        LoggerProject.logDebug("010013", "Clearing inventory");
-        ((ServerPlayer) p).getInventory().clearContent();
+        //1. Clear player inventory
+        p.getInventory().clearContent();
+
+        //2. clear items on ground around player
+        AABB area = new AABB(p.blockPosition()).inflate(5);
+        for (ItemEntity item : CHALLENGE_LEVEL.getEntitiesOfClass(ItemEntity.class, area)) {
+            item.discard();
+        }
     }
 
-    public static void processClearInventory(ServerTickEvent event) {
-        CHALLENGERS.values().forEach(challenger -> {
-            if (!challenger.clearInventoryQueue.isEmpty()) {
-                challenger.clearInventoryQueue.poll();
-                challenger.challengerClearInventory();
-            }
-        });
+    private void challengerReturnInventory() {
+        ChallengeTempleMain.INSTANCE.inventoryApi.returnInventory((ServerPlayer) p, lastGravePos);
+        this.pendingInventoryReturn = false;
     }
+
 
     private void onChallengerBlockUsed(UseBlockEvent e)
     {
@@ -185,8 +193,11 @@ public class ManagedChallenger implements IManagedPlayer {
         if (this.activeTemple == null) return;
 
         BlockState hitBlockState = e.getState();
-        if(hitBlockState.equals( ModBlocks.challengeBed.defaultBlockState() ))
-            this.activeTemple.playerQuitChallenge(this); //quit challenge if bed is broken
+        if(hitBlockState.equals( ModBlocks.challengeBed.defaultBlockState() )) {
+            this.enqueueClearInventory();
+            this.activeTemple.playerQuitChallenge(this);
+        }
+
     }
 
 
@@ -197,12 +208,19 @@ public class ManagedChallenger implements IManagedPlayer {
         this.activeTempleInfo = null;
         this.holdInventory = null;
 
+        String id = managedTemple.getChallengeRoom().getChallengeId();
+        if(!this.challengesComplete.contains(id))
+            this.enqueueClearInventory();
         this.setPlayerSpawn(managedTemple.getLevel(), this.originalSpawnPos, false);
-        //challengerClearInventory();
-        ChallengeTempleMain.INSTANCE.inventoryApi.returnInventory((ServerPlayer) p, lastGravePos);
+        this.pendingInventoryReturn = true;
+        Messager.getInstance().sendChat((ServerPlayer) this.p,
+            String.format("Ending Challenge: %s, your inventory is being cleared",
+            managedTemple.getChallengeRoom().getChallengeId()
+        ));
     }
 
     public void completedChallenge(ManagedTemple managedTemple) {
+        this.enqueueClearInventory();
         challengesComplete.add(managedTemple.getChallengeRoom().getChallengeId());
     }
 
@@ -223,7 +241,18 @@ public class ManagedChallenger implements IManagedPlayer {
         int i = 0;  //just for debugging
     }
 
-
+    public static void processClearInventory(ServerTickEvent event)
+    {
+        for (ManagedChallenger c : CHALLENGERS.values())
+        {
+            if (c.clearInventoryQueue.isEmpty()) {
+                if(c.pendingInventoryReturn)
+                    c.challengerReturnInventory();
+            } else if( c.clearInventoryQueue.poll() ) {
+                c.challengerClearInventory();
+            }
+        }
+    }
 
     public static void onPlayerUsedBlock(UseBlockEvent e)
     {

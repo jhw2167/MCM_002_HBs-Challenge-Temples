@@ -24,10 +24,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.holybuckets.challengetemple.core.ChallengeRoom.EXIT_PORTAL_BLOCK;
@@ -50,6 +47,7 @@ public class ManagedChallenger implements IManagedPlayer {
     BlockPos originalSpawnPos;
     BlockPos templeSpawnPos;
     List<Pair<Integer,ItemStack>> holdInventory;
+    private Queue<Boolean> clearInventoryQueue = new LinkedList<>();
 
     static {
         registerManagedPlayerData(
@@ -70,6 +68,7 @@ public class ManagedChallenger implements IManagedPlayer {
         reg.registerOnUseBlock(ManagedChallenger::onPlayerUsedBlock);
         reg.registerOnBreakBlock(ManagedChallenger::onPlayerBreakBlock);
         reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ManagedChallenger::onServer20Ticks );
+        reg.registerOnServerTick(EventRegistrar.TickType.ON_SINGLE_TICK, ManagedChallenger::processClearInventory);
     }
 
 
@@ -147,35 +146,27 @@ public class ManagedChallenger implements IManagedPlayer {
 
     }
 
-        public synchronized void enqueueClearInventory() {
-            new Thread(() -> challengerClearInventory()).start();
+    public synchronized void enqueueClearInventory() {
+        // Add 40 clear inventory operations to the queue
+        for (int i = 0; i < 40; i++) {
+            clearInventoryQueue.offer(true);
         }
+    }
 
-        private void challengerClearInventory()
-        {
+    private void challengerClearInventory() {
+        if (!(p instanceof ServerPlayer)) return;
+        LoggerProject.logDebug("010013", "Clearing inventory");
+        ((ServerPlayer) p).getInventory().clearContent();
+    }
 
-            //1. wait until player is in challegne dimension
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                return;
+    public static void processClearInventory(ServerTickEvent event) {
+        CHALLENGERS.values().forEach(challenger -> {
+            if (!challenger.clearInventoryQueue.isEmpty()) {
+                challenger.clearInventoryQueue.poll();
+                challenger.challengerClearInventory();
             }
-
-            //2. Clear the inventory multiple times, protecting against cheese
-            final int TOTAL_CLEARS = 10;
-            for (int i = 0; i < TOTAL_CLEARS; i++) {
-                LoggerProject.logDebug("010013", "Clearing inventory: " + (i + 1) + "/" + TOTAL_CLEARS);
-                ((ServerPlayer) p).getInventory().clearContent();
-                try {
-                    Thread.sleep(250); // wait a second before next clear
-                } catch (InterruptedException e) {
-                    return;
-                }
-            }
-
-            //3. Clear items on the ground around the player
-
-        }
+        });
+    }
 
     private void onChallengerBlockUsed(UseBlockEvent e)
     {

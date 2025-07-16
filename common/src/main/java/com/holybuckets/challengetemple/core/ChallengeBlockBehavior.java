@@ -15,7 +15,10 @@ import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ChallengeBlockBehavior {
 
@@ -43,9 +46,14 @@ public class ChallengeBlockBehavior {
         CHALLENGE_UNMINEABLE.add( ModBlocks.challengeCobble );  //checks mineable blocks first
 
 
-        //Flammable blocks
-        FireBlock b = (FireBlock) Blocks.FIRE;
-        b.
+    }
+
+    public static Map<Block, Pair<Integer, Integer>> getFlammable() {
+        Map<Block, Pair<Integer, Integer>> flammableBlocks = new HashMap<>();
+        // Add flammable blocks with their encouragement and flammability values
+        flammableBlocks.put(ModBlocks.challengeLog, Pair.of(5, 5));
+        // Add more blocks as needed
+        return flammableBlocks;
     }
 
     //on inventory getDestroySpeed mixin

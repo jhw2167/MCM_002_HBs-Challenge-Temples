@@ -72,7 +72,7 @@ public class ChallengeBlockBehavior {
         }
 
         if (CHALLENGE_UNMINEABLE.contains(state.getBlock())) {
-            MobEffectInstance mei = new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 20, 4, false, false, false);
+            MobEffectInstance mei = new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5, 3, false, false, false);
             p.addEffect( mei );
             return UNMINEABLE_SPEED;
         }

@@ -43,6 +43,7 @@ public class ModBlocks {
     //public static DeferredObject<Block> challengeChest;
     public static Block challengeChest;
     public static Block challengeLadder;
+    public static Block buildingBlock;
     public static final EnumMap<DyeColor, Block> BUILDING_BLOCKS = new EnumMap<>(DyeColor.class);
 
 
@@ -74,14 +75,12 @@ public class ModBlocks {
             id("challenge_ladder"));
 
         // Register building blocks for each color
-        for (DyeColor color : DyeColor.values()) {
-            String colorName = color.getName();
-            blocks.register(
-                () -> BUILDING_BLOCKS.put(color, new ChallengeBuildingBlock(color)),
-                () -> itemBlock(BUILDING_BLOCKS.get(color)),
-                id(colorName + "_building_block")
-            );
-        }
+
+        blocks.register(
+            () -> buildingBlock = new ChallengeBuildingBlock(),
+            () -> itemBlock(buildingBlock),
+            id("building_block")
+        );
 
     }
 

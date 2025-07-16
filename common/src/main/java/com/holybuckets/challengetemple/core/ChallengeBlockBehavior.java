@@ -44,7 +44,8 @@ public class ChallengeBlockBehavior {
 
 
         //Flammable blocks
-        //ModBlocks.challengeLog.
+        FireBlock b = (FireBlock) Blocks.FIRE;
+        b.
     }
 
     //on inventory getDestroySpeed mixin

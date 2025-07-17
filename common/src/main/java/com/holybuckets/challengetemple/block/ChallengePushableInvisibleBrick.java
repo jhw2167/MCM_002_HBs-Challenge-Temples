@@ -15,8 +15,8 @@ public class ChallengePushableInvisibleBrick extends GlassBlock {
     }
 
     static Properties PROPERTIES = Properties.copy(Blocks.GLASS)
-        .destroyTime(-1f)
-        .explosionResistance(3600000f)
+        .destroyTime(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
+        .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES_BLASTABLE)
         .pushReaction(PushReaction.NORMAL);
 
     @Override

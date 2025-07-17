@@ -26,6 +26,7 @@ public class ModBlocks {
     public static float CHALLENGE_BLOCK_EXPL_RES = 1000000f;
     public static float CHALLENGE_BLOCK_EXPL_RES_BLASTABLE = 1.0f;
 
+    public static Block challengeBlock;
     public static Block challengeBed;
     public static Block challengeBrick;
     public static Block challengePushableBrick;
@@ -65,7 +66,9 @@ public class ModBlocks {
 
 
 
-    public static void initialize(BalmBlocks blocks) {
+    public static void initialize(BalmBlocks blocks)
+    {
+        blocks.register(() -> challengeBlock = new ChallengeBlock(), () -> itemBlock(challengeBlock), id("challenge_"));
         blocks.register(() -> challengeBed = new ChallengeBed(), () -> itemBlock(challengeBed), id("challenge_bed"));
         blocks.register(() -> challengeBrick = new ChallengeBrick(), () -> itemBlock(challengeBrick), id("challenge_brick"));
         blocks.register(() -> challengePushableBrick = new ChallengePushableBrick(), () -> itemBlock(challengePushableBrick), id("challenge_pushable_brick"));

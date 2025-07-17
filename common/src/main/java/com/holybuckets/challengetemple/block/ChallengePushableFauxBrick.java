@@ -13,8 +13,8 @@ public class ChallengePushableFauxBrick extends Block {
     }
 
     static Properties PROPERTIES = Properties.copy(Blocks.STONE_BRICKS)
-        .destroyTime(-1f)
-        .explosionResistance(3600000f)
+        .destroyTime(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
+        .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES)
         .pushReaction(PushReaction.NORMAL)
         .noCollission();
 

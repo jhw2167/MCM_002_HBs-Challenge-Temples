@@ -1,8 +1,9 @@
 {
   "itemGroup.hbs_challenge_temple.creative_tab": "HB's Challenge Temple",
 
-  "block.hbs_challenge_temple.challenge_bed": "Challenge Spawn Anchor",
   "block.hbs_challenge_temple.challenge_brick": "Challenge Brick",
+  "block.hbs_challenge_temple.challenge_": "Challenge Base Block",
+  "block.hbs_challenge_temple.challenge_bed": "Challenge Spawn Anchor",
   "block.hbs_challenge_temple.challenge_pushable_brick": "Challenge Pushable Brick",
   "block.hbs_challenge_temple.challenge_glowstone": "Challenge Glowstone",
   "block.hbs_challenge_temple.challenge_brick_slab": "Challenge Brick Slab",

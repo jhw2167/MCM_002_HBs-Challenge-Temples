@@ -44,6 +44,7 @@ public class ModItems {
             //buildBlocks.add( ModBlocks.BUILDING_BLOCKS.get(color) );
         }
         List<ItemLike> addBlocks = List.of(
+                ModBlocks.challengeBlock,
                 ModBlocks.challengeBed,
                 ModBlocks.challengeBrick,
                 ModBlocks.challengePushableBrick,
@@ -65,18 +66,19 @@ public class ModItems {
                 ModBlocks.challengeLog,
                 ModBlocks.challengeWood,
 
-                ModBlocks.buildingBlock,
+                ModBlocks.challengeBuildingBlock,
 
-                ModBlocks.challengeChest,
                 ModBlocks.challengeLadder,
-                ModBlocks.challengeStonePlate,
+                ModBlocks.challengeChest,
                 ModBlocks.challengeDoor,
                 ModBlocks.challengeTrapdoor,
                 ModBlocks.challengeFenceGate,
+                ModBlocks.challengeStonePlate,
                 ModBlocks.challengeGoldPlate,
                 ModBlocks.challengeClearingPlate,
                 ModBlocks.challengeButton,
                 ModBlocks.challengeLever,
+                ModBlocks.challengeLamp,
                 ModBlocks.challengeLava
         );
 

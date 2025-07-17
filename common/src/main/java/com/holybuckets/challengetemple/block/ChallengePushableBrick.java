@@ -15,8 +15,8 @@ public class ChallengePushableBrick extends Block {
     }
 
     static BlockBehaviour.Properties PROPERTIES = BlockBehaviour.Properties.copy(Blocks.STONE_BRICKS)
-        .destroyTime(-1f)
-        .explosionResistance(3600000f)
+        .destroyTime(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
+        .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES)
         .pushReaction(PushReaction.NORMAL);
 
     @Override

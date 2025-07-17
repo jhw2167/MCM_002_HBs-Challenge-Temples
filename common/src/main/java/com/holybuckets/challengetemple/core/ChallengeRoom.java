@@ -12,6 +12,7 @@ import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.datastore.DataStore;
 import com.holybuckets.foundation.datastore.LevelSaveData;
 import com.holybuckets.foundation.event.EventRegistrar;
+import com.holybuckets.foundation.event.custom.DatastoreSaveEvent;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -442,6 +443,7 @@ public class ChallengeRoom {
         // Register the static event handler
         reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
         reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ChallengeRoom::on20TicksTryExitPortal);
+        reg.registerOnDataSave(ChallengeRoom::onDataSaveEvent);
 
         PORTAL_API = ChallengeTempleMain.INSTANCE.portalApi;
     }
@@ -522,13 +524,8 @@ public class ChallengeRoom {
         .addProcessor(JigsawReplacementProcessor.INSTANCE);
 
 
-    /**
-     * Clear static values
-     * MUST STORE MOST RECENT GRAVE DATA TO AVOID IT CLEARING BETWEEN GAME RESTARTS
-     */
-    public static void shutdown()
+    public static void onDataSaveEvent(DatastoreSaveEvent e)
     {
-        //1. Clear unused graves
         MinecraftServer server = GeneralConfig.getInstance().getServer();
         //ChallengeTempleMain.INSTANCE.inventoryApi.clearUnusedGraves(server);
 
@@ -543,6 +540,16 @@ public class ChallengeRoom {
         DataStore dataStore = GeneralConfig.getInstance().getDataStore();
         LevelSaveData levelData = dataStore.getOrCreateLevelSaveData(Constants.MOD_ID, CHALLENGE_LEVEL);
         levelData.addProperty("challengeRoomData", data);
+    }
+
+    /**
+     * Clear static values
+     * MUST STORE MOST RECENT GRAVE DATA TO AVOID IT CLEARING BETWEEN GAME RESTARTS
+     */
+    public static void shutdown()
+    {
+        //1. Clear unused graves
+
 
         //3. clear values
         for (ChallengeRoom room : ACTIVE_ROOMS.values()) {

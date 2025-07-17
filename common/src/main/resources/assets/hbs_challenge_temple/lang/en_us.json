@@ -22,6 +22,7 @@
   "block.hbs_challenge_temple.challenge_clearing_plate": "Challenge Clearing Plate",
   "block.hbs_challenge_temple.challenge_stone_plate": "Challenge Pressure Plate",
   "block.hbs_challenge_temple.challenge_button": "Challenge Button",
-  "block.hbs_challenge_temple.challenge_lever": "Challenge Lever"
+  "block.hbs_challenge_temple.challenge_lever": "Challenge Lever",
+  "block.hbs_challenge_temple.challenge_lava": "Challenge Lava"
 
 }

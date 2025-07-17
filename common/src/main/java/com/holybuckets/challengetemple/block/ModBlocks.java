@@ -50,6 +50,7 @@ public class ModBlocks {
     public static Block challengeStonePlate;
     public static Block challengeButton;
     public static Block challengeLever;
+    public static Block challengeLava;
     public static final EnumMap<DyeColor, Block> BUILDING_BLOCKS = new EnumMap<>(DyeColor.class);
 
 

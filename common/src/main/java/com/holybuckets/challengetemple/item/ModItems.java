@@ -65,7 +65,8 @@ public class ModItems {
                 ModBlocks.challengeClearingPlate,
                 ModBlocks.challengeStonePlate,
                 ModBlocks.challengeButton,
-                ModBlocks.challengeLever
+                ModBlocks.challengeLever,
+                ModBlocks.challengeLava
         );
 
         List<ItemLike> vanillaBlocks = List.of(

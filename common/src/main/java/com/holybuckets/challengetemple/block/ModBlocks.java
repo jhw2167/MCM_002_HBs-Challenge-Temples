@@ -32,9 +32,12 @@ public class ModBlocks {
     public static Block challengeBrickSlab;
     public static Block challengeGlowstone;
     public static Block challengeGlass;
+    public static Block challengePushableGlass;
     public static Block challengeGlassPane;
     public static Block challengeFauxBrick;
+    public static Block challengePushableFauxBrick;
     public static Block challengeInvisibleBrick;
+    public static Block challengePushableInvisibleBrick;
 
     public static Block challengeWood;
     public static Block challengeStone;
@@ -64,11 +67,14 @@ public class ModBlocks {
         blocks.register(() -> challengeGlowstone = new ChallengeGlowstone(), () -> itemBlock(challengeGlowstone), id("challenge_glowstone"));
         blocks.register(() -> challengeBrickSlab = new ChallengeBrickSlab(), () -> itemBlock(challengeBrickSlab), id("challenge_brick_slab"));
         blocks.register(() -> challengeGlass = new ChallengeGlass(), () -> itemBlock(challengeGlass), id("challenge_glass"));
+        blocks.register(() -> challengePushableGlass = new ChallengePushableGlass(), () -> itemBlock(challengePushableGlass), id("challenge_pushable_glass"));
         blocks.register(() -> challengeGlassPane = new ChallengeGlassPane(), () -> itemBlock(challengeGlassPane), id("challenge_glass_pane"));
         //blocks.register(() -> challengeWood = new ChallengeWood(), () -> itemBlock(challengeWood), id("challenge_wood"));
 
         blocks.register(() -> challengeFauxBrick = new ChallengeFauxBrick(), () -> itemBlock(challengeFauxBrick), id("challenge_faux_brick"));
+        blocks.register(() -> challengePushableFauxBrick = new ChallengePushableFauxBrick(), () -> itemBlock(challengePushableFauxBrick), id("challenge_pushable_faux_brick"));
         blocks.register(() -> challengeInvisibleBrick = new ChallengeInvisibleBrick(), () -> itemBlock(challengeInvisibleBrick), id("challenge_invisible_brick"));
+        blocks.register(() -> challengePushableInvisibleBrick = new ChallengePushableInvisibleBrick(), () -> itemBlock(challengePushableInvisibleBrick), id("challenge_pushable_invisible_brick"));
 
         blocks.register(() -> challengeStone = new ChallengeStone(), () -> itemBlock(challengeStone), id("challenge_stone"));
         blocks.register(() -> challengeCobble = new ChallengeCobble(), () -> itemBlock(challengeCobble), id("challenge_cobble"));

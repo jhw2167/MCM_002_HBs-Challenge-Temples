@@ -47,7 +47,7 @@ public class ModBlocks {
     //public static DeferredObject<Block> challengeChest;
     public static Block challengeChest;
     public static Block challengeLadder;
-    public static Block buildingBlock;
+    public static Block challengeBuildingBlock;
     public static Block challengeDoor;
     public static Block challengeGoldPlate;
     public static Block challengeClearingPlate;
@@ -115,9 +115,9 @@ public class ModBlocks {
         // Register building blocks for each color
 
         blocks.register(
-            () -> buildingBlock = new ChallengeBuildingBlock(),
-            () -> itemBlock(buildingBlock),
-            id("building_block")
+            () -> challengeBuildingBlock = new ChallengeBuildingBlock(),
+            () -> itemBlock(challengeBuildingBlock),
+            id("challenge_building_block")
         );
 
     }

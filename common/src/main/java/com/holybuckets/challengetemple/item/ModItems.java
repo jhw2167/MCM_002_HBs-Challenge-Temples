@@ -62,7 +62,9 @@ public class ModItems {
                 ModBlocks.challengeDoor,
                 ModBlocks.challengeGoldPlate,
                 ModBlocks.challengeClearingPlate,
-                ModBlocks.challengeStonePlate
+                ModBlocks.challengeStonePlate,
+                ModBlocks.challengeButton,
+                ModBlocks.challengeLever
 
         );
 

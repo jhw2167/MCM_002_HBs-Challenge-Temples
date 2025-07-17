@@ -48,6 +48,8 @@ public class ModBlocks {
     public static Block challengeGoldPlate;
     public static Block challengeClearingPlate;
     public static Block challengeStonePlate;
+    public static Block challengeButton;
+    public static Block challengeLever;
     public static final EnumMap<DyeColor, Block> BUILDING_BLOCKS = new EnumMap<>(DyeColor.class);
 
 
@@ -93,6 +95,14 @@ public class ModBlocks {
         blocks.register(() -> challengeStonePlate = new ChallengePressurePlates.ChallengePressurePlate(),
             () -> itemBlock(challengeStonePlate),
             id("challenge_stone_plate"));
+            
+        blocks.register(() -> challengeButton = new ChallengeButton(),
+            () -> itemBlock(challengeButton),
+            id("challenge_button"));
+            
+        blocks.register(() -> challengeLever = new ChallengeLever(),
+            () -> itemBlock(challengeLever),
+            id("challenge_lever"));
 
         // Register building blocks for each color
 

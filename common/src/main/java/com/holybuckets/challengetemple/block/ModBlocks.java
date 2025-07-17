@@ -51,6 +51,7 @@ public class ModBlocks {
     public static Block challengeButton;
     public static Block challengeLever;
     public static Block challengeLava;
+    public static Block challengeTrapdoor;
     public static final EnumMap<DyeColor, Block> BUILDING_BLOCKS = new EnumMap<>(DyeColor.class);
 
 
@@ -108,6 +109,10 @@ public class ModBlocks {
         blocks.register(() -> challengeLava = new ChallengeLava(), // TODO: Add proper fluid registration
             () -> itemBlock(challengeLava),
             id("challenge_lava"));
+            
+        blocks.register(() -> challengeTrapdoor = new ChallengeTrapdoor(),
+            () -> itemBlock(challengeTrapdoor),
+            id("challenge_trapdoor"));
 
         // Register building blocks for each color
 

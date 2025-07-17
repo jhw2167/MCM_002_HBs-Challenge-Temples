@@ -105,7 +105,7 @@ public class ModBlocks {
             () -> itemBlock(challengeLever),
             id("challenge_lever"));
             
-        blocks.register(() -> challengeLava = new ChallengeLava(null), // TODO: Add proper fluid registration
+        blocks.register(() -> challengeLava = new ChallengeLava(), // TODO: Add proper fluid registration
             () -> itemBlock(challengeLava),
             id("challenge_lava"));
 

@@ -199,6 +199,7 @@ Create additional challenge block variants
 	signs blast resistent
 	move temple template over
 	delete the second button
+	replace chests in temple structure with challenge chests
 	
 	
 
@@ -261,6 +262,7 @@ Skeleton run I, II, III
 Creeper run - dig down through dirt with creepers, then stone
 Spider run - climb ladders 
 Zombie run - flat area with holes in it, give zombies knock back swords,
+	- maze with oak doors they can break down
 
 Create mechanics:
 Belts

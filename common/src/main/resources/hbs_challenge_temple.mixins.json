@@ -10,8 +10,7 @@
         "MixinListPoolElement",
         "MixinSinglePoolElement",
         "StructureTemplateMixin",
-        "InventoryMixin",
-        "FireBlockMixin"
+        "InventoryMixin"
     ],
     "client": [
     ],

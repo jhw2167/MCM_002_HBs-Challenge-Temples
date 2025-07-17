@@ -21,7 +21,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.apache.commons.lang3.tuple.Pair;
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.holybuckets.challengetemple.core.ChallengeRoom.EXIT_PORTAL_BLOCK;
 import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
 import static com.holybuckets.foundation.player.ManagedPlayer.registerManagedPlayerData;
 
@@ -83,6 +81,7 @@ public class ManagedChallenger implements IManagedPlayer {
         if(! CHALLENGERS.containsKey(p)) return false;
         return CHALLENGERS.get(p).activeTemple != null;
     }
+
 
     //** CORE
     public void setPlayerSpawn(Level level, BlockPos spawnPos, boolean setTempleSpawn)
@@ -284,6 +283,17 @@ public class ManagedChallenger implements IManagedPlayer {
         if (challenger.activeTemple != null) {
            challenger.onChallengerBlockBreak(breakBlockEvent);
         }
+    }
+
+    public static void onChallengerClearingPlatePressed(Level level, BlockPos pos)
+    {
+        Player player = level.getNearestPlayer(pos.getX(), pos.getY(), pos.getZ(), 2, false);
+        if (player == null || !(player instanceof ServerPlayer)) return;
+
+        ManagedChallenger challenger = CHALLENGERS.get(player);
+        if (challenger == null) return;
+
+        challenger.enqueueClearInventory();
     }
 
 

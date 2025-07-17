@@ -60,10 +60,11 @@ public class ModItems {
                 ModBlocks.challengeLog,
 
                 ModBlocks.challengeLadder,
+                ModBlocks.challengeStonePlate,
                 ModBlocks.challengeDoor,
+                ModBlocks.challengeTrapdoor,
                 ModBlocks.challengeGoldPlate,
                 ModBlocks.challengeClearingPlate,
-                ModBlocks.challengeStonePlate,
                 ModBlocks.challengeButton,
                 ModBlocks.challengeLever,
                 ModBlocks.challengeLava

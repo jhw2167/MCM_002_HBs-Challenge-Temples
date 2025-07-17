@@ -8,8 +8,10 @@ import net.minecraft.world.level.block.state.properties.BlockSetType;
 public class ChallengeDoor extends DoorBlock {
     public ChallengeDoor() {
         super(BlockBehaviour.Properties.copy(Blocks.IRON_DOOR)
-                .strength(0f)
-                .noOcclusion(),
-            BlockSetType.IRON);
+        .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
+        .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES)
+        .noOcclusion(),
+               BlockSetType.IRON);
     }
+
 }

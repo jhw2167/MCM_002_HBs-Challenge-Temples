@@ -11,6 +11,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,11 +66,25 @@ public class ModItems {
                 ModBlocks.challengeStonePlate,
                 ModBlocks.challengeButton,
                 ModBlocks.challengeLever
+        );
 
+        List<ItemLike> vanillaBlocks = List.of(
+            Blocks.OAK_BUTTON,
+            Blocks.LEVER,
+            Blocks.OAK_PRESSURE_PLATE,
+            Blocks.PISTON,
+            Blocks.STICKY_PISTON,
+            Blocks.REPEATER,
+            Blocks.DISPENSER,
+            Blocks.DROPPER,
+            Blocks.STONE,
+            Blocks.OAK_FENCE,
+            Blocks.NETHERRACK
         );
 
         blocks.addAll(buildBlocks);
         blocks.addAll(addBlocks);
+        blocks.addAll(vanillaBlocks);
         return blocks.toArray(new ItemLike[0]);
     }
 
@@ -78,3 +93,4 @@ public class ModItems {
     }
 
 }
+

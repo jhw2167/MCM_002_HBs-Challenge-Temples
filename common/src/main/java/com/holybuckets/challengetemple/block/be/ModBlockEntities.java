@@ -23,3 +23,30 @@ public class ModBlockEntities {
         return new ResourceLocation(Constants.MOD_ID, name);
     }
 }
+package com.holybuckets.challengetemple.block.be;
+
+import com.holybuckets.challengetemple.Constants;
+import com.holybuckets.challengetemple.block.ModBlocks;
+import net.blay09.mods.balm.api.DeferredObject;
+import net.blay09.mods.balm.api.block.BalmBlockEntities;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+
+public class ModBlockEntities {
+    public static DeferredObject<BlockEntityType<ChallengeChestBlockEntity>> challengeChest;
+    public static DeferredObject<BlockEntityType<ChallengeCountingChestBlockEntity>> challengeCountingChest;
+    public static DeferredObject<BlockEntityType<ChallengeSingleUseChestBlockEntity>> challengeSingleUseChest;
+
+    public static void initialize(BalmBlockEntities blockEntities) {
+        challengeChest = blockEntities.registerBlockEntity("challenge_chest",
+                ChallengeChestBlockEntity::new,
+                () -> ModBlocks.challengeChest);
+
+        challengeCountingChest = blockEntities.registerBlockEntity("challenge_counting_chest",
+                ChallengeCountingChestBlockEntity::new,
+                () -> ModBlocks.challengeCountingChest);
+
+        challengeSingleUseChest = blockEntities.registerBlockEntity("challenge_single_use_chest",
+                ChallengeSingleUseChestBlockEntity::new,
+                () -> ModBlocks.challengeSingleUseChest);
+    }
+}

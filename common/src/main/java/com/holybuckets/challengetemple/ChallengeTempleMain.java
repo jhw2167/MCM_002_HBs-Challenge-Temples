@@ -79,7 +79,7 @@ public class ChallengeTempleMain {
     private void onServerStarting(ServerStartingEvent e) {
         CONFIG = Balm.getConfig().getActiveConfig(ChallengeTempleConfig.class);
         //this.DEV_MODE = CONFIG.devMode;
-        this.DEV_MODE = false;
+        this.DEV_MODE = true;
         this.inventoryApi.initConfig();
         ChallengeBlockBehavior.setFlammable();
     }

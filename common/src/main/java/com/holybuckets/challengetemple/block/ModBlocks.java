@@ -104,6 +104,10 @@ public class ModBlocks {
         blocks.register(() -> challengeLever = new ChallengeLever(),
             () -> itemBlock(challengeLever),
             id("challenge_lever"));
+            
+        blocks.register(() -> challengeLava = new ChallengeLava(null), // TODO: Add proper fluid registration
+            () -> itemBlock(challengeLava),
+            id("challenge_lava"));
 
         // Register building blocks for each color
 

@@ -47,6 +47,8 @@ public class ModBlocks {
 
     //public static DeferredObject<Block> challengeChest;
     public static Block challengeChest;
+    public static Block challengeCountingChest;
+    public static Block challengeSingleUseChest; 
     public static Block challengeLadder;
     public static Block challengeBuildingBlock;
     public static Block challengeDoor;
@@ -93,6 +95,8 @@ public class ModBlocks {
         //DeferredObject<Block> registerBlock(Function<ResourceLocation, Block> supplier, ResourceLocation identifier);
         //challengeChest = blocks.registerBlock( loc -> new ChallengeChestBlock()  , id("challenge_chest"));
         blocks.register(() -> challengeChest = new ChallengeChestBlock(), () -> new ChallengeChestItem(challengeChest, new Properties()), id("challenge_chest"));
+        blocks.register(() -> challengeCountingChest = new ChallengeCountingChestBlock(), () -> new ChallengeChestItem(challengeCountingChest, new Properties()), id("challenge_counting_chest"));
+        blocks.register(() -> challengeSingleUseChest = new ChallengeSingleUseChestBlock(), () -> new ChallengeChestItem(challengeSingleUseChest, new Properties()), id("challenge_single_use_chest"));
         blocks.register(() -> challengeLadder = new ChallengeLadder(), () -> itemBlock(challengeLadder), id("challenge_ladder"));
             
         blocks.register(() -> challengeDoor = new ChallengeDoor(), () -> itemBlock(challengeDoor), id("challenge_door"));

@@ -2,22 +2,13 @@ package com.holybuckets.challengetemple.block;
 
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.item.ChallengeChestItem;
-import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.block.BalmBlocks;
-import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.piston.*;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.DyeColor;
 import java.util.EnumMap;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class ModBlocks {
 
@@ -95,8 +86,8 @@ public class ModBlocks {
         //DeferredObject<Block> registerBlock(Function<ResourceLocation, Block> supplier, ResourceLocation identifier);
         //challengeChest = blocks.registerBlock( loc -> new ChallengeChestBlock()  , id("challenge_chest"));
         blocks.register(() -> challengeChest = new ChallengeChestBlock(), () -> new ChallengeChestItem(challengeChest, new Properties()), id("challenge_chest"));
-        blocks.register(() -> challengeCountingChest = new ChallengeCountingChestBlock(), () -> new ChallengeChestItem(challengeCountingChest, new Properties()), id("challenge_counting_chest"));
-        blocks.register(() -> challengeSingleUseChest = new ChallengeSingleUseChestBlock(), () -> new ChallengeChestItem(challengeSingleUseChest, new Properties()), id("challenge_single_use_chest"));
+        blocks.register(() -> challengeCountingChest = new ChallengeChestCountingBlock(), () -> new ChallengeChestItem(challengeCountingChest, new Properties()), id("challenge_counting_chest"));
+        blocks.register(() -> challengeSingleUseChest = new ChallengeChestSingleUseBlock(), () -> new ChallengeChestItem(challengeSingleUseChest, new Properties()), id("challenge_single_use_chest"));
         blocks.register(() -> challengeLadder = new ChallengeLadder(), () -> itemBlock(challengeLadder), id("challenge_ladder"));
             
         blocks.register(() -> challengeDoor = new ChallengeDoor(), () -> itemBlock(challengeDoor), id("challenge_door"));

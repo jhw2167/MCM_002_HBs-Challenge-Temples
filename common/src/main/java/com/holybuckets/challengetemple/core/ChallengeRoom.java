@@ -62,6 +62,7 @@ public class ChallengeRoom {
     private BlockPos challengeExitPos;
     private BlockPos exitStructurePos;
     private Entity exitPortal;      //exit portal on the floor, 2x2 in x,z direction
+    private ChallengeKeyBlockManager challengeKeyBlocks;
 
 
     //Statics
@@ -169,6 +170,10 @@ public class ChallengeRoom {
             succeeded = true && this.generateStructure(id, false);
         }
 
+        if(succeeded) {
+            this.challengeKeyBlocks = new ChallengeKeyBlockManager( this.worldPos, challenge.getSize());
+        }
+
         return succeeded;
     }
 
@@ -230,27 +235,12 @@ public class ChallengeRoom {
     {
 
         if( this.exitPortal != null ) {
-            this.exitPortal.discard();
+            PORTAL_API.removePortal(this.exitPortal);
+            this.exitPortal = null;
         }
 
-        //1. Parse area for minecraft:soul_torch
-        Vec3i sz = challenge.getSize();
-        if( this.exitStructurePos != null )
-            sz = new Vec3i(0,0,0);
-
-        for(int x = 0; x < sz.getX(); x++) {
-            for(int y = 0; y < sz.getY(); y++) {
-                for (int z = 0; z < sz.getZ(); z++) {
-                    BlockPos pos = this.getWorldPos().offset(x, y, z);
-                    BlockState state = CHALLENGE_LEVEL.getBlockState(pos);
-                    if(state.equals(EXIT_PORTAL_BLOCK)) {
-                        this.exitStructurePos = pos.offset(0,-1,0); // Found the exit portal block
-                        sz = new Vec3i(0,0,0);
-                        break;
-                    }
-                }
-            }
-        }
+        if( this.exitStructurePos == null)
+            this.exitStructurePos = challengeKeyBlocks.getExitStructurePos();
 
         //log error and return false if not found
         if( this.exitStructurePos == null ) {

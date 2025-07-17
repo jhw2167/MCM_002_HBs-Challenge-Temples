@@ -32,6 +32,7 @@
   "block.hbs_challenge_temple.challenge_stairs": "Challenge Stairs",
   "block.hbs_challenge_temple.challenge_pushable_stairs": "Challenge Pushable Stairs",
   "block.hbs_challenge_temple.challenge_fence": "Challenge Fence",
-  "block.hbs_challenge_temple.challenge_fence_gate": "Challenge Fence Gate"
+  "block.hbs_challenge_temple.challenge_fence_gate": "Challenge Fence Gate",
+  "block.hbs_challenge_temple.challenge_lamp": "Challenge Lamp"
 
 }

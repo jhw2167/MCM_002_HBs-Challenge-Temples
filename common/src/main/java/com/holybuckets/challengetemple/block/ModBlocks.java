@@ -60,6 +60,7 @@ public class ModBlocks {
     public static Block challengePushableStairs;
     public static Block challengeFence;
     public static Block challengeFenceGate;
+    public static Block challengeLamp;
     public static final EnumMap<DyeColor, Block> BUILDING_BLOCKS = new EnumMap<>(DyeColor.class);
 
 
@@ -109,6 +110,7 @@ public class ModBlocks {
 
         blocks.register(() -> challengeFence = new ChallengeFence(), () -> itemBlock(challengeFence), id("challenge_fence"));
         blocks.register(() -> challengeFenceGate = new ChallengeFenceGate(), () -> itemBlock(challengeFenceGate), id("challenge_fence_gate"));
+        blocks.register(() -> challengeLamp = new ChallengeLamp(), () -> itemBlock(challengeLamp), id("challenge_lamp"));
 
         // Register building blocks for each color
 

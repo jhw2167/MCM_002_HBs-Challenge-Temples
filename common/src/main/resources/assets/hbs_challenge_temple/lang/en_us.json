@@ -28,6 +28,8 @@
   "block.hbs_challenge_temple.challenge_button": "Challenge Button",
   "block.hbs_challenge_temple.challenge_lever": "Challenge Lever",
   "block.hbs_challenge_temple.challenge_lava": "Challenge Lava",
-  "block.hbs_challenge_temple.challenge_ladder": "Challenge Ladder"
+  "block.hbs_challenge_temple.challenge_ladder": "Challenge Ladder",
+  "block.hbs_challenge_temple.challenge_stairs": "Challenge Stairs",
+  "block.hbs_challenge_temple.challenge_pushable_stairs": "Challenge Pushable Stairs"
 
 }

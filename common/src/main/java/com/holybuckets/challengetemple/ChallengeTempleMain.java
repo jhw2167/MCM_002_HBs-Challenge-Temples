@@ -2,10 +2,7 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
-import com.holybuckets.challengetemple.core.ChallengeBlockBehavior;
-import com.holybuckets.challengetemple.core.ChallengeDB;
-import com.holybuckets.challengetemple.core.ManagedChallenger;
-import com.holybuckets.challengetemple.core.TempleManager;
+import com.holybuckets.challengetemple.core.*;
 import com.holybuckets.challengetemple.externalapi.InventoryApi;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
@@ -64,10 +61,12 @@ public class ChallengeTempleMain {
 
             EventRegistrar registrar = EventRegistrar.getInstance();
             ChallengeBlockBehavior.init(registrar);
+            ChallengeKeyBlockManager.init(registrar);
 
             TempleManager.init(registrar);
             ManagedChallenger.init(registrar);
             ChallengeDB.init(registrar);
+
 
             //register events
             registrar.registerOnBeforeServerStarted(this::onServerStarting);
@@ -79,7 +78,7 @@ public class ChallengeTempleMain {
     private void onServerStarting(ServerStartingEvent e) {
         CONFIG = Balm.getConfig().getActiveConfig(ChallengeTempleConfig.class);
         //this.DEV_MODE = CONFIG.devMode;
-        this.DEV_MODE = true;
+        this.DEV_MODE = false;
         this.inventoryApi.initConfig();
         ChallengeBlockBehavior.setFlammable();
     }

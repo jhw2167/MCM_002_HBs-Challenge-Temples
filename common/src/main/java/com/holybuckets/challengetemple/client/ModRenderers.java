@@ -1,18 +1,11 @@
 package com.holybuckets.challengetemple.client;
 
 import com.holybuckets.challengetemple.Constants;
-import com.holybuckets.challengetemple.block.ChallengeChestBlock;
 import com.holybuckets.challengetemple.block.ModBlocks;
-import com.holybuckets.challengetemple.block.be.ChallengeChestBlockEntity;
 import com.holybuckets.challengetemple.block.be.ModBlockEntities;
 import net.blay09.mods.balm.api.client.rendering.BalmRenderers;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
 
 public class ModRenderers {
@@ -35,7 +28,13 @@ public class ModRenderers {
         //default <T extends BlockEntity > void registerBlockEntityRenderer(ResourceLocation identifier, Supplier<BlockEntityType<T>> type,
         // BlockEntityRendererProvider<? super T> provider) {
         renderers.registerBlockEntityRenderer( id("challenge_chest"),
-            ModBlockEntities.challengeChest::get, ChallengeChestRenderer::new );
+            ModBlockEntities.challengeChest::get, ChestRenderers.ChallengeChestRenderer::new );
+
+        renderers.registerBlockEntityRenderer( id("challenge_chest_counting"),
+            ModBlockEntities.challengeCountingChest::get, ChestRenderers.ChallengeCountingChestRenderer::new );
+
+        renderers.registerBlockEntityRenderer( id("challenge_chest_single_use"),
+            ModBlockEntities.challengeSingleUseChest::get, ChestRenderers.ChallengeSingleUseChestRenderer::new );
 
     }
 

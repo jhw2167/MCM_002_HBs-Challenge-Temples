@@ -24,5 +24,17 @@ public class ChallengeTempleMainClientFabric implements ClientModInitializer {
             new FabricChallengeBlockItemRenderer( ModBlockEntities.challengeChest.get(),
                 ModBlocks.challengeChest.defaultBlockState())
         );
+
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModBlocks.challengeCountingChest.asItem(),
+            new FabricChallengeBlockItemRenderer( ModBlockEntities.challengeCountingChest.get(),
+                ModBlocks.challengeCountingChest.defaultBlockState())
+        );
+
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModBlocks.challengeSingleUseChest.asItem(),
+            new FabricChallengeBlockItemRenderer( ModBlockEntities.challengeSingleUseChest.get(),
+                ModBlocks.challengeSingleUseChest.defaultBlockState())
+        );
     }
 }

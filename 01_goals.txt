@@ -240,7 +240,8 @@ keep notes
 
 CHALLENGES
 ---
-
+challenge_chest_single_use
+challenge_chest_counting
 
 Tutorial temple always first
 Maze in lava with wooden planks
@@ -251,6 +252,7 @@ Frost Walker boots
 Parkool boots
 Skinny bridge + skeletons
 1D parkour
+Over and Back - cross a large lava lakes placing invisible blocks, then return
 
 Challenges:
 Redstone Basics I - build T flip flop

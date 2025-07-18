@@ -20,8 +20,8 @@
   "block.hbs_challenge_temple.challenge_pushable_invisible_brick": "Challenge Pushable Invisible Brick",
 
   "block.hbs_challenge_temple.challenge_chest": "Challenge Chest",
-  "block.hbs_challenge_temple.challenge_counting_chest": "Challenge Counting Chest",
-  "block.hbs_challenge_temple.challenge_single_use_chest": "Challenge Single Use Chest",
+  "block.hbs_challenge_temple.challenge_chest_counting": "Counting Chest",
+  "block.hbs_challenge_temple.challenge_chest_single_use": "Single Use Chest",
   "block.hbs_challenge_temple.challenge_door": "Challenge Door",
   "block.hbs_challenge_temple.challenge_building_block": "Challenge Building Block",
   "block.hbs_challenge_temple.challenge_trapdoor": "Challenge Trapdoor",

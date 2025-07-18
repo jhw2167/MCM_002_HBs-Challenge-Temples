@@ -3,9 +3,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import net.minecraft.core.Direction;
+
 public interface PortalApi {
 
-    enum Direction { NORTH, SOUTH, EAST, WEST, DOWN, UP }
 
     static int PORTAL_COOLDOWN = 5000;
 

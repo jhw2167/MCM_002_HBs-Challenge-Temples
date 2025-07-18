@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "hbs_challenge_temple:block/challenge_chest" },
+        "facing=south": { "model": "hbs_challenge_temple:block/challenge_chest", "y": 180 },
+        "facing=west":  { "model": "hbs_challenge_temple:block/challenge_chest", "y": 270 },
+        "facing=east":  { "model": "hbs_challenge_temple:block/challenge_chest", "y": 90 }
+    }
+}

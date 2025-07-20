@@ -1,0 +1,21 @@
+{
+    "challengeId": "000000754",
+    "author": "Holy_Buckets",
+    "challengeName": "Tutorial Challenge 4x4",
+    "difficulty": 0,
+    "size": "4x4",
+    "challengeRules": {
+        "playerMaxHearts": 10,
+        "maxDeaths": -1,
+        "resetBlocksOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": true,
+        "keepInventoryOnPlayerDeath": false,
+        "playerDropsInventoryOnDeath": true
+    },
+    "lootRules": {
+        "lootPool": 0,
+        "specificLoot": [
+            "minecraft:red_bed"
+        ]
+    }
+}

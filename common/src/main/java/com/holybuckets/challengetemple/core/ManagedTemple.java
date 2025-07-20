@@ -8,6 +8,7 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -210,7 +211,7 @@ public class ManagedTemple {
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
         this.portalToChallenge = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, level,
-            CHALLENGE_LEVEL, sourcePos, destination, PortalApi.Direction.SOUTH);
+            CHALLENGE_LEVEL, sourcePos, destination, Direction.NORTH);
         brickInOut(true);
     }
 
@@ -230,7 +231,7 @@ public class ManagedTemple {
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
         this.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
-            level, destination, sourcePos, PortalApi.Direction.NORTH);
+            level, destination, sourcePos, Direction.SOUTH);
         brickInOut(false);
     }
 
@@ -346,7 +347,6 @@ public class ManagedTemple {
 
         }
 
-    private static Vec3i REWARDS_CHEST_OFFSET = new Vec3i(0, 0, 4);
     public void playerEndChallenge(ManagedChallenger player)
     {
         boolean containedPlayer = activePlayers.remove(player.getServerPlayer());
@@ -378,6 +378,7 @@ public class ManagedTemple {
         */
     }
 
+    private static Vec3i REWARDS_CHEST_OFFSET = new Vec3i(0, -1, 4);
     public void loadRewardsChest()
     {
         BlockPos chestPos = this.entityPos.offset(REWARDS_CHEST_OFFSET);

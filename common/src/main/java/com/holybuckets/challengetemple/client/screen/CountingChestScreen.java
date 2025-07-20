@@ -8,6 +8,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+//import BUFFER from ChestCountingMenu
+import static com.holybuckets.challengetemple.menu.ChallengeChestCountingMenu.BUFFER;
 /**
  * Screen for Challenge Counting Chest — displays the chest GUI with a special layout.
  */
@@ -17,11 +19,14 @@ public class CountingChestScreen extends AbstractContainerScreen<ChallengeChestC
     private static final ResourceLocation TEXTURE =
         new ResourceLocation(Constants.MOD_ID, "textures/gui/challenge_chest_counting_gui.png");
 
+    public static int INV_HEIGHT = 170;
+    public static int INV_WIDTH = 176;
+
     public CountingChestScreen(ChallengeChestCountingMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
 
-        this.imageHeight = 114 + (menu.containerRows - 1) * 18;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.imageHeight = INV_HEIGHT;
+        this.inventoryLabelY = this.imageHeight - (94 - BUFFER/2);
     }
 
     @Override

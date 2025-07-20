@@ -18,7 +18,9 @@ public class ChallengeChestCountingMenu extends AbstractContainerMenu {
     public final int containerRows;
     private static final int CONTAINER_COLUMNS = 9;
 
-    public ChallengeChestCountingMenu(int syncId, Inventory playerInventory, Container container) {
+    public final static int BUFFER = 4;
+    public ChallengeChestCountingMenu(int syncId, Inventory playerInventory, Container container)
+    {
         super(ModMenus.countingChestMenu.get() , syncId);
         this.container = container;
         this.containerRows = (container.getContainerSize() / 9);
@@ -33,13 +35,13 @@ public class ChallengeChestCountingMenu extends AbstractContainerMenu {
             for (int col = 0; col < CONTAINER_COLUMNS; ++col) {
                 int index = row * CONTAINER_COLUMNS + col;
                 int x = 8 + col * 18;
-                int y = 17 + row * 18;
+                int y = BUFFER + 17 + row * 18;
                 this.addSlot(new Slot(container, index, x, y));
             }
         }
 
         // Player inventory
-        int playerInvStartY = 17 + (containerRows) * 18 + 14;
+        int playerInvStartY = BUFFER + 17 + (containerRows) * 18 + 14;
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < CONTAINER_COLUMNS; ++col) {
                 this.addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, playerInvStartY + row * 18));
@@ -76,8 +78,10 @@ public class ChallengeChestCountingMenu extends AbstractContainerMenu {
                 if (!this.moveItemStackTo(itemstack, containerSlotCount, this.slots.size(), true))
                     return ItemStack.EMPTY;
             } else {
+                int contIndex = 9;
+                if(player.isCreative()) contIndex = 0;
                 // From player inventory to normal container rows (skip restricted top row)
-                if (!this.moveItemStackTo(itemstack, 9, containerSlotCount, false))
+                if (!this.moveItemStackTo(itemstack, contIndex, containerSlotCount, false))
                     return ItemStack.EMPTY;
             }
 
@@ -90,6 +94,14 @@ public class ChallengeChestCountingMenu extends AbstractContainerMenu {
             return original;
         }
         return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        if (container instanceof BlockEntity blockEntity) {
+            this.container.stopOpen(player);
+        }
     }
 
     // --- RestrictedSlot ---

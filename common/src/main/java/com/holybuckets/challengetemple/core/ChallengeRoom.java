@@ -15,6 +15,7 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.DatastoreSaveEvent;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -136,6 +137,8 @@ public class ChallengeRoom {
 
     public void setActive(boolean isActive) {
         this.roomActive = isActive;
+        if(this.challengeKeyBlocks != null)
+            this.challengeKeyBlocks.clearPortals();
     }
 
     public void setChallenge(String ChallengeId)
@@ -170,8 +173,12 @@ public class ChallengeRoom {
             succeeded = true && this.generateStructure(id, false);
         }
 
-        if(succeeded) {
-            this.challengeKeyBlocks = new ChallengeKeyBlockManager( this.worldPos, challenge.getSize());
+        if(succeeded)
+        {
+            if(this.challengeKeyBlocks == null)
+                this.challengeKeyBlocks = new ChallengeKeyBlockManager( this.worldPos, challenge.getSize());
+            else
+                this.challengeKeyBlocks.refreshBlocks();
         }
 
         return succeeded;
@@ -319,7 +326,7 @@ public class ChallengeRoom {
                 returnLevel,
                 toVec3( portalPos ),
                 toVec3( overworldExitPos),
-                PortalApi.Direction.UP
+                Direction.UP
             );
 
             return this.exitPortal != null;
@@ -330,8 +337,11 @@ public class ChallengeRoom {
      * @return
      */
     boolean refreshStructure() {
-        if( this.loadStructure() )
+        if( this.loadStructure() ) {
+            this.challengeKeyBlocks.refreshBlocks();
             return this.generateExitStructure();
+        }
+
         return false;
     }
 

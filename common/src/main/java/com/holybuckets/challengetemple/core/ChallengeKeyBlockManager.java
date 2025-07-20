@@ -2,7 +2,6 @@ package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.block.ModBlocks;
-import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.minecraft.core.BlockPos;
@@ -14,11 +13,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
+import static net.minecraft.core.Direction.NORTH;
+import static net.minecraft.core.Direction.SOUTH;
+import static net.minecraft.core.Direction.EAST;
+import static net.minecraft.core.Direction.WEST;
+import static net.minecraft.core.Direction.UP;
+import static net.minecraft.core.Direction.DOWN;
 import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
 import static com.holybuckets.challengetemple.core.TempleManager.PORTAL_API;
 import static com.holybuckets.foundation.HBUtil.BlockUtil;
@@ -42,21 +47,23 @@ public class ChallengeKeyBlockManager {
 
     /**
      * Creates and load array of key blocks in the challenge area.
+     *
      * @param startPos
      * @param size
      */
-    public ChallengeKeyBlockManager(ServerLevel level, BlockPos startPos, Vec3i size)
+    public ChallengeKeyBlockManager(BlockPos startPos, Vec3i size)
     {
         this.BLOCKS = new HashMap<>();
         this.REPLACERS = new HashMap<>();
         this.PORTALS = new ArrayList<>();
-        this.level = level;
+        this.level = CHALLENGE_LEVEL;
         this.startPos = startPos;
         this.size = size;
         this.loaded = false;
 
         initReplacers();
         loadChallengeBlocks();
+        refreshBlocks();
     }
 
     private void initReplacers() {
@@ -90,7 +97,31 @@ public class ChallengeKeyBlockManager {
             }
         }
 
+    }
+
+    public void refreshBlocks() {
+        //Clear portals, generate portals, replace blocks
+
         generatePortals();
+        replaceBlocks();
+        resetRedstone();
+    }
+
+    public void clearPortals() {
+        PORTALS.forEach(PORTAL_API::removePortal);
+        PORTALS.clear();
+    }
+
+
+    private void replaceBlocks() {
+        //Replace blocks with air or brick
+        for (Map.Entry<BlockState, List<BlockPos>> entry : REPLACERS.entrySet()) {
+            BlockState state = entry.getKey();
+            List<BlockPos> positions = entry.getValue();
+            for (BlockPos pos : positions) {
+                CHALLENGE_LEVEL.setBlockAndUpdate(pos, state);
+            }
+        }
     }
 
 
@@ -108,8 +139,6 @@ public class ChallengeKeyBlockManager {
         {
             List<BlockPos> pistons = BLOCKS.getOrDefault(Blocks.PISTON, Collections.emptyList());
             List<BlockPos> stickyPistons = BLOCKS.getOrDefault(Blocks.STICKY_PISTON, Collections.emptyList());
-            REPLACERS.get(R.get(Blocks.PISTON)).addAll(pistons);
-            REPLACERS.get(R.get(Blocks.STICKY_PISTON)).addAll(stickyPistons);
 
             if( pistons.isEmpty() || stickyPistons.isEmpty() ) continue;
 
@@ -133,10 +162,10 @@ public class ChallengeKeyBlockManager {
             int xWidth = 0, zWidth = 0;
             //find the max difference in the x dimension and the z dimension using a nested for loop
             BlockPos[] positions = sourcePortals.keySet().toArray(new BlockPos[0]);
-            BlockPos topLeft = positions[0];
+            BlockPos topLeftSource = positions[0];
             for (int i = 0; i < positions.length; i++) {
-                if( positions[i].getX() < topLeft.getX() || positions[i].getZ() > topLeft.getZ() )
-                    topLeft = positions[i];
+                if( positions[i].getX() > topLeftSource.getX() || positions[i].getZ() > topLeftSource.getZ() )
+                    topLeftSource = positions[i];
 
                 for (int j = i + 1; j < positions.length; j++) {
                     BlockPos a = positions[i];
@@ -152,33 +181,102 @@ public class ChallengeKeyBlockManager {
 
             int height = 0;
             int width = 0;
-            Direction dir = null;
-            if(xWidth == 0) {  //portal in z dimension
-                width = zWidth;
+            Vec3 centering = Vec3.ZERO;
+            Vec3 destCentering = Vec3.ZERO;
+            Direction  dir = sourcePortals.get(positions[0]).getRight();
+            /*
+             *  Consider:
+             *  - SOUTH = +z
+             *  - NORTH = -z
+             *  - EAST = +x
+             *  - WEST = -x
+             *  - UP = +y
+             *  - DOWN = -y
+             *
+             * if portal is in Z dimension, move to the center of the bock in direction portal is facing
+             * if portal is in X dimension, move to the center of the block in direction portal is facing +/- (0, 0, 0.5)
+             * if portal is in Y dimension, move to the center of the block in direction portal is facing +/- (, 0.5, )
+             *
+             * if portal width is ODD, move have block in dimension ALIGNED to the width, to keep portal centered on block
+             * if portal width is EVEN, portal centers on block edges already
+             */
+            if( dir == EAST || dir == WEST ) {  //portal in z dimension
+                width = zWidth+1;
                 height = Math.abs( sourcePortals.get(positions[0]).getLeft() )-1;
-                dir = sourcePortals.get(positions[0]).getRight();
+
+              double normalCenter = (dir == EAST) ? 0.5 : -0.5;
+              double blockAlignedCenter = (width % 2 == 0) ? 0 : 0.5;
+              centering = new Vec3(normalCenter, 0,  blockAlignedCenter);
+              destCentering = centering.multiply(-1, 1, 1); //dest portal is opposite direction in z dimension
             }
-            else if(zWidth == 0) { //portal in x dimension
-                width = xWidth;
+            else if( dir == NORTH || dir == SOUTH ) {  //portal in x dimension
+                width = xWidth+1;
                 height = Math.abs( sourcePortals.get(positions[0]).getLeft() )-1;
-                dir = sourcePortals.get(positions[0]).getRight();
+
+                double normalCenter = (dir == SOUTH) ? 0.5 : -0.5; //portal runs along x dimension, move to center of block in z dimension
+                double blockAlignedCenter = (width % 2 == 0) ? 0 : 0.5;
+                centering = new Vec3(blockAlignedCenter, 0, normalCenter);
+                destCentering = centering.multiply(1, 1, -1);
             }
             else {  //portal is up or down
-               height = xWidth;
-               width = zWidth;
+               height = xWidth+1;
+               width = zWidth+1;
                dir = sourcePortals.get(positions[0]).getRight();
+
+               centering = new Vec3(0, (height % 2 == 0) ? 0 : 0.5, 0);
+                destCentering = centering.multiply(1, -1, 1);
             }
 
             //Portal starts in top left, most negative x, most positive z, highest y
+            positions = destPortals.keySet().toArray(new BlockPos[0]);
+            BlockPos topLeftDest = positions[0];
+            for (int i = 0; i < positions.length; i++) {
+                if( positions[i].getX() > topLeftDest.getX() || positions[i].getZ() > topLeftDest.getZ() )
+                    topLeftDest = positions[i];
+            }
+
+            Direction destDir = destPortals.get(positions[0]).getRight();
+            if( destDir == dir )
+                destCentering = centering;
 
             //Create the portal entity
-            Entity portals = PORTAL_API.createPortal(
-                level, topLeft, width, height, dir
-            );
+            Vec3 source = BlockUtil.toVec3( topLeftSource.offset(0, height, 0) );
+            Vec3 dest = BlockUtil.toVec3( topLeftDest.offset(0, height, 0) );
+            //Center the portal on the block in the direction the portal faces
+            Entity portal = PORTAL_API.createPortal(width, height,
+            CHALLENGE_LEVEL, CHALLENGE_LEVEL,
+                source.add(centering), dest.add(destCentering),
+             dir );
+
+            PORTALS.add(portal);
+
+            //Cleanup blocks
+            for (BlockPos pos : sourcePortals.keySet()) {
+                cleanupBlocks(pos, sourcePortals.get(pos).getLeft(), Blocks.PISTON);
+            }
+
+            for (BlockPos pos : destPortals.keySet()) {
+                cleanupBlocks(pos, destPortals.get(pos).getLeft(), Blocks.STICKY_PISTON);
+            }
 
         }
 
     }
+
+    private void cleanupBlocks(BlockPos pos, Integer total, Block type) {
+        //Add wool block as air or brick
+        //if( total < 0) REPLACERS.get(AIR).add(pos);
+        //else REPLACERS.get(BRICK).add(pos);
+
+        //add piston pos as air
+        int d = (total > 0) ? 1 : -1;
+        BlockPos temp = pos.offset(0, d, 0);
+        for(int i = 0; i < Math.abs(total); i++) {
+            REPLACERS.get(R.get(type)).add(temp);
+            temp = temp.offset(0, d, 0);
+        }
+    }
+
 
     private Pair<Integer, Direction> findPistonsAboveBelow(BlockPos woolPos, Block type)
     {
@@ -198,12 +296,34 @@ public class ChallengeKeyBlockManager {
 
         BlockPos pos = woolPos.offset(0, dir, 0);
         BlockState next = level.getBlockState(pos);
+        BlockState first = level.getBlockState(pos);
         while( next.is(type) ) {
             pos = pos.offset(0, dir, 0);
             next = level.getBlockState(pos);
         }
 
-        return Pair.of((pos.getY() - woolPos.getY()), next.getValue(BlockStateProperties.FACING) );
+        return Pair.of((pos.getY() - woolPos.getY()), first.getValue(BlockStateProperties.FACING) );
+    }
+
+
+    /**
+     * updateNeighbors for all redstone type blocks
+     */
+    private void resetRedstone() {
+
+        //For all redstone blocks, place the block again where it is, update all neighbors of bloc below
+        for (Block block : REDSTONE_BLOCKS)
+        {
+            List<BlockPos> positions = BLOCKS.getOrDefault(block, Collections.emptyList());
+            for (BlockPos pos : positions) {
+                BlockState state = level.getBlockState(pos);
+                level.setBlockAndUpdate(pos, state); // Replaces the block with itself
+                BlockPos below = pos.below();
+                if (level.getBlockState(below).isRedstoneConductor(level, below)) {
+                    level.updateNeighborsAt(below, block);
+                }
+            }
+        }
     }
 
 
@@ -271,10 +391,12 @@ public class ChallengeKeyBlockManager {
     }
 
     static final HashSet<Block> KEY_BLOCKS = new HashSet<>();
+    static final Set<Block> WOOL_BLOCKS = new HashSet<>();
+    static final Set<Block> REDSTONE_BLOCKS = new HashSet<>();
     static void loadKeyBlocks()
     {
         //All wool blocks
-        final var WOOL_BLOCKS = List.of(
+        WOOL_BLOCKS.addAll( List.of(
             Blocks.WHITE_WOOL,
             Blocks.ORANGE_WOOL,
             Blocks.MAGENTA_WOOL,
@@ -291,9 +413,21 @@ public class ChallengeKeyBlockManager {
             Blocks.GREEN_WOOL,
             Blocks.RED_WOOL,
             Blocks.BLACK_WOOL
-        );
+        ));
 
         KEY_BLOCKS.addAll(WOOL_BLOCKS);
+
+        //Redstone blocks
+        REDSTONE_BLOCKS.addAll( List.of(
+            Blocks.REDSTONE_BLOCK,
+            Blocks.REDSTONE_TORCH,
+            Blocks.REDSTONE_WIRE,
+            Blocks.REDSTONE_WALL_TORCH,
+            Blocks.REPEATER,
+            Blocks.COMPARATOR
+        ));
+
+        KEY_BLOCKS.addAll(REDSTONE_BLOCKS);
 
         //Pistons
         KEY_BLOCKS.add(Blocks.PISTON);
@@ -311,12 +445,14 @@ public class ChallengeKeyBlockManager {
 
     }
 
+    private static BlockState AIR;
+    private static BlockState BRICK;
     private static final Map<Block, BlockState> R = new HashMap<>();
     private static void loadReplacementMap() {
-        BlockState A = Blocks.AIR.defaultBlockState();
-        BlockState B = ModBlocks.challengeBrick.defaultBlockState();
-        R.put(Blocks.PISTON, A);
-        R.put(Blocks.STICKY_PISTON, A);
+        AIR = Blocks.AIR.defaultBlockState();
+        BRICK = ModBlocks.challengeBrick.defaultBlockState();
+        R.put(Blocks.PISTON, AIR);
+        R.put(Blocks.STICKY_PISTON, AIR);
     }
 
 

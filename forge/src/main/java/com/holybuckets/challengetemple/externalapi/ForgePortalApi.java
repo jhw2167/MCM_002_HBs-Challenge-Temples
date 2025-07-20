@@ -40,9 +40,9 @@ public class ForgePortalApi implements PortalApi {
         portal.setPosRaw(sourcePos.x, sourcePos.y, sourcePos.z);
 
         if(dir == Direction.NORTH) {
-            portal.axisW = new Vec3(1, 0,0);
-        } else if (dir == Direction.SOUTH) {
             portal.axisW = new Vec3(-1, 0,0);
+        } else if (dir == Direction.SOUTH) {
+            portal.axisW = new Vec3(1, 0,0);
         } else if (dir == Direction.EAST) {
             portal.axisW = new Vec3(0, 0, -1);
         } else if (dir == Direction.WEST) {

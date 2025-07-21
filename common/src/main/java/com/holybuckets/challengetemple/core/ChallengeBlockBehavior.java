@@ -55,7 +55,7 @@ public class ChallengeBlockBehavior {
         CHALLENGE_UNMINEABLE.add( Blocks.CHEST );
         CHALLENGE_UNMINEABLE.add( ModBlocks.challengeCobble );  //checks mineable blocks first
 
-
+        setFlammable();
     }
 
     /**

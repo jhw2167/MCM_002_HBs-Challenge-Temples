@@ -20,7 +20,10 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.apache.commons.lang3.tuple.Pair;
@@ -150,6 +153,12 @@ public class ManagedChallenger implements IManagedPlayer {
 
     }
 
+    public void replenishPlayer() {
+        ServerPlayer sp = (ServerPlayer) this.p;
+        sp.getFoodData().setFoodLevel(MAX_FOOD);
+        sp.setHealth(sp.getMaxHealth());
+    }
+
     private static int CLEAR_RATE = 5;
     public synchronized void enqueueClearInventory() {
         // Add 40 clear inventory operations to the queue
@@ -182,9 +191,47 @@ public class ManagedChallenger implements IManagedPlayer {
 
         BlockPos hitPos = e.getHitResult().getBlockPos();
         BlockState hitBlockState = e.getLevel().getBlockState(hitPos);
-        if(hitBlockState.equals( ModBlocks.challengeBed.defaultBlockState() ))
-            this.setPlayerSpawn(CHALLENGE_LEVEL, hitPos.offset(0,1,0), true);
+        Block block = hitBlockState.getBlock();
+        if(block.equals( ModBlocks.challengeBed ))
+        {
+            this.bedBlockUsed(hitPos, hitBlockState);
+            e.setCanceled(true);
+            return;
+        }
+        else if( block.equals(Blocks.PISTON) ||
+                block.equals(Blocks.STICKY_PISTON) ||
+                block.equals(Blocks.PISTON_HEAD) ||
+                block.equals(Blocks.MOVING_PISTON) )
+        {
+            //if player is using shears item in either hand
+            ItemStack mainHandItem = e.getPlayer().getMainHandItem();
+            ItemStack offHandItem = e.getPlayer().getOffhandItem();
+             if (mainHandItem.getItem().equals(Items.SHEARS)) {
+                this.pistonBlockUsed(hitPos, hitBlockState);
+            }
+            else if (offHandItem.getItem().equals(Items.SHEARS)) {
+                this.pistonBlockUsed(hitPos, hitBlockState);
+            }
+
+        }
     }
+
+        private void pistonBlockUsed(BlockPos pos, BlockState state) {
+            Level level = CHALLENGE_LEVEL;
+            if (level == null) return;
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            ItemStack stack = new ItemStack(state.getBlock());
+            //add it to the players inventory directly
+            ((ServerPlayer) this.p).getInventory().add(stack);
+        }
+
+        //Respawn anchor behavior
+        private static final int MAX_FOOD = 20;
+        private void bedBlockUsed(BlockPos pos, BlockState state) {
+            this.setPlayerSpawn(CHALLENGE_LEVEL, pos.offset(0,1,0), true);
+            this.replenishPlayer();
+        }
+
 
     private void onChallengerBlockBreak(BreakBlockEvent e)
     {
@@ -221,6 +268,7 @@ public class ManagedChallenger implements IManagedPlayer {
     public void completedChallenge(ManagedTemple managedTemple) {
         this.enqueueClearInventory();
         challengesComplete.add(managedTemple.getChallengeRoom().getChallengeId());
+        this.replenishPlayer();
     }
 
     //** EVENTS

@@ -23,7 +23,7 @@ public class ChallengeBuildingBlock extends Block {
 
     public ChallengeBuildingBlock() {
         super(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)
-        .strength(0.2f)
+        .strength(0.05f)
         .sound(SoundType.STONE)
         );
         this.registerDefaultState(this.defaultBlockState().setValue(COLOR, DyeColor.WHITE));

@@ -235,6 +235,22 @@ hbs foundation
 - handles to Overworld, Nether, end
 - getTicksInSession
 
+
+18.
+---
+
+- bugtest join in progress
+- bugtest join and leave
+- bugtest on complete shrine unloading
+
+
+
+
+READ NOTES
+---
+
+
+
 keep notes
 ---
 
@@ -247,6 +263,7 @@ hbs_challenge_temple:challenge_template_4x4
 hbs_challenge_temple:challenge_room_4x4_03
 hbs_challenge_temple:challenge_room_4x4_07
 minecraft:challenge_room_2x2_00
+hbs_challenge_temple:challenge_000000754_00
 
 Tutorial temple always first
 Maze in lava with wooden planks

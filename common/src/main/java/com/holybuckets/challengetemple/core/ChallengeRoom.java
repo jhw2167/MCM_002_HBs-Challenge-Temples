@@ -135,10 +135,8 @@ public class ChallengeRoom {
 
     public Challenge getChallenge() { return challenge; }
 
-    public void setActive(boolean isActive) {
+    private void setActive(boolean isActive) {
         this.roomActive = isActive;
-        if(this.challengeKeyBlocks != null)
-            this.challengeKeyBlocks.clearPortals();
     }
 
     public void setChallenge(String ChallengeId)
@@ -337,6 +335,7 @@ public class ChallengeRoom {
      * @return
      */
     boolean refreshStructure() {
+        this.roomLoaded = false;
         if( this.loadStructure() ) {
             this.challengeKeyBlocks.refreshBlocks();
             return this.generateExitStructure();
@@ -423,7 +422,7 @@ public class ChallengeRoom {
 
     private void clearExitPortal() {
         if (this.exitPortal != null) {
-            this.exitPortal.discard();
+            PORTAL_API.removePortal(this.exitPortal);
             this.exitPortal = null;
         }
         this.exitStructurePos = null;
@@ -431,10 +430,10 @@ public class ChallengeRoom {
     }
 
     void roomShutdown() {
-        if(this.exitPortal != null) {
-            this.exitPortal.discard();
-            this.exitPortal = null;
-        }
+        clearExitPortal();
+        if(this.challengeKeyBlocks != null)
+            this.challengeKeyBlocks.clearPortals();
+        setActive(false);
     }
 
     //** STATICS

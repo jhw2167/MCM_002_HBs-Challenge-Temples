@@ -335,7 +335,7 @@ public class ManagedTemple {
     public void playerJoinedInChallenge(ServerPlayer p) {
         nearPlayers.add(p);
         activePlayers.add(p);
-        this.challengeRoom.setActive( true );
+        this.challengeRoom.startChallenge();
     }
 
     public void playerDiedInChallenge(ManagedChallenger c) {
@@ -352,7 +352,7 @@ public class ManagedTemple {
         boolean containedPlayer = activePlayers.remove(player.getServerPlayer());
         if(!containedPlayer) return;
         if( activePlayers.isEmpty() ) {
-            this.challengeRoom.setActive( false );
+            this.challengeRoom.roomShutdown();
             this.deleteHomePortal();
         }
 

@@ -265,13 +265,13 @@ public class ChallengeKeyBlockManager {
 
     private void cleanupBlocks(BlockPos pos, Integer total, Block type) {
         //Add wool block as air or brick
-        //if( total < 0) REPLACERS.get(AIR).add(pos);
-        //else REPLACERS.get(BRICK).add(pos);
+        if( total < 0) REPLACERS.get(AIR).add(pos);
+        else REPLACERS.get(BRICK).add(pos);
 
         //add piston pos as air
         int d = (total > 0) ? 1 : -1;
         BlockPos temp = pos.offset(0, d, 0);
-        for(int i = 0; i < Math.abs(total); i++) {
+        for(int i = 0; i < Math.abs(total)-1; i++) {
             REPLACERS.get(R.get(type)).add(temp);
             temp = temp.offset(0, d, 0);
         }

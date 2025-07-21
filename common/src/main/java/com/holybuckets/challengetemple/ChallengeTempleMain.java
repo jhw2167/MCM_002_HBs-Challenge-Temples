@@ -80,7 +80,6 @@ public class ChallengeTempleMain {
         //this.DEV_MODE = CONFIG.devMode;
         this.DEV_MODE = false;
         this.inventoryApi.initConfig();
-        ChallengeBlockBehavior.setFlammable();
     }
 
 

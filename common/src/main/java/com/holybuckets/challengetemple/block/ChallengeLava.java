@@ -22,7 +22,7 @@ public class ChallengeLava extends LiquidBlock {
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (!entity.fireImmune()) {
-            entity.hurt(level.damageSources().lava(), 10.0F); // 2x normal lava damage
+            entity.hurt(level.damageSources().lava(), 15.0F); // 2x normal lava damage
         }
     }
 

@@ -19,10 +19,4 @@ public class ChallengeBrick extends Block {
         .explosionResistance(3600000f)
         .pushReaction(PushReaction.IGNORE);
 
-
-
-    @Override
-    public int getLightBlock(BlockState $$0, BlockGetter $$1, BlockPos $$2) {
-        return 0;
-    }
 }

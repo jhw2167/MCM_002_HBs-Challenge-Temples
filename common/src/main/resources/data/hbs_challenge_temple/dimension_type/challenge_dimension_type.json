@@ -1,5 +1,5 @@
 {
-  "ambient_light": 0,
+  "ambient_light": 0.0,
   "bed_works": true,
   "coordinate_scale": 1,
   "effects": "minecraft:overworld",
@@ -10,11 +10,11 @@
   "infiniburn": "#minecraft:infiniburn_overworld",
   "logical_height": 384,
   "min_y": 0,
-  "monster_spawn_block_light_limit": 0,
+  "monster_spawn_block_light_limit": 15,
   "monster_spawn_light_level": {
     "type": "minecraft:uniform",
     "value": {
-      "max_inclusive": 5,
+      "max_inclusive": 15,
       "min_inclusive": 0
     }
   },

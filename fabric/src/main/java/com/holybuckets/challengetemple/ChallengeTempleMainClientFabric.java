@@ -2,6 +2,7 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.block.be.ModBlockEntities;
+import com.holybuckets.challengetemple.client.CommonClassClient;
 import com.holybuckets.challengetemple.client.FabricChallengeBlockItemRenderer;
 import com.mojang.authlib.minecraft.client.MinecraftClient;
 import net.blay09.mods.balm.api.client.BalmClient;
@@ -16,7 +17,7 @@ public class ChallengeTempleMainClientFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        BalmClient.initialize(Constants.MOD_ID, CommonClass::initClient);
+        BalmClient.initialize(Constants.MOD_ID, CommonClassClient::initClient);
 
         //Rendering
         BuiltinItemRendererRegistry.INSTANCE.register(

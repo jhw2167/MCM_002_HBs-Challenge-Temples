@@ -7,8 +7,12 @@ import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.console.Messager;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
+import com.holybuckets.foundation.event.custom.TickType;
 import com.holybuckets.foundation.modelInterface.IManagedPlayer;
-import net.blay09.mods.balm.api.event.*;
+
+import net.blay09.mods.balm.api.event.BreakBlockEvent;
+import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
+import net.blay09.mods.balm.api.event.UseBlockEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -73,8 +77,8 @@ public class ManagedChallenger implements IManagedPlayer {
         reg.registerOnPlayerChangedDimension(ManagedChallenger::onPlayerChangeDimension);
         reg.registerOnUseBlock(ManagedChallenger::onPlayerUsedBlock);
         reg.registerOnBreakBlock(ManagedChallenger::onPlayerBreakBlock);
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ManagedChallenger::onServer20Ticks );
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_SINGLE_TICK, ManagedChallenger::processClearInventory);
+        reg.registerOnServerTick(TickType.ON_20_TICKS, ManagedChallenger::onServer20Ticks );
+        reg.registerOnServerTick(TickType.ON_SINGLE_TICK, ManagedChallenger::processClearInventory);
     }
 
 

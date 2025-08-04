@@ -338,6 +338,27 @@ End chest to transfer items to yourself
 
 Make Your own maze- navigate through a maze with invisible brick
 
+
+Blaze run - blazes attack you over oak logs that fall and burn apart
+
+Bouncy tnt - tnt bounces on slime block, great mechanics
+
+Warehouse - pack a warehouse with mobs, tnt, and some torches to find, your bow has flame on it
+
+Junkyard - find torches before the junkyard dogs find you
+
+TNT parkour - TNT falls from the sky while you parkour, also with invisible blocks
+
+Thanks man - a skeleton shoots targets for you
+
+Minecraft madness - shoot target blocks to trigger powered rails, track switches, match wool patterns LR side, shoot mobs off blocks, shoot TNT, shoot mobs instead of TNT
+
+Under da see - swim and look for torches in a coral reef
+
+Duck hunt - shoot ducks going back n forth on Minecraft
+
+
+
 RewardsClass: normal, rare, epic, none
 SpecificRewards: specify items guaranteed to be in the rewards chest
 keepChest - new item added by the mod, any item in this chest will be kept by the player after they exit the shrine, config takes a list of items to put in the chest.

@@ -1,6 +1,5 @@
 package com.holybuckets.challengetemple;
 
-import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
 import com.holybuckets.challengetemple.core.*;
 import com.holybuckets.challengetemple.externalapi.InventoryApi;
@@ -10,14 +9,12 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.EventPriority;
 import net.blay09.mods.balm.api.event.LevelLoadingEvent;
-import net.blay09.mods.balm.api.event.server.ServerStartedEvent;
 import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.blay09.mods.balm.api.event.server.ServerStoppedEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-//net.minecraft.server.commands.LocateCommand;
 public class ChallengeTempleMain {
 
     public static final String CLASS_ID = "001";    //unused variable, value will be used for logging messages

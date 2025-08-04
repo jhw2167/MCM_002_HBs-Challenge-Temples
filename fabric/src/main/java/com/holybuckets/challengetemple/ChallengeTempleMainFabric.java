@@ -1,6 +1,7 @@
 package com.holybuckets.challengetemple;
 
 import net.blay09.mods.balm.api.Balm;
+import net.blay09.mods.balm.api.client.BalmClient;
 import net.fabricmc.api.ModInitializer;
 
 //YOU NEED TO UPDATE NAME OF MAIN CLASS IN fabric.mod.json

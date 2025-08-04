@@ -14,10 +14,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static com.holybuckets.foundation.item.ModItems.FOUNDATIONS_TAB;
 
 public class ModItems {
     public static Item challengeBrickItem;
@@ -29,7 +26,7 @@ public class ModItems {
         items.addToCreativeModeTab(id("creative_tab"), ModItems::getItemLikeArray);
     }
 
-    public static void clientInit() {
+    public static void clientInitialize() {
         ChallengeItemBlockRenderer.CHEST_RENDERER = new ChallengeItemBlockRenderer(
                 ModBlockEntities.challengeChest.get(),
                 ModBlocks.challengeChest.defaultBlockState()

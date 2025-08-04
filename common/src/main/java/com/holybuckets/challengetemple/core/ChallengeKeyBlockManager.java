@@ -424,7 +424,8 @@ public class ChallengeKeyBlockManager {
             Blocks.REDSTONE_WIRE,
             Blocks.REDSTONE_WALL_TORCH,
             Blocks.REPEATER,
-            Blocks.COMPARATOR
+            Blocks.COMPARATOR,
+            Blocks.DETECTOR_RAIL
         ));
 
         KEY_BLOCKS.addAll(REDSTONE_BLOCKS);

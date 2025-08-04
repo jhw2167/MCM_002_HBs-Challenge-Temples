@@ -8,6 +8,7 @@ import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.DatastoreSaveEvent;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
+import com.holybuckets.foundation.event.custom.TickType;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
 import net.blay09.mods.balm.api.event.PlayerChangedDimensionEvent;
 import net.minecraft.core.BlockPos;
@@ -51,8 +52,8 @@ public class TempleManager {
     public static void init(EventRegistrar reg) {
         reg.registerOnChunkLoad(TempleManager::onChunkLoad);
         reg.registerOnChunkUnload(TempleManager::onChunkUnload);
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, TempleManager::onServerTick120 );
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, TempleManager::on20Ticks);
+        reg.registerOnServerTick(TickType.ON_120_TICKS, TempleManager::onServerTick120 );
+        reg.registerOnServerTick(TickType.ON_20_TICKS, TempleManager::on20Ticks);
 
         //ManagedTemple.init();
         ChallengeRoom.init(reg);

@@ -6,6 +6,7 @@ import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
+import com.holybuckets.foundation.event.custom.TickType;
 import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -455,7 +456,7 @@ public class ManagedTemple {
 
     //** Statics
     static void init(EventRegistrar reg) {
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ManagedTemple::onServer20Ticks);
+        reg.registerOnServerTick(TickType.ON_20_TICKS, ManagedTemple::onServer20Ticks);
     }
 
     static void onServer20Ticks(ServerTickEvent event) {

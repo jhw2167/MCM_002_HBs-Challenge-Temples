@@ -2,17 +2,12 @@ package com.holybuckets.challengetemple;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.block.be.ModBlockEntities;
-import com.holybuckets.challengetemple.client.ModRenderers;
-import com.holybuckets.challengetemple.client.screen.ModScreens;
 import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
 import com.holybuckets.challengetemple.menu.ModMenus;
 import com.holybuckets.challengetemple.platform.Services;
 import com.holybuckets.challengetemple.item.ModItems;
 import com.holybuckets.foundation.event.BalmEventRegister;
 import net.blay09.mods.balm.api.Balm;
-import net.blay09.mods.balm.api.client.BalmClient;
-import net.blay09.mods.balm.api.client.rendering.BalmRenderers;
-
 
 public class CommonClass {
 
@@ -42,11 +37,6 @@ public class CommonClass {
         isInitialized = true;
     }
 
-    public static void initClient() {
-        ModRenderers.clientInitialize(BalmClient.getRenderers());
-        ModScreens.clientInitialize(BalmClient.getScreens());
-        //ModItems.clientInit();
-    }
 
     /**
      * Description: Run sample tests methods

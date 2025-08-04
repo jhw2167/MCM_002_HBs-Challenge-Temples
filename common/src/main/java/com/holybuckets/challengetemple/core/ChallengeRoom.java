@@ -14,6 +14,7 @@ import com.holybuckets.foundation.datastore.LevelSaveData;
 import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.event.custom.DatastoreSaveEvent;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
+import com.holybuckets.foundation.event.custom.TickType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -440,8 +441,8 @@ public class ChallengeRoom {
 
     public static void init(EventRegistrar reg) {
         // Register the static event handler
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
-        reg.registerOnServerTick(EventRegistrar.TickType.ON_20_TICKS, ChallengeRoom::on20TicksTryExitPortal);
+        reg.registerOnServerTick(TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
+        reg.registerOnServerTick(TickType.ON_20_TICKS, ChallengeRoom::on20TicksTryExitPortal);
         reg.registerOnDataSave(ChallengeRoom::onDataSaveEvent);
 
         PORTAL_API = ChallengeTempleMain.INSTANCE.portalApi;

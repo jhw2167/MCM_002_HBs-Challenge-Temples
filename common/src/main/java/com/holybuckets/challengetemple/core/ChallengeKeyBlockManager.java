@@ -111,6 +111,32 @@ public class ChallengeKeyBlockManager {
         resetRedstone();
     }
 
+    private void clearEntities() {
+        // Create bounding box for entire challenge area
+        AABB aabb = new AABB(
+            startPos.getX(), startPos.getY(), startPos.getZ(),
+            startPos.getX() + size.getX(), 
+            startPos.getY() + size.getY(),
+            startPos.getZ() + size.getZ()
+        );
+
+        // Get all entities in the area
+        List<Entity> entities = CHALLENGE_LEVEL.getEntities((Entity)null, aabb, 
+            (entity) -> !(entity instanceof ServerPlayer));
+
+        // Remove entities
+        for (Entity entity : entities) {
+            if (PORTAL_API.isPortal(entity)) {
+                PORTAL_API.removePortal(entity);
+            } else {
+                entity.remove(Entity.RemovalReason.DISCARDED);
+            }
+        }
+
+        // Clear tracked portals
+        clearPortals();
+    }
+
     public void clearPortals() {
         PORTALS.forEach(PORTAL_API::removePortal);
         PORTALS.clear();

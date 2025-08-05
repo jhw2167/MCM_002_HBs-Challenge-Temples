@@ -111,7 +111,9 @@ public class ChallengeKeyBlockManager {
         generatePortals();
         replaceBlocks();
         resetRedstone();
+        spawnEntities();
     }
+
 
     private void clearEntities()
     {
@@ -358,6 +360,14 @@ public class ChallengeKeyBlockManager {
                 }
             }
         }
+    }
+
+    /**
+     * Spawn entities programatically on specific blocks.
+     * bone_block - skeletons
+     *
+     */
+    private void spawnEntities() {
     }
 
 

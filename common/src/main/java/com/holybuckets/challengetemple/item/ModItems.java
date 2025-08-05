@@ -45,6 +45,7 @@ public class ModItems {
             ModBlocks.challengeBlock,
             ModBlocks.challengeBed,
             ModBlocks.challengeBrick,
+            ModBlocks.challengeSkeletonBrick,
             ModBlocks.challengePushableBrick,
             ModBlocks.challengeBrickSlab,
             ModBlocks.challengeFauxBrick,

@@ -89,8 +89,6 @@ def main():
 
     for file in NBT_INPUT_DIR.glob("*.nbt"):
         target_name = file.name.replace("room_4x4", f"challenge_{new_id}")
-        if (NBT_OUTPUT_DIR / target_name).exists():
-            raise Exception(f"NBT output file {target_name} already exists.")
 
     # Update JSON
     challenge["challengeId"] = new_id
@@ -119,8 +117,6 @@ def main():
             raise Exception(f"Could not match known room pattern in filename: {file.name}")
 
         target_file = NBT_OUTPUT_DIR / new_name
-        if target_file.exists():
-            raise Exception(f"NBT output file {new_name} already exists.")
 
         shutil.copy(file, target_file)
 

@@ -1,7 +1,7 @@
 package com.holybuckets.challengetemple.block;
 
 import com.holybuckets.challengetemple.Constants;
-import com.holybuckets.challengetemple.block.spawner.SkeletonBrick;
+import com.holybuckets.challengetemple.block.spawner.*;
 import com.holybuckets.challengetemple.item.ChallengeChestItem;
 import net.blay09.mods.balm.api.block.BalmBlocks;
 import net.minecraft.resources.ResourceLocation;

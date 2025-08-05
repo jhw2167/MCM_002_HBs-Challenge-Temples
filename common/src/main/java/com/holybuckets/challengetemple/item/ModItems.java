@@ -103,6 +103,7 @@ public class ModItems {
         blocks.addAll(buildBlocks);
         blocks.addAll(addBlocks);
         blocks.addAll(vanillaBlocks);
+        blocks.addAll(spawnerBlocks);
         return blocks.toArray(new ItemLike[0]);
     }
 

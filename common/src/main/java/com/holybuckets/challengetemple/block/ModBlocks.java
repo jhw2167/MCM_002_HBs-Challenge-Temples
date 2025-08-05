@@ -22,6 +22,7 @@ public class ModBlocks {
     public static Block challengeBed;
     public static Block challengeBrick;
     public static Block skeletonBrick;
+    public static Block zombieBrick;
     public static Block challengePushableBrick;
     public static Block challengeBrickSlab;
     public static Block challengeGlowstone;
@@ -121,6 +122,7 @@ public class ModBlocks {
 
         //Spawner blocks
         blocks.register(() -> skeletonBrick = new SkeletonBrick(), () -> itemBlock(skeletonBrick), id("skeleton_brick"));
+        blocks.register(() -> zombieBrick = new ZombieBrick(), () -> itemBlock(zombieBrick), id("zombie_brick"));
 
     }
 

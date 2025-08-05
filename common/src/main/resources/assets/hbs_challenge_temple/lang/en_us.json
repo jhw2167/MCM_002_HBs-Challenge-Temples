@@ -40,6 +40,7 @@
   "block.hbs_challenge_temple.challenge_fence_gate": "Challenge Fence Gate",
   "block.hbs_challenge_temple.challenge_lamp": "Challenge Lamp",
 
-  "block.hbs_challenge_temple.skeleton_brick": "Skeleton Brick"
+  "block.hbs_challenge_temple.skeleton_brick": "Skeleton Brick",
+  "block.hbs_challenge_temple.zombie_brick": "Zombie Brick"
 
 }

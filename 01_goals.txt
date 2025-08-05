@@ -266,6 +266,7 @@ hbs_challenge_temple:challenge_room_4x4_03
 hbs_challenge_temple:challenge_room_4x4_07
 minecraft:challenge_room_2x2_00
 hbs_challenge_temple:challenge_000000754_00
+challenge_000000754_00.nbt
 
 Tutorial temple always first
 Maze in lava with wooden planks

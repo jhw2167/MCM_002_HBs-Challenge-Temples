@@ -264,6 +264,7 @@ public class ManagedTemple {
         }
 
         if(this.isCompleted) return;
+        templeEntity.setProperty("hasPortals", "true");
 
         if(this.activePlayers.isEmpty())
             createChallengePortal();
@@ -358,6 +359,7 @@ public class ManagedTemple {
             this.challengeComplete(player.getServerPlayer());
             player.completedChallenge(this);
             loadRewardsChest();
+            templeEntity.setProperty("complete", "true");
         } else {
            this.setMarkedForPortalCreationTime();
         }

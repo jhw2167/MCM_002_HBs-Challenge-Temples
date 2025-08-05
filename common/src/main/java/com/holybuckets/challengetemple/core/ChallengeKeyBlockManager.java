@@ -72,6 +72,10 @@ public class ChallengeKeyBlockManager {
         REPLACERS.put(ModBlocks.challengeBrick.defaultBlockState(), new LinkedList<>());
     }
 
+    /**
+     * Finds all KEY_BLOCKS (wool, pistons, redstone, soul torches) in the challenge
+     * and stores them in HashTable for individual processing of dynamic blocks.
+     */
     private void loadChallengeBlocks()
     {
         //Load all key blocks
@@ -101,7 +105,7 @@ public class ChallengeKeyBlockManager {
 
     public void refreshBlocks() {
         //Clear portals, generate portals, replace blocks
-
+        clearEntities();
         generatePortals();
         replaceBlocks();
         resetRedstone();

@@ -1,6 +1,7 @@
 package com.holybuckets.challengetemple.block;
 
 import com.holybuckets.challengetemple.Constants;
+import com.holybuckets.challengetemple.block.spawner.SkeletonBrick;
 import com.holybuckets.challengetemple.item.ChallengeChestItem;
 import net.blay09.mods.balm.api.block.BalmBlocks;
 import net.minecraft.resources.ResourceLocation;
@@ -65,7 +66,6 @@ public class ModBlocks {
         blocks.register(() -> challengeBlock = new ChallengeBlock(), () -> itemBlock(challengeBlock), id("challenge_"));
         blocks.register(() -> challengeBed = new ChallengeBed(), () -> itemBlock(challengeBed), id("challenge_bed"));
         blocks.register(() -> challengeBrick = new ChallengeBrick(), () -> itemBlock(challengeBrick), id("challenge_brick"));
-        blocks.register(() -> skeletonBrick = new ChallengeBrick(), () -> itemBlock(skeletonBrick), id("skeleton_brick"));
         blocks.register(() -> challengePushableBrick = new ChallengePushableBrick(), () -> itemBlock(challengePushableBrick), id("challenge_pushable_brick"));
         blocks.register(() -> challengeGlowstone = new ChallengeGlowstone(), () -> itemBlock(challengeGlowstone), id("challenge_glowstone"));
         blocks.register(() -> challengeBrickSlab = new ChallengeBrickSlab(), () -> itemBlock(challengeBrickSlab), id("challenge_brick_slab"));
@@ -113,12 +113,14 @@ public class ModBlocks {
         blocks.register(() -> challengeLamp = new ChallengeLamp(), () -> itemBlock(challengeLamp), id("challenge_lamp"));
 
         // Register building blocks for each color
-
         blocks.register(
             () -> challengeBuildingBlock = new ChallengeBuildingBlock(),
             () -> itemBlock(challengeBuildingBlock),
             id("challenge_building_block")
         );
+
+        //Spawner blocks
+        blocks.register(() -> skeletonBrick = new SkeletonBrick(), () -> itemBlock(skeletonBrick), id("skeleton_brick"));
 
     }
 

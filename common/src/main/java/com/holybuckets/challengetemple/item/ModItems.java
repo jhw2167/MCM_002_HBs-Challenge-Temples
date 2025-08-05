@@ -45,7 +45,6 @@ public class ModItems {
             ModBlocks.challengeBlock,
             ModBlocks.challengeBed,
             ModBlocks.challengeBrick,
-            ModBlocks.skeletonBrick,
             ModBlocks.challengePushableBrick,
             ModBlocks.challengeBrickSlab,
             ModBlocks.challengeFauxBrick,
@@ -80,6 +79,11 @@ public class ModItems {
             ModBlocks.challengeLever,
             ModBlocks.challengeLamp,
             ModBlocks.challengeLava
+        );
+
+        List<ItemLike> spawnerBlocks = List.of(
+            ModBlocks.skeletonBrick,
+
         );
 
         List<ItemLike> vanillaBlocks = List.of(

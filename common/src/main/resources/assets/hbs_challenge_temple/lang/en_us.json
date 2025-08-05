@@ -2,7 +2,9 @@
   "itemGroup.hbs_challenge_temple.creative_tab": "HB's Challenge Temple",
 
   "block.hbs_challenge_temple.challenge_brick": "Challenge Brick",
+  "block.hbs_challenge_temple.challenge_brick.desc": "Stone Brick variant with properties of Bedrock",
   "block.hbs_challenge_temple.challenge_": "Challenge Base Block",
+  "block.hbs_challenge_temple.challenge_.desc": "Exists purely to easily tab complete other challenge blocks",
   "block.hbs_challenge_temple.challenge_bed": "Challenge Spawn Anchor",
   "block.hbs_challenge_temple.challenge_pushable_brick": "Challenge Pushable Brick",
   "block.hbs_challenge_temple.challenge_glowstone": "Challenge Glowstone",
@@ -36,9 +38,8 @@
   "block.hbs_challenge_temple.challenge_pushable_stairs": "Challenge Pushable Stairs",
   "block.hbs_challenge_temple.challenge_fence": "Challenge Fence",
   "block.hbs_challenge_temple.challenge_fence_gate": "Challenge Fence Gate",
-  "block.hbs_challenge_temple.challenge_lamp": "Challenge Lamp"
+  "block.hbs_challenge_temple.challenge_lamp": "Challenge Lamp",
 
-}
-{
   "block.hbs_challenge_temple.skeleton_brick": "Skeleton Brick"
+
 }

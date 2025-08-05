@@ -1,14 +1,10 @@
 package com.holybuckets.challengetemple;
 
-import com.holybuckets.challengetemple.block.ModBlocks;
-import com.holybuckets.challengetemple.client.ChallengeItemBlockRenderer;
 import com.holybuckets.challengetemple.client.CommonClassClient;
 import com.holybuckets.challengetemple.client.IBewlrRenderer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod( Constants.MOD_ID)
 public class ChallengeTempleMainForgeClient {
 
 

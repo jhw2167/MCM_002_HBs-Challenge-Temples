@@ -259,7 +259,9 @@ CHALLENGES
 challenge_chest_single_use
 challenge_chest_counting
 
-hbs_challenge_temple:challenge_template_4x4
+hbs_challenge_temple:challenge_template4x4_00
+hbs_challenge_temple:challenge_template4x4_01
+hbs_challenge_temple:challenge_template2x2_00
 hbs_challenge_temple:challenge_room_4x4_03
 hbs_challenge_temple:challenge_room_4x4_07
 minecraft:challenge_room_2x2_00

@@ -21,6 +21,7 @@ public class ClientEvents {
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.challengeGlass, RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.challengeGlassPane, RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.challengeInvisibleBrick, RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(ModBlocks.challengePushableGlass, RenderType.translucent());
         });
     }
 

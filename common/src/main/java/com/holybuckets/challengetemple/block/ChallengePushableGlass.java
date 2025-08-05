@@ -15,7 +15,7 @@ public class ChallengePushableGlass extends GlassBlock {
     }
 
     static Properties PROPERTIES = Properties.copy(Blocks.GLASS)
-        .destroyTime(-1f)
+        .destroyTime(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
         .explosionResistance(3600000f)
         .pushReaction(PushReaction.NORMAL);
 

@@ -1,7 +1,6 @@
 package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.block.ModBlocks;
-import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
@@ -11,13 +10,9 @@ import com.holybuckets.foundation.model.ManagedChunkUtility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -264,9 +259,10 @@ public class ManagedTemple {
 
         if(templeId.equals( SPECIAL_TEMPLE)) {
             int i = 0;
+        } else { //let portal spawn at 0,0 in dev_mode
+            if( DEV_MODE ) this.isCompleted = true;
         }
 
-        if( DEV_MODE ) this.isCompleted = true;
         if(this.isCompleted) return;
 
         if(this.activePlayers.isEmpty())
@@ -289,9 +285,7 @@ public class ManagedTemple {
 
     public void swapPortals()
     {
-        this.findPortals();
-        this.deleteChallengePortal();
-        this.deleteHomePortal();
+        cleanupPortals();
 
         if( this.activePlayers.isEmpty() ) {
             this.createChallengePortal();
@@ -434,20 +428,22 @@ public class ManagedTemple {
         this.activePlayers.remove(p);
     }
 
+    void onChunkLoad() {
 
-    void shutdown()
+    }
+
+
+    void onChunkUnload()
     {
         if (watchChallengersThread != null && watchChallengersThread.isAlive()) {
             watchChallengersThread.interrupt();
         }
 
-        if (challengeRoom != null) {
+        if (challengeRoom != null && this.activePlayers.isEmpty()) {
             challengeRoom.roomShutdown();
         }
 
-        this.findPortals();
-        this.deleteHomePortal();
-        this.deleteChallengePortal();
+        this.cleanupPortals();
 
         this.nearPlayers.clear();
         this.activePlayers.clear();
@@ -465,10 +461,20 @@ public class ManagedTemple {
             if (temple.isFullyLoaded()) {
                 temple.onTick();
             }
+
+            if(temple.activePlayers.isEmpty() && temple.nearPlayers.isEmpty()) {
+                temple.cleanupPortals();
+            }
         }
     }
 
-        void onTick() {
+    private void cleanupPortals() {
+        this.findPortals();
+        this.deleteHomePortal();
+        this.deleteChallengePortal();
+    }
+
+    void onTick() {
             int i = 0;
         }
 

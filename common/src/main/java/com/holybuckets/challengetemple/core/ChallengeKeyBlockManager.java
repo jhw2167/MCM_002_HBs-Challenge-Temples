@@ -8,11 +8,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -111,7 +113,11 @@ public class ChallengeKeyBlockManager {
         resetRedstone();
     }
 
-    private void clearEntities() {
+    private void clearEntities()
+    {
+        // Clear tracked portals
+        clearPortals();
+
         // Create bounding box for entire challenge area
         AABB aabb = new AABB(
             startPos.getX(), startPos.getY(), startPos.getZ(),
@@ -133,8 +139,6 @@ public class ChallengeKeyBlockManager {
             }
         }
 
-        // Clear tracked portals
-        clearPortals();
     }
 
     public void clearPortals() {

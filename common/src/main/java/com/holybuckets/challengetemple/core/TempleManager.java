@@ -6,7 +6,6 @@ import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
-import com.holybuckets.foundation.event.custom.DatastoreSaveEvent;
 import com.holybuckets.foundation.event.custom.ServerTickEvent;
 import com.holybuckets.foundation.event.custom.TickType;
 import net.blay09.mods.balm.api.event.ChunkLoadingEvent;
@@ -116,11 +115,6 @@ public class TempleManager {
 
     private void workerThreadBuildPortal()
     {
-        if( CONFIG.getTotalTickCount() < processing_buffer_start_tick ) {
-            LoggerProject.logDebug("005010", "Skipping portal creation, waiting for buffer to fill");
-            return;
-        }
-
         temples.values().stream()
             .filter(t -> t.isFullyLoaded() )
             .filter(t -> !t.hasPortal() )
@@ -196,11 +190,22 @@ public class TempleManager {
     }
 
     private void handleChunkUnloaded(ChunkAccess c) {
-        this.temples.remove(HBUtil.ChunkUtil.getId(c.getPos()));
+        String id = HBUtil.ChunkUtil.getId(c.getPos());
+        ManagedTemple temple = this.temples.get(id);
+        if( temple != null ) {
+            temple.onChunkUnload();
+            temples.remove(id);
+        }
         //LoggerProject.logInfo( "00501","Chunk unloaded: " + c.getPos());
     }
 
-    private void handleOnServerTicks120() {
+    private void handleOnServerTicks120()
+    {
+        if( CONFIG.getTotalTickCount() < processing_buffer_start_tick ) {
+            LoggerProject.logDebug("005010", "Skipping portal creation, waiting for buffer to fill");
+            return;
+        }
+
         workerThreadReadEntityData();
         workerThreadBuildPortal();
     }
@@ -259,7 +264,6 @@ public class TempleManager {
     public void shutdown()
     {
         LoggerProject.logInfo("005999", "Shutting down TempleManager for level: " + this.level);
-        temples.values().forEach(ManagedTemple::shutdown);
         temples.clear();
 
         ChallengeRoom.shutdown();

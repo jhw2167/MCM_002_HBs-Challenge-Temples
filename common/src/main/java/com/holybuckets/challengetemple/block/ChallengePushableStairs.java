@@ -9,7 +9,7 @@ public class ChallengePushableStairs extends StairBlock {
     public ChallengePushableStairs() {
         super(Blocks.STONE_BRICK_STAIRS.defaultBlockState(),
             BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_STAIRS)
-            .strength(ModBlocks.CHALLENGE_BLOCK_STRENGTH_MINEABLE)
+            .destroyTime(ModBlocks.CHALLENGE_BLOCK_STRENGTH)
             .explosionResistance(ModBlocks.CHALLENGE_BLOCK_EXPL_RES)
                 .pushReaction(PushReaction.NORMAL));
     }

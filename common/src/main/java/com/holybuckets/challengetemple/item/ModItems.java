@@ -83,7 +83,15 @@ public class ModItems {
 
         List<ItemLike> spawnerBlocks = List.of(
             ModBlocks.skeletonBrick,
-            ModBlocks.zombieBrick
+            ModBlocks.zombieBrick,
+            ModBlocks.blazeBrick,
+            ModBlocks.endermanBrick,
+            ModBlocks.creeperBrick,
+            ModBlocks.piglinBrick,
+            ModBlocks.zombiePiglinBrick,
+            ModBlocks.witchBrick,
+            ModBlocks.dogBrick,
+            ModBlocks.catBrick
         );
 
         List<ItemLike> vanillaBlocks = List.of(

@@ -41,6 +41,14 @@
   "block.hbs_challenge_temple.challenge_lamp": "Challenge Lamp",
 
   "block.hbs_challenge_temple.skeleton_brick": "Skeleton Brick",
-  "block.hbs_challenge_temple.zombie_brick": "Zombie Brick"
+  "block.hbs_challenge_temple.zombie_brick": "Zombie Brick",
+  "block.hbs_challenge_temple.blaze_brick": "Blaze Brick",
+  "block.hbs_challenge_temple.enderman_brick": "Enderman Brick",
+  "block.hbs_challenge_temple.creeper_brick": "Creeper Brick",
+  "block.hbs_challenge_temple.piglin_brick": "Piglin Brick",
+  "block.hbs_challenge_temple.zombie_piglin_brick": "Zombie Piglin Brick",
+  "block.hbs_challenge_temple.witch_brick": "Witch Brick",
+  "block.hbs_challenge_temple.dog_brick": "Dog Brick",
+  "block.hbs_challenge_temple.cat_brick": "Cat Brick"
 
 }

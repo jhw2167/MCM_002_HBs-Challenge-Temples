@@ -23,6 +23,14 @@ public class ModBlocks {
     public static Block challengeBrick;
     public static Block skeletonBrick;
     public static Block zombieBrick;
+    public static Block blazeBrick;
+    public static Block endermanBrick;
+    public static Block creeperBrick;
+    public static Block piglinBrick;
+    public static Block zombiePiglinBrick;
+    public static Block witchBrick;
+    public static Block dogBrick;
+    public static Block catBrick;
     public static Block challengePushableBrick;
     public static Block challengeBrickSlab;
     public static Block challengeGlowstone;
@@ -123,6 +131,14 @@ public class ModBlocks {
         //Spawner blocks
         blocks.register(() -> skeletonBrick = new SkeletonBrick(), () -> itemBlock(skeletonBrick), id("skeleton_brick"));
         blocks.register(() -> zombieBrick = new ZombieBrick(), () -> itemBlock(zombieBrick), id("zombie_brick"));
+        blocks.register(() -> blazeBrick = new BlazeBrick(), () -> itemBlock(blazeBrick), id("blaze_brick"));
+        blocks.register(() -> endermanBrick = new EndermanBrick(), () -> itemBlock(endermanBrick), id("enderman_brick"));
+        blocks.register(() -> creeperBrick = new CreeperBrick(), () -> itemBlock(creeperBrick), id("creeper_brick"));
+        blocks.register(() -> piglinBrick = new PiglinBrick(), () -> itemBlock(piglinBrick), id("piglin_brick"));
+        blocks.register(() -> zombiePiglinBrick = new ZombiePiglinBrick(), () -> itemBlock(zombiePiglinBrick), id("zombie_piglin_brick"));
+        blocks.register(() -> witchBrick = new WitchBrick(), () -> itemBlock(witchBrick), id("witch_brick"));
+        blocks.register(() -> dogBrick = new DogBrick(), () -> itemBlock(dogBrick), id("dog_brick"));
+        blocks.register(() -> catBrick = new CatBrick(), () -> itemBlock(catBrick), id("cat_brick"));
 
     }
 

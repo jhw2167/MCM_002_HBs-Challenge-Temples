@@ -49,6 +49,14 @@
   "block.hbs_challenge_temple.zombie_piglin_brick": "Zombie Piglin Brick",
   "block.hbs_challenge_temple.witch_brick": "Witch Brick",
   "block.hbs_challenge_temple.dog_brick": "Dog Brick",
-  "block.hbs_challenge_temple.cat_brick": "Cat Brick"
+  "block.hbs_challenge_temple.cat_brick": "Cat Brick",
+  "block.hbs_challenge_temple.slime_brick": "Slime Brick",
+  "block.hbs_challenge_temple.spider_brick": "Spider Brick",
+  "block.hbs_challenge_temple.polar_brick": "Polar Bear Brick",
+  "block.hbs_challenge_temple.ghast_brick": "Ghast Brick",
+  "block.hbs_challenge_temple.pillager_brick": "Pillager Brick",
+  "block.hbs_challenge_temple.vindicator_brick": "Vindicator Brick",
+  "block.hbs_challenge_temple.evoker_brick": "Evoker Brick",
+  "block.hbs_challenge_temple.ravager_brick": "Ravager Brick"
 
 }

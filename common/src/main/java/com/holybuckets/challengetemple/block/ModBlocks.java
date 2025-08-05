@@ -31,6 +31,14 @@ public class ModBlocks {
     public static Block witchBrick;
     public static Block dogBrick;
     public static Block catBrick;
+    public static Block slimeBrick;
+    public static Block spiderBrick;
+    public static Block polarBrick;
+    public static Block ghastBrick;
+    public static Block pillagerBrick;
+    public static Block vindicatorBrick;
+    public static Block evokerBrick;
+    public static Block ravagerBrick;
     public static Block challengePushableBrick;
     public static Block challengeBrickSlab;
     public static Block challengeGlowstone;
@@ -139,6 +147,14 @@ public class ModBlocks {
         blocks.register(() -> witchBrick = new WitchBrick(), () -> itemBlock(witchBrick), id("witch_brick"));
         blocks.register(() -> dogBrick = new DogBrick(), () -> itemBlock(dogBrick), id("dog_brick"));
         blocks.register(() -> catBrick = new CatBrick(), () -> itemBlock(catBrick), id("cat_brick"));
+        blocks.register(() -> slimeBrick = new SlimeBrick(), () -> itemBlock(slimeBrick), id("slime_brick"));
+        blocks.register(() -> spiderBrick = new SpiderBrick(), () -> itemBlock(spiderBrick), id("spider_brick"));
+        blocks.register(() -> polarBrick = new PolarBrick(), () -> itemBlock(polarBrick), id("polar_brick"));
+        blocks.register(() -> ghastBrick = new GhastBrick(), () -> itemBlock(ghastBrick), id("ghast_brick"));
+        blocks.register(() -> pillagerBrick = new PillagerBrick(), () -> itemBlock(pillagerBrick), id("pillager_brick"));
+        blocks.register(() -> vindicatorBrick = new VindicatorBrick(), () -> itemBlock(vindicatorBrick), id("vindicator_brick"));
+        blocks.register(() -> evokerBrick = new EvokerBrick(), () -> itemBlock(evokerBrick), id("evoker_brick"));
+        blocks.register(() -> ravagerBrick = new RavagerBrick(), () -> itemBlock(ravagerBrick), id("ravager_brick"));
 
     }
 

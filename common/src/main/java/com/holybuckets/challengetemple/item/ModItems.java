@@ -91,7 +91,15 @@ public class ModItems {
             ModBlocks.zombiePiglinBrick,
             ModBlocks.witchBrick,
             ModBlocks.dogBrick,
-            ModBlocks.catBrick
+            ModBlocks.catBrick,
+            ModBlocks.slimeBrick,
+            ModBlocks.spiderBrick,
+            ModBlocks.polarBrick,
+            ModBlocks.ghastBrick,
+            ModBlocks.pillagerBrick,
+            ModBlocks.vindicatorBrick,
+            ModBlocks.evokerBrick,
+            ModBlocks.ravagerBrick
         );
 
         List<ItemLike> vanillaBlocks = List.of(

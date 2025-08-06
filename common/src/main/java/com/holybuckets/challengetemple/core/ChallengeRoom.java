@@ -337,6 +337,7 @@ public class ChallengeRoom {
      */
     boolean refreshStructure() {
         this.roomLoaded = false;
+        this.challengeKeyBlocks.clearEntities();
         if( this.loadStructure() ) {
             this.challengeKeyBlocks.refreshBlocks();
             return this.generateExitStructure();

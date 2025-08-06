@@ -268,6 +268,44 @@ minecraft:challenge_room_2x2_00
 hbs_challenge_temple:challenge_000000754_00
 challenge_000000754_00.nbt
 
+Spawner blocks
+bone_block
+mossy_cobblestone
+
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add <BRICK> using textures from <TEXTURES>. 
+Make sure to add this block to the spawnerBlocks array in ModItems, and add it to the bottom of ModBlocks init method with skeletonBrick.
+Add the blockstate, item, and block jsonfiles as necessary. Also upate en_us to add the block name and description.
+
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add BlazeBrick using textures from nether_brick.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add EndermanBrick using textures from end_stone.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add CreeperBrick using textures from tnt.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add PiglinBrick using textures from gold_block.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add ZombiePiglinBrick using textures from nether_gold_ore.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add WitchBrick using textures from moss_block.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add DogBrick using textures from spruce_log.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add CatBrick using textures from oak_log.
+
+
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add SlimeBrick using textures from slime_block.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add SpiderBrick using textures from cobweb.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add PolarBrick using textures from packed_ice.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add GhastBrick using textures from quartz_block.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add PillagerBrick using textures from cracked_stone_bricks.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add VindicatorBrick using textures from dark_oak_planks.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add EvokerBrick using textures from dark_oak_log.
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add RavagerBrick using textures from chiseled_stone_bricks.
+
+Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add DrownedBrick using textures from prismarine.
+
+Make sure to add this block to the spawnerBlocks array in ModItems, and add it to the bottom of ModBlocks init method with skeletonBrick.
+Add the blockstate, item, and block jsonfiles as necessary. Also upate en_us to add the block name and description.
+
+Art:
+- Redstone Power Me! Block
+- Green torch
+- New Challenge Chest or counting chest design
+- 
+
 Tutorial temple always first
 Maze in lava with wooden planks
 Short hop - place blocks as you land tech

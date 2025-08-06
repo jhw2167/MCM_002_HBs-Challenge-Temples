@@ -10,6 +10,9 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.Blocks;
@@ -107,15 +110,14 @@ public class ChallengeKeyBlockManager {
 
     public void refreshBlocks() {
         //Clear portals, generate portals, replace blocks
-        clearEntities();
         generatePortals();
+        spawnEntities();
         replaceBlocks();
         resetRedstone();
-        spawnEntities();
     }
 
 
-    private void clearEntities()
+    void clearEntities()
     {
         // Clear tracked portals
         clearPortals();
@@ -136,7 +138,8 @@ public class ChallengeKeyBlockManager {
         for (Entity entity : entities) {
             if (PORTAL_API.isPortal(entity)) {
                 PORTAL_API.removePortal(entity);
-            } else {
+            }
+            else {
                 entity.remove(Entity.RemovalReason.DISCARDED);
             }
         }
@@ -364,12 +367,24 @@ public class ChallengeKeyBlockManager {
 
     /**
      * Spawn entities programatically on specific blocks.
-     * bone_block - skeletons
+     * SkeletonBrick - skeleton
+     * ZombieBrick - zombie
      *
      */
     private void spawnEntities() {
-    }
 
+        //Spawn skeletons on skeleton bricks
+        for (BlockPos pos : getPositions(ModBlocks.skeletonBrick) ) {
+            Entity entity = EntityType.SKELETON.spawn(CHALLENGE_LEVEL, pos.above(), MobSpawnType.NATURAL);
+            REPLACERS.get(R.get(ModBlocks.skeletonBrick)).add(pos);
+        }
+
+        for (BlockPos pos : getPositions(ModBlocks.zombieBrick) ) {
+            Entity entity = EntityType.ZOMBIE.spawn(CHALLENGE_LEVEL, pos, MobSpawnType.NATURAL);
+        }
+
+
+    }
 
 
     public List<BlockPos> getPositions(Block b) {
@@ -484,6 +499,10 @@ public class ChallengeKeyBlockManager {
         KEY_BLOCKS.add(ModBlocks.challengeCountingChest);
         KEY_BLOCKS.add(ModBlocks.challengeSingleUseChest);
 
+        //SpawnBlocks
+        KEY_BLOCKS.add(ModBlocks.skeletonBrick);
+        KEY_BLOCKS.add(ModBlocks.zombieBrick);
+
         //Misc
         KEY_BLOCKS.add(Blocks.SOUL_TORCH);
         KEY_BLOCKS.add(Blocks.SPAWNER);
@@ -498,6 +517,19 @@ public class ChallengeKeyBlockManager {
         BRICK = ModBlocks.challengeBrick.defaultBlockState();
         R.put(Blocks.PISTON, AIR);
         R.put(Blocks.STICKY_PISTON, AIR);
+
+        //Spawner Blocks - default replaced with challenge_brick
+            //ghst spawner replaced with air
+            // drowned spawner replaced with water
+        {
+            R.put(ModBlocks.skeletonBrick, BRICK);
+            R.put(ModBlocks.zombieBrick, BRICK);
+        }
+
+        //Chests
+        {
+
+        }
     }
 
 

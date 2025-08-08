@@ -370,6 +370,7 @@ Mountain miner - build create railroad that breaks blocks, follows track
 - hop off train to flip switch
 - use dispensers to shoot arrows
 
+challenge_room_4x4_01.nbt
 
 Doors
 	- Several doors that have miscellaneos materials locked behind them

@@ -55,12 +55,12 @@ public class ChallengeDB {
         CHALLENGE_IDS = new LinkedList<>();
         CHALLENGES = new LinkedList<>();
 
-        ResourceManager manager = GeneralConfig.getInstance()
+        ResourceManager fileResourceManager = GeneralConfig.getInstance()
             .getServer().getResourceManager();
 
 
         //Open our challengeDb file
-        Resource challengesCSV = manager.listResources(CHALLENGES_CSV, p -> true)
+        Resource challengesCSV = fileResourceManager.listResources(CHALLENGES_CSV, p -> true)
         .get( new ResourceLocation(CHALLENGE_DB_PATH.getNamespace(), CHALLENGES_CSV) );
         String challengeDB = null;
 
@@ -76,16 +76,18 @@ public class ChallengeDB {
 
         if(challengeDB == null || challengeDB.isEmpty()) return;
 
-        Map<ResourceLocation, Resource> jsonChallenges = manager.listResources("challenges/json", p -> true);
-        ResourceLocation defaultJsonLocation = new ResourceLocation(CHALLENGE_DB_PATH.getNamespace(),
-            CHALLENGES_DEFAULT_JSON);
+        Map<ResourceLocation, Resource> jsonChallengeFiles = fileResourceManager.listResources("challenges/json", p -> true);
+        ResourceLocation defaultJsonLocation = new ResourceLocation(CHALLENGE_DB_PATH.getNamespace(), CHALLENGES_DEFAULT_JSON);
+
         String challengeDefaultJson = null;
-        try(InputStream is = jsonChallenges.get(defaultJsonLocation).open()) {
+        try(InputStream is = jsonChallengeFiles.get(defaultJsonLocation).open()) {
             challengeDefaultJson = new String(is.readAllBytes());
         } catch (IOException e) {
             LoggerProject.logError("021003", "Failed to load default challenge json" + CHALLENGES_DEFAULT_JSON );
             return;
         }
+
+
         String lineDelim = "\n";
         if( challengeDB.contains("\r\n") )
             lineDelim = "\r\n"; // Windows line endings
@@ -101,7 +103,7 @@ public class ChallengeDB {
             ResourceLocation locationWithId = new ResourceLocation(
                 CHALLENGE_DB_PATH.getNamespace(),
                 CHALLENGES_JSON + "/" + c.challengeId + ".json");
-           Resource challengeJson = jsonChallenges.get(locationWithId);
+           Resource challengeJson = jsonChallengeFiles.get(locationWithId);
             try(InputStream is = challengeJson.open())
             {
                 Challenge challenge = loadChallenge(c, new String(is.readAllBytes()), challengeDefaultJson );
@@ -122,12 +124,10 @@ public class ChallengeDB {
 
 
     }
+
         static final String DEFAULT_CHALLENGE_JSON = "CHALLENGE_DB_PATH.json";
         static Challenge loadChallenge(Cursor c, String json, String defaultJson) throws NoDefaultConfig, IOException
         {
-            //Path jsonPath = Paths.get(CHALLENGE_DB_PATH.getPath());
-            //final File challengeFile = jsonPath.resolve("json/" + c.challengeId + ".json").toFile();
-            //final File challengeDefault = jsonPath.resolve(DEFAULT_CHALLENGE_JSON).toFile();
             final JsonObject challengeJson = new JsonParser().parse(json).getAsJsonObject();
             final JsonObject challengeDefJson = new JsonParser().parse(defaultJson).getAsJsonObject();
 

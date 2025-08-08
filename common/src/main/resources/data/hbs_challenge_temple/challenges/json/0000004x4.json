@@ -1,10 +1,10 @@
 {
     "challengeId": "0000004x4",
     "author": "Holy_Buckets",
-    "challengeName": "Template Small Temple",
+    "challengeName": "Template Large Temple",
     "difficulty": 4,
     "size": "4x4",
-    "replaceStructureBlocksWith": ["diamond_block", "air"],
+    "replaceStructureBlocksWith": ["hbs_challenge_temple:challenge_brick", "air"],
     "challengeRules": {
         "playerMaxHearts": 10,
         "maxDeaths": -1,

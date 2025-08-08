@@ -23,9 +23,7 @@ public class FabricPortalApi implements PortalApi {
     public boolean removePortal(Entity entity) {
         if (!isPortal(entity)) return false;
         Portal portal = (Portal) entity;
-        //GlobalPortalStorage.get((ServerLevel) portal.level()).removePortal(portal);
-        Level l = entity.level();
-        portal.kill();
+        GlobalPortalStorage.get((ServerLevel) portal.level()).removePortal(portal);
         return true;
     }
 

@@ -59,6 +59,8 @@ public class ChallengeTempleApi {
         if( nearTemple == null)
             return "No temple found in nearby chunks, please be within 1 chunk of a naturally spawned temple";
 
+        challengeId = mapTestId(challengeId);
+
         try {
             nearTemple.setChallenge(challengeId);
         } catch (ChallengeLoadException e) {
@@ -67,6 +69,13 @@ public class ChallengeTempleApi {
 
         return "Challenge loaded successfully";
     }
+
+        private static String mapTestId(String challengeId) {
+            if( challengeId.equals("test") ) return "room_2x2";
+            if( challengeId.equals("test2x2") ) return "room_2x2";
+            if( challengeId.equals("test4x4") ) return "room_4x4";
+            return challengeId;
+        }
 
     public static ManagedChallenger getManagedChallenger(Player p) throws NotActiveChallengerException
     {

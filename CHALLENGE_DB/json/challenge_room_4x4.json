@@ -1,7 +1,7 @@
 {
-    "challengeId": "0000004x4",
-    "author": "Holy_Buckets",
-    "challengeName": "Template Large Temple",
+    "challengeId": "room_4x4",
+    "author": "You",
+    "challengeName": "Test4x4 loads any recently saved structure under template name challenge_room_4x4_##",
     "difficulty": 4,
     "size": "4x4",
     "replaceStructureBlocksWith": ["hbs_challenge_temple:challenge_brick", "air"],
@@ -11,7 +11,7 @@
         "resetBlocksOnPlayerDeath": true,
         "resetChestsOnPlayerDeath": true,
         "keepInventoryOnPlayerDeath": true,
-        "playerDropsInventoryOnDeath": true
+        "playerDropsInventoryOnDeath": false
     },
     "lootRules": {
         "lootPool": 4,

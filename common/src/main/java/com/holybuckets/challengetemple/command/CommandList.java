@@ -28,6 +28,38 @@ public class CommandList {
         CommandRegistry.register(LocateClusters::noArgs);
         CommandRegistry.register(LocateClusters::limitCount);
         CommandRegistry.register(LocateClusters::limitCountSpecifyBlockType);
+        CommandRegistry.register(ExitTemple::noArgs);
+        CommandRegistry.register(LoadChallenge::noArgs);
+    }
+
+    //Exit Temple Command
+    private static class ExitTemple {
+        private static LiteralArgumentBuilder<CommandSourceStack> noArgs() {
+            return Commands.literal(PREFIX)
+                .then(Commands.literal("exitTemple")
+                    .executes(context -> execute(context.getSource()))
+                );
+        }
+
+        private static int execute(CommandSourceStack source) {
+            // Implementation will go here
+            return 0;
+        }
+    }
+
+    //Load Challenge Command  
+    private static class LoadChallenge {
+        private static LiteralArgumentBuilder<CommandSourceStack> noArgs() {
+            return Commands.literal(PREFIX)
+                .then(Commands.literal("loadChallenge")
+                    .executes(context -> execute(context.getSource()))
+                );
+        }
+
+        private static int execute(CommandSourceStack source) {
+            // Implementation will go here
+            return 0;
+        }
     }
 
     //1. Locate Clusters

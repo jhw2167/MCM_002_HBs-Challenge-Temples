@@ -122,6 +122,8 @@ public class ChallengeRoom {
     }
 
     public void startChallenge() {
+        if(this.challengeKeyBlocks != null)
+            this.challengeKeyBlocks.refreshBlocks();
         this.generateExitStructure();
         this.roomActive = true;
     }
@@ -176,8 +178,6 @@ public class ChallengeRoom {
         {
             if(this.challengeKeyBlocks == null)
                 this.challengeKeyBlocks = new ChallengeKeyBlockManager( this.worldPos, challenge.getSize());
-            else
-                this.challengeKeyBlocks.refreshBlocks();
         }
 
         return succeeded;

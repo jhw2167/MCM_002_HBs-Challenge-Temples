@@ -371,6 +371,32 @@ Mountain miner - build create railroad that breaks blocks, follows track
 - use dispensers to shoot arrows
 
 
+Doors
+	- Several doors that have miscellaneos materials locked behind them
+		- redstone dust
+		- Enderman
+		- gold block
+		- wood
+		- water
+		- lava
+		- arrows
+		- tnt
+		- dog
+		- creepers
+		- skeletons
+		- spiders
+		- boat
+		- redstone connected elsewhere
+
+		- wood blocked
+		- stone blocked
+
+		- facad blocked
+		- facad blocked on top
+		- duck under
+		- single block open
+
+
 Early Game speed run
 
 Target practice - just arrows and floating targets, wireless redstone

@@ -124,7 +124,7 @@ public class ChallengeKeyBlockManager {
 
         // Create bounding box for entire challenge area
         AABB aabb = new AABB(
-            startPos.getX(), startPos.getY(), startPos.getZ(),
+            startPos.getX()+1, startPos.getY(), startPos.getZ()+1,
             startPos.getX() + size.getX(), 
             startPos.getY() + size.getY(),
             startPos.getZ() + size.getZ()

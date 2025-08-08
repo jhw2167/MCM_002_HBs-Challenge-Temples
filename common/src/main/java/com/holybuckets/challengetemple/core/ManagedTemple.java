@@ -226,6 +226,7 @@ public class ManagedTemple {
         deleteChallengePortal();
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
+        destination = destination.add(0,0,-1.1); //moved backward so as not to delete when challenge refreshes entities
         this.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
             level, destination, sourcePos, Direction.SOUTH);
         brickInOut(false);
@@ -298,6 +299,7 @@ public class ManagedTemple {
 
     }
 
+    //playerStartChallenge
     static final long PORTAL_COOLDOWN = 100l;
     public void playerTakeChallenge(ManagedChallenger player)
     {
@@ -336,6 +338,8 @@ public class ManagedTemple {
 
     public void playerDiedInChallenge(ManagedChallenger c) {
         challengeRoom.onChallengerDeath(c);
+        //Create exit portal, it is removed on challenger death
+        //this.createHomePortal();
         if( challengeRoom.isChallengerFailed(c) )
             this.kickChallenger(c);
     }

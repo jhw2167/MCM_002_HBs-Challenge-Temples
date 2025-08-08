@@ -393,6 +393,7 @@ public class ManagedChallenger implements IManagedPlayer {
     public void handlePlayerRespawn(Player player)
     {
         if(this.activeTemple == null) return;
+        this.activeTemple.playerDiedInChallenge(this);
 
         this.setPlayerSpawn(CHALLENGE_LEVEL, this.templeSpawnPos, true);
 
@@ -430,7 +431,8 @@ public class ManagedChallenger implements IManagedPlayer {
             this.p.getInventory().clearContent();
         }
 
-        this.activeTemple.playerDiedInChallenge(this);
+        //this is too early
+        //this.activeTemple.playerDiedInChallenge(this);
     }
 
     @Override

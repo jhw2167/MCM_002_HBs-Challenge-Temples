@@ -32,6 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -474,6 +475,14 @@ public class ManagedChallenger implements IManagedPlayer {
     public ManagedTemple getActiveTemple() {
         return activeTemple;
     }
+
+    //** Static Utility
+    @Nullable
+    public static ManagedChallenger getManagedChallenger(Player p) {
+        if (p == null || !(p instanceof ServerPlayer)) return null;
+        return CHALLENGERS.get(p);
+    }
+
 
     @Override
     public CompoundTag serializeNBT() {

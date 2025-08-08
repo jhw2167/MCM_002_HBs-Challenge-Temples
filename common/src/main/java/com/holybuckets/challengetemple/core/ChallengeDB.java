@@ -1,6 +1,5 @@
 package com.holybuckets.challengetemple.core;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.holybuckets.challengetemple.ChallengeTempleMain;
@@ -12,7 +11,6 @@ import com.holybuckets.foundation.event.EventRegistrar;
 import com.holybuckets.foundation.exception.NoDefaultConfig;
 import net.blay09.mods.balm.api.event.EventPriority;
 import net.blay09.mods.balm.api.event.server.ServerStartedEvent;
-import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.blay09.mods.balm.api.event.server.ServerStoppedEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -166,6 +164,16 @@ public class ChallengeDB {
         int rand = (int) (Math.random() * filteredChallenges.size());
         return filteredChallenges.get(rand);
 
+    }
+
+    public static Challenge getChallengeById(String challengeId)
+    {
+        for(Challenge challenge : CHALLENGES) {
+            if(challenge.challengeId.equals(challengeId)) {
+                return challenge;
+            }
+        }
+        return null;
     }
 
 

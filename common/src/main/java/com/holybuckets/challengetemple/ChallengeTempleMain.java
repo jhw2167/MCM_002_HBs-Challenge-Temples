@@ -1,10 +1,12 @@
 package com.holybuckets.challengetemple;
 
+import com.holybuckets.challengetemple.command.CommandList;
 import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
 import com.holybuckets.challengetemple.core.*;
 import com.holybuckets.challengetemple.externalapi.InventoryApi;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.HBUtil;
+import com.holybuckets.foundation.event.CommandRegistry;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.Balm;
 import net.blay09.mods.balm.api.event.EventPriority;
@@ -56,13 +58,14 @@ public class ChallengeTempleMain {
         .build();
         inventoryApi.setInstance(inventoryApi);
 
-            EventRegistrar registrar = EventRegistrar.getInstance();
-            ChallengeBlockBehavior.init(registrar);
-            ChallengeKeyBlockManager.init(registrar);
+        CommandList.register();
+        EventRegistrar registrar = EventRegistrar.getInstance();
+        ChallengeBlockBehavior.init(registrar);
+        ChallengeKeyBlockManager.init(registrar);
 
-            TempleManager.init(registrar);
-            ManagedChallenger.init(registrar);
-            ChallengeDB.init(registrar);
+        TempleManager.init(registrar);
+        ManagedChallenger.init(registrar);
+        ChallengeDB.init(registrar);
 
 
             //register events
@@ -75,7 +78,7 @@ public class ChallengeTempleMain {
     private void onServerStarting(ServerStartingEvent e) {
         CONFIG = Balm.getConfig().getActiveConfig(ChallengeTempleConfig.class);
         //this.DEV_MODE = CONFIG.devMode;
-        this.DEV_MODE = true;
+        this.DEV_MODE = false;
         this.inventoryApi.initConfig();
     }
 

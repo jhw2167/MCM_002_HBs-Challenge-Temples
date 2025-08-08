@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.holybuckets.challengetemple.core.ChallengeException.ChallengeLoadException;
+
 import static com.holybuckets.challengetemple.ChallengeTempleMain.DEV_MODE;
 import static com.holybuckets.challengetemple.ChallengeTempleMain.OVERWORLD_DIM;
 import static com.holybuckets.challengetemple.core.TempleManager.*;
@@ -195,6 +197,30 @@ public class ManagedTemple {
         markForPortalCreation.set(l+PORTAL_COOLDOWN);
     }
 
+    /**
+     * Loads a challenge at this temple corresponding to the challengeId.
+     * @param challengeId
+     */
+    public void setChallenge(String challengeId) throws ChallengeLoadException
+    {
+        if(ChallengeDB.getChallengeById(challengeId) == null) {
+            throw new ChallengeLoadException("Challenge with id " + challengeId + " does not exist");
+        }
+
+        if (this.challengeRoom != null) {
+            this.challengeRoom.roomShutdown();
+        }
+
+        this.challengeRoom = new ChallengeRoom(this.templeId, overworldExitPos, level, challengeId);
+        this.templeEntity.setProperty("challengeId", challengeId);
+        this.templeEntity.setProperty("hasPortals", "true");
+
+        this.activePlayers.clear();
+        this.deleteHomePortal();
+        this.deleteChallengePortal();
+        this.swapPortals();
+    }
+
     //** CORE
 
     static final double P_HEIGHT = 2;
@@ -226,7 +252,7 @@ public class ManagedTemple {
         deleteChallengePortal();
         Vec3 sourcePos = HBUtil.BlockUtil.toVec3(this.getPortalSourcePos());
         Vec3 destination = HBUtil.BlockUtil.toVec3(this.getPortalDest());
-        destination = destination.add(0,0,-1.1); //moved backward so as not to delete when challenge refreshes entities
+        destination = destination.add(0,0,-1.01); //moved backward so as not to delete when challenge refreshes entities
         this.portalToHome = PORTAL_API.createPortal(P_WIDTH, P_HEIGHT, CHALLENGE_LEVEL,
             level, destination, sourcePos, Direction.SOUTH);
         brickInOut(false);
@@ -493,4 +519,5 @@ public class ManagedTemple {
         sp.teleportTo(p.getX() + 0.5, p.getY() - 0.5, p.getZ() + 0.5);
         this.challengeRoom.refreshStructure();
     }
+
 }

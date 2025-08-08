@@ -59,16 +59,28 @@ public class CommandList {
         private static LiteralArgumentBuilder<CommandSourceStack> challengeId() {
             return Commands.literal(PREFIX)
                 .then(Commands.literal("loadChallenge")
-                    .then(Commands.argument("challengeId", StringArgumentType.string()))
+                    .then(Commands.argument("challengeId", StringArgumentType.string())
                     .executes(context -> {
                         String id = StringArgumentType.getString(context, "challengeId");
                         return execute(context.getSource(), id);
                     })
+                    )
                 );
         }
 
         private static int execute(CommandSourceStack source, String id) {
-            // Implementation will go here
+            try {
+                ServerPlayer player = source.getPlayerOrException();
+                String msg = ChallengeTempleApi.loadChallenge(player, id);
+                if(msg == null) {
+                    source.sendSuccess(() -> Component.literal( "Challenge loaded: " + id ), true);
+                } else {
+                    source.sendFailure(Component.translatable(msg));
+                }
+            } catch (Exception e) {
+                source.sendFailure(Component.translatable("Unknown error processing command: ", e.getMessage()));
+                return 1;
+            }
             return 0;
         }
     }

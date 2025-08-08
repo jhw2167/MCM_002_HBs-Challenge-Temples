@@ -54,7 +54,7 @@ public class TempleManager {
         reg.registerOnServerTick(TickType.ON_120_TICKS, TempleManager::onServerTick120 );
         reg.registerOnServerTick(TickType.ON_20_TICKS, TempleManager::on20Ticks);
 
-        //ManagedTemple.init();
+        ManagedTemple.init(reg);
         ChallengeRoom.init(reg);
 
         MANAGERS = new HashMap<>();
@@ -120,6 +120,28 @@ public class TempleManager {
             .filter(t -> !t.hasPortal() )
             .filter(t -> t.playerInPortalRange() )
             .forEach( this::handleBuildPortal );
+
+        //Unload all chunks without player in portal range
+        temples.values().stream()
+            .filter(t -> !t.playerInPortalRange() )
+            .filter(t -> !t.isActive() )
+            .filter(t -> HBUtil.ChunkUtil.isChunkForceLoaded(this.level, t.getTempleId()))
+            .forEach(t -> {
+                    HBUtil.ChunkUtil.unforceLoadChunk(this.level, t.getTempleId());
+                    t.cleanupPortals();
+                }
+            );
+
+        //forceload all chunks with player in portal range
+        temples.values().stream()
+            .filter(t -> t.playerInPortalRange() )
+            .filter(t -> !HBUtil.ChunkUtil.isChunkForceLoaded(this.level, t.getTempleId()))
+            .forEach(t -> {
+                HBUtil.ChunkUtil.forceLoadChunk(this.level, t.getTempleId());
+                t.setMarkedForPortalCreationTime();
+            });
+
+
     }
 
     //* HANDLERS

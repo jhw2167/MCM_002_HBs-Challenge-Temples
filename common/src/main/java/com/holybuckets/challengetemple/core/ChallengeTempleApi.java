@@ -5,6 +5,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+
+import javax.annotation.Nullable;
 import java.util.List;
 
 
@@ -27,6 +29,7 @@ public class ChallengeTempleApi {
      * @param p
      * @return String error or success message to be returned to the caller
      */
+     @Nullable
     public static String forceExitChallenge(Player p)
     {
         try {
@@ -36,7 +39,7 @@ public class ChallengeTempleApi {
             return e.getMessage();
         }
 
-        return "Quit challenge successfully";
+        return null;
     }
 
     public static String loadChallenge(Player p, String challengeId) {

@@ -6,7 +6,6 @@ import com.holybuckets.challengetemple.ChallengeTempleMain;
 import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.externalapi.InventoryApi;
-import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.datastore.DataStore;
@@ -20,11 +19,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -58,6 +55,7 @@ public class ChallengeRoom {
     private BlockEntity structureBlock;
     private StructureTemplate structureTemplate;
     private List<BlockPos> graveyardPositions = new ArrayList<>();
+    Set<String> forceloadedChunks = new HashSet<>();
 
     //challenge exit
     private BlockPos worldPos;
@@ -101,6 +99,22 @@ public class ChallengeRoom {
         this.roomLoaded = false;
         this.roomActive = false;
         this.roomCompleted = false;
+
+
+        //Forceload all chunks in range - use nested  for loop over x and z axis starting with chunkId
+        int chunkXStart = HBUtil.ChunkUtil.getChunkPos(chunkId).x;
+        int chunkZStart = HBUtil.ChunkUtil.getChunkPos(chunkId).z;
+        Vec3i size = this.challenge.getSize();
+        for(int x = chunkXStart; x < chunkXStart + size.getX(); x++) {
+            for(int z = chunkZStart; z < chunkZStart + size.getZ(); z++) {
+                String id = HBUtil.ChunkUtil.getId(x, z);
+                if(!HBUtil.ChunkUtil.isChunkForceLoaded(CHALLENGE_LEVEL, id)) {
+                    forceloadedChunks.add(id);
+                    HBUtil.ChunkUtil.forceLoadChunk(CHALLENGE_LEVEL, id);
+                }
+            }
+        }
+
         ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
 
     }
@@ -316,7 +330,13 @@ public class ChallengeRoom {
 
 
         private static final Vec3i EXIT_PORTAL_OFFSET = new Vec3i(2, -1, 2);
-        private boolean generateExitPortal(BlockPos portalTorchPos) {
+        private boolean generateExitPortal(BlockPos portalTorchPos)
+        {
+            if( this.exitPortal != null ) {
+                PORTAL_API.removePortal(this.exitPortal);
+                this.exitPortal = null;
+            }
+
             Vec3i portalPos = portalTorchPos.offset(EXIT_PORTAL_OFFSET);
 
             this.exitPortal = PORTAL_API.createPortal(
@@ -337,6 +357,11 @@ public class ChallengeRoom {
      */
     boolean refreshStructure() {
         this.roomLoaded = false;
+        if(this.exitPortal != null) {
+            PORTAL_API.removePortal(this.exitPortal);
+            this.exitPortal = null;
+        }
+
         this.challengeKeyBlocks.clearEntities();
         if( this.loadStructure() ) {
             this.challengeKeyBlocks.refreshBlocks();
@@ -431,10 +456,17 @@ public class ChallengeRoom {
         this.roomLoaded = false;
     }
 
-    void roomShutdown() {
+    void roomShutdown()
+    {
         clearExitPortal();
         if(this.challengeKeyBlocks != null)
             this.challengeKeyBlocks.clearPortals();
+
+        // Clear forceloaded chunks
+        for (String chunkId : forceloadedChunks) {
+        if( HBUtil.ChunkUtil.isChunkForceLoaded(CHALLENGE_LEVEL, chunkId))
+            HBUtil.ChunkUtil.unforceLoadChunk(CHALLENGE_LEVEL, chunkId);
+        }
         setActive(false);
     }
 

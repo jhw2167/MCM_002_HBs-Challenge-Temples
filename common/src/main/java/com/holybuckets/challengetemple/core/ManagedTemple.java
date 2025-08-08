@@ -216,8 +216,7 @@ public class ManagedTemple {
         this.templeEntity.setProperty("hasPortals", "true");
 
         this.activePlayers.clear();
-        this.deleteHomePortal();
-        this.deleteChallengePortal();
+        this.cleanupPortals();
         this.swapPortals();
     }
 
@@ -333,9 +332,6 @@ public class ManagedTemple {
             return;
         }
 
-        //this.deleteHomePortal();
-        //this.deleteChallengePortal();
-
         this.setMarkedForPortalCreationTime();
 
         if (activePlayers.contains(player.getServerPlayer())) return;
@@ -349,9 +345,7 @@ public class ManagedTemple {
 
     public void challengeComplete(ServerPlayer p)
     {
-        this.deleteHomePortal();
-        this.deleteChallengePortal();
-
+        this.cleanupPortals();
         this.isCompleted = true;
         this.markForPortalCreation.set(Long.MAX_VALUE);
     }
@@ -379,11 +373,8 @@ public class ManagedTemple {
         if(!containedPlayer) return;
         if( activePlayers.isEmpty() ) {
             this.challengeRoom.roomShutdown();
-            this.deleteHomePortal();
+            this.cleanupPortals();
         }
-
-        //this.deleteHomePortal();
-        //this.deleteChallengePortal();
 
         if(challengeRoom.isRoomCompleted()) {
             this.challengeComplete(player.getServerPlayer());
@@ -454,6 +445,10 @@ public class ManagedTemple {
         return activePlayers.contains(c.getServerPlayer());
     }
 
+    public boolean isActive() {
+        return !this.activePlayers.isEmpty();
+    }
+
     //** EVENTS
     public void onPlayerLeave(ServerPlayer p) {
         if (p == null) return;
@@ -494,13 +489,19 @@ public class ManagedTemple {
                 temple.onTick();
             }
 
+            /*
+            Moved to TempleManager
             if(temple.activePlayers.isEmpty() && temple.nearPlayers.isEmpty()) {
                 temple.cleanupPortals();
+            } else {
+                temple.setMarkedForPortalCreationTime();
             }
+            */
+
         }
     }
 
-    private void cleanupPortals() {
+    void cleanupPortals() {
         this.findPortals();
         this.deleteHomePortal();
         this.deleteChallengePortal();
@@ -519,5 +520,6 @@ public class ManagedTemple {
         sp.teleportTo(p.getX() + 0.5, p.getY() - 0.5, p.getZ() + 0.5);
         this.challengeRoom.refreshStructure();
     }
+
 
 }

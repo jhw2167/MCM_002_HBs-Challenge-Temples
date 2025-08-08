@@ -65,7 +65,7 @@ public class ChallengeBlockBehavior {
     public static Map<Block, Pair<Integer, Integer>> getFlammable() {
         Map<Block, Pair<Integer, Integer>> flammableBlocks = new HashMap<>();
         //IGNITE CHANCE - 60 -> 0, burn time: 100 -> 0
-        flammableBlocks.put(ModBlocks.challengeLog, Pair.of(25, 15));
+        flammableBlocks.put(ModBlocks.challengeLog, Pair.of(25, 5));
 
         return flammableBlocks;
     }

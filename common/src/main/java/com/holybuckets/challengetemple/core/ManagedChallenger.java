@@ -18,7 +18,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -219,6 +218,9 @@ public class ManagedChallenger implements IManagedPlayer {
             }
 
         }
+
+        this.activeTemple.challengerUsedBlock(hitPos);
+
     }
 
         private void pistonBlockUsed(BlockPos pos, BlockState state) {
@@ -313,14 +315,13 @@ public class ManagedChallenger implements IManagedPlayer {
 
         Player player = e.getPlayer();
         if (player == null || !(player instanceof  ServerPlayer)) return;
-        if (!e.getHand().equals(InteractionHand.MAIN_HAND)) return;
 
         ManagedChallenger challenger = CHALLENGERS.get(player);
         if (challenger == null) return;
 
-        if (challenger.activeTemple != null) {
-            challenger.onChallengerBlockUsed(e);
-        }
+        if (challenger.activeTemple == null) return;
+
+        challenger.onChallengerBlockUsed(e);
     }
 
 
@@ -428,11 +429,14 @@ public class ManagedChallenger implements IManagedPlayer {
                     this.holdInventory.add(Pair.of(i, stack.copy()));
                 }
             }
-        } else {
+        }
+
+        //Clear inventory so natural drop doesnt happen
+        {
             this.p.getInventory().clearContent();
         }
 
-        //this is too early
+        //this is too early - triggered on respawn
         //this.activeTemple.playerDiedInChallenge(this);
     }
 

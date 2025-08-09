@@ -4,6 +4,7 @@
 	"challengeName": "Common name displayed to the player when they enter the temple",
 	"difficulty": "PEACEFUL | EASY | NORMAL | HARD",
 	"size": "2x2",
+	"exitStructureTorchCount": 4,
 	"challengeRules": {
 		"playerMaxHearts": 10,
 		"maxDeaths": -1,

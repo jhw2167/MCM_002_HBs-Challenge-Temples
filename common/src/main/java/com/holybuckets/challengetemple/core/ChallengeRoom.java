@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,7 +36,6 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-import static com.holybuckets.challengetemple.ChallengeTempleMain.DEV_MODE;
 import static com.holybuckets.challengetemple.core.TempleManager.*;
 import static com.holybuckets.challengetemple.core.ManagedTemple.*;
 import static com.holybuckets.challengetemple.core.ChallengeDB.ChallengeFilter;
@@ -167,6 +167,11 @@ public class ChallengeRoom {
         this.challengeId = this.challenge.getChallengeId();
     }
 
+    public void challengerUsedBlock(BlockPos pos) {
+        if(this.challengeKeyBlocks != null)
+            this.challengeKeyBlocks.challengerUsedBlock(pos);
+    }
+
     //** CORE
 
 
@@ -177,7 +182,6 @@ public class ChallengeRoom {
      */
     boolean loadStructure()
     {
-        if( DEV_MODE ) return  true;
         if( this.roomLoaded ) return false;
 
         this.roomLoaded = true;
@@ -243,7 +247,12 @@ public class ChallengeRoom {
     }
 
 
-
+    static final List<Vec3i> TORCH_OFFSETS = List.of(
+        new Vec3i(1, 1, 1), // Torch 1
+        new Vec3i(0, 0, 3), // Torch 2
+        new Vec3i(3, 0, 0), // Torch 3
+        new Vec3i(0, 0, -3)  // Torch 4
+    );
     /**
      * 1. Parses entire structure for soul torches in a 6x6 area, using size from Challenge Obj
      * 2. Builds exist structure in bottom left corner (min x, min z)
@@ -287,6 +296,16 @@ public class ChallengeRoom {
             CHALLENGE_LEVEL.getRandom(),
             18                                  // Block update flag
         );
+
+        //Replace torches in exit portal with air
+        BlockPos torchPos = this.exitStructurePos;
+        int numTorches = this.challenge.getExitStructureTorchCount();
+        for(int i=numTorches; i < TORCH_OFFSETS.size(); i++) {
+            torchPos = torchPos.offset(TORCH_OFFSETS.get(i));
+            CHALLENGE_LEVEL.setBlock( torchPos, Blocks.AIR.defaultBlockState(), 18); // Replace with air
+        }
+
+
 
         this.roomLoaded = true;
 
@@ -459,8 +478,10 @@ public class ChallengeRoom {
     void roomShutdown()
     {
         clearExitPortal();
-        if(this.challengeKeyBlocks != null)
-            this.challengeKeyBlocks.clearPortals();
+        if(this.challengeKeyBlocks != null) {
+            this.challengeKeyBlocks.onRoomShutdown();
+        }
+
 
         // Clear forceloaded chunks
         for (String chunkId : forceloadedChunks) {

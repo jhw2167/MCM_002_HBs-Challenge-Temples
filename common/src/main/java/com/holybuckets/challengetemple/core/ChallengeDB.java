@@ -98,7 +98,6 @@ public class ChallengeDB {
             String line = dbLines[i].trim();
             Cursor c = new Cursor(line);
             CHALLENGE_IDS.add(c);
-            if(!c.doUse) continue;
 
             ResourceLocation locationWithId = new ResourceLocation(
                 CHALLENGE_DB_PATH.getNamespace(),
@@ -107,6 +106,7 @@ public class ChallengeDB {
             try(InputStream is = challengeJson.open())
             {
                 Challenge challenge = loadChallenge(c, new String(is.readAllBytes()), challengeDefaultJson );
+                challenge.setDoUse(c.doUse);
                 CHALLENGES.add(challenge);
             } catch (NoDefaultConfig  ndc) {
                 LoggerProject.logError("021001", "No default challenge json reference in: "

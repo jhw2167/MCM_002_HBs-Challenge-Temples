@@ -212,6 +212,7 @@ public class ManagedTemple {
         }
 
         this.challengeRoom = new ChallengeRoom(this.templeId, overworldExitPos, level, challengeId);
+        this.challengeRoom.loadStructure();
         this.templeEntity.setProperty("challengeId", challengeId);
         this.templeEntity.setProperty("hasPortals", "true");
 
@@ -447,6 +448,11 @@ public class ManagedTemple {
 
     public boolean isActive() {
         return !this.activePlayers.isEmpty();
+    }
+
+    public void challengerUsedBlock(BlockPos pos) {
+        if (this.challengeRoom == null) return;
+        this.challengeRoom.challengerUsedBlock(pos);
     }
 
     //** EVENTS

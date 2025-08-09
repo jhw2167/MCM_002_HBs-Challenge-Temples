@@ -67,7 +67,7 @@ public class ChallengeTempleApi {
             return e.getMessage();
         }
 
-        return "Challenge loaded successfully";
+        return null;
     }
 
         private static String mapTestId(String challengeId) {

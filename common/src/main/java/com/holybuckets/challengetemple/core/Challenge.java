@@ -16,24 +16,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static  com.holybuckets.challengetemple.core.ChallengeDB.ChallengeFilter;
-
 /**
  * Stores settings and metadata specific to each challenge.
  */
 public class Challenge {
 
     String challengeId;
+    boolean doUse;
     String author;
     String challengeName;
     List<Block> replaceEntityBlocks;
     String difficulty;
     Vec3i size;
+    int exitStructureTorchCount;
     int totalPieces;
 
     ChallengeRules challengeRules;
     LootRules lootRules;
 
+    public void setDoUse(boolean doUse) {
+        this.doUse = doUse;
+    }
     public List<Block> getReplaceEntityBlocks() {
         return replaceEntityBlocks;
     }
@@ -71,6 +74,7 @@ public class Challenge {
     public String getDifficulty() { return difficulty; }
     public Vec3i getSize() { return size; }
     public int getTotalPieces() { return totalPieces; }
+    public int getExitStructureTorchCount() { return this.exitStructureTorchCount; }
 
     public ChallengeRules getChallengeRules() { return challengeRules; }
     public LootRules getLootRules() { return lootRules; }
@@ -83,12 +87,15 @@ public class Challenge {
     public static Challenge read(JsonObject json) {
 
         Challenge c = new Challenge();
+        initDefaults(c);
         c.challengeId = json.get("challengeId").getAsString();
         c.author = json.get("author").getAsString();
         c.setReplaceEntityBlocks(json);
         c.challengeName = json.get("challengeName").getAsString();
         c.difficulty = json.get("difficulty").getAsString();
         c.setSize(json.get("size"));
+        if( json.has("exitStructureTorchCount") )
+            c.exitStructureTorchCount = json.get("exitStructureTorchCount").getAsInt();
 
         //Challenge Rules
         ChallengeRules r = new ChallengeRules();
@@ -111,6 +118,10 @@ public class Challenge {
 
         return c;
     }
+
+        private static void initDefaults(Challenge c) {
+            c.exitStructureTorchCount = 4;
+        }
 
     void setReplaceEntityBlocks(JsonObject json)
     {

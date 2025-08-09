@@ -2,6 +2,7 @@ package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.block.ModBlocks;
+import com.holybuckets.challengetemple.block.be.ChallengeSingleUseChestBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.minecraft.core.BlockPos;
@@ -12,8 +13,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,8 +29,6 @@ import static net.minecraft.core.Direction.NORTH;
 import static net.minecraft.core.Direction.SOUTH;
 import static net.minecraft.core.Direction.EAST;
 import static net.minecraft.core.Direction.WEST;
-import static net.minecraft.core.Direction.UP;
-import static net.minecraft.core.Direction.DOWN;
 import static com.holybuckets.challengetemple.core.TempleManager.CHALLENGE_LEVEL;
 import static com.holybuckets.challengetemple.core.TempleManager.PORTAL_API;
 import static com.holybuckets.foundation.HBUtil.BlockUtil;
@@ -42,13 +42,17 @@ public class ChallengeKeyBlockManager {
 
     public static final String CLASS_ID = "027";
 
-    private final Map<Block, List<BlockPos>> BLOCKS;
-    private final Map<BlockState, List<BlockPos>> REPLACERS;
-    private final List<Entity> PORTALS;
+
     private final ServerLevel level;
     final BlockPos startPos;
     final Vec3i size;
     boolean loaded;
+
+    private final Map<Block, List<BlockPos>> challengeBlocks;
+    private final Map<BlockState, List<BlockPos>> blockStateReplacements;
+    private final List<Entity> portals;
+    private final Set<BlockPos> usedChests;
+
 
     /**
      * Creates and load array of key blocks in the challenge area.
@@ -58,13 +62,15 @@ public class ChallengeKeyBlockManager {
      */
     public ChallengeKeyBlockManager(BlockPos startPos, Vec3i size)
     {
-        this.BLOCKS = new HashMap<>();
-        this.REPLACERS = new HashMap<>();
-        this.PORTALS = new ArrayList<>();
+        this.challengeBlocks = new HashMap<>();
+        this.blockStateReplacements = new HashMap<>();
+        this.portals = new ArrayList<>();
         this.level = CHALLENGE_LEVEL;
         this.startPos = startPos;
         this.size = size;
         this.loaded = false;
+
+        this.usedChests = new HashSet<>();
 
         initReplacers();
         loadChallengeBlocks();
@@ -73,9 +79,12 @@ public class ChallengeKeyBlockManager {
 
     private void initReplacers() {
         //Initialize replacers
-        REPLACERS.put(Blocks.AIR.defaultBlockState(), new LinkedList<>());
-        REPLACERS.put(ModBlocks.challengeBrick.defaultBlockState(), new LinkedList<>());
+        blockStateReplacements.put(Blocks.AIR.defaultBlockState(), new LinkedList<>());
+        blockStateReplacements.put(ModBlocks.challengeBrick.defaultBlockState(), new LinkedList<>());
     }
+
+
+    //** CORE
 
     /**
      * Finds all KEY_BLOCKS (wool, pistons, redstone, soul torches) in the challenge
@@ -85,7 +94,7 @@ public class ChallengeKeyBlockManager {
     {
         //Load all key blocks
         for (Block block : KEY_BLOCKS) {
-            BLOCKS.put(block, new LinkedList<>());
+            challengeBlocks.put(block, new LinkedList<>());
         }
 
         //1. Parse area for minecraft:soul_torch
@@ -100,7 +109,7 @@ public class ChallengeKeyBlockManager {
                     BlockState state = CHALLENGE_LEVEL.getBlockState(pos);
                     Block block = state.getBlock();
                     if (KEY_BLOCKS.contains(state.getBlock())) {
-                        BLOCKS.get(block).add(pos);
+                        challengeBlocks.get(block).add(pos);
                     }
                 }
             }
@@ -114,6 +123,25 @@ public class ChallengeKeyBlockManager {
         spawnEntities();
         replaceBlocks();
         resetRedstone();
+        checkChests();
+    }
+
+    private void checkChests()
+    {
+        //** SINGLE USE CHESTS -- Clear inventory
+        for (BlockPos pos : getPositions(ModBlocks.challengeSingleUseChest)) {
+            if (usedChests.contains(pos)) {
+                BlockEntity entity = CHALLENGE_LEVEL.getBlockEntity(pos);
+                if (entity instanceof ChallengeSingleUseChestBlockEntity) {
+                    ChallengeSingleUseChestBlockEntity chest = (ChallengeSingleUseChestBlockEntity) entity;
+                    int i=0;
+                    while(i < chest.getContainerSize()) {
+                        chest.setItem(i++, ItemStack.EMPTY);
+                    }
+                }
+            }
+        }
+
     }
 
 
@@ -147,14 +175,14 @@ public class ChallengeKeyBlockManager {
     }
 
     public void clearPortals() {
-        PORTALS.forEach(PORTAL_API::removePortal);
-        PORTALS.clear();
+        portals.forEach(PORTAL_API::removePortal);
+        portals.clear();
     }
 
 
     private void replaceBlocks() {
         //Replace blocks with air or brick
-        for (Map.Entry<BlockState, List<BlockPos>> entry : REPLACERS.entrySet()) {
+        for (Map.Entry<BlockState, List<BlockPos>> entry : blockStateReplacements.entrySet()) {
             BlockState state = entry.getKey();
             List<BlockPos> positions = entry.getValue();
             for (BlockPos pos : positions) {
@@ -167,22 +195,22 @@ public class ChallengeKeyBlockManager {
     private void generatePortals()
     {
         List<Block> woolBlocks = new ArrayList<>();
-        for (Block block : BLOCKS.keySet())
+        for (Block block : challengeBlocks.keySet())
         {
-            if( BLOCKS.get(block).isEmpty() ) continue;
+            if( challengeBlocks.get(block).isEmpty() ) continue;
             String name = BlockUtil.blockToString(block);
             if( name.endsWith("_wool") ) woolBlocks.add(block);
         }
 
         for( Block wool : woolBlocks )
         {
-            List<BlockPos> pistons = BLOCKS.getOrDefault(Blocks.PISTON, Collections.emptyList());
-            List<BlockPos> stickyPistons = BLOCKS.getOrDefault(Blocks.STICKY_PISTON, Collections.emptyList());
+            List<BlockPos> pistons = challengeBlocks.getOrDefault(Blocks.PISTON, Collections.emptyList());
+            List<BlockPos> stickyPistons = challengeBlocks.getOrDefault(Blocks.STICKY_PISTON, Collections.emptyList());
 
             if( pistons.isEmpty() || stickyPistons.isEmpty() ) continue;
 
             Map<BlockPos, Pair<Integer, Direction>> sourcePortals = new HashMap<>();
-            for( BlockPos woolPos : BLOCKS.get(wool) ) {
+            for( BlockPos woolPos : challengeBlocks.get(wool) ) {
                 Pair<Integer, Direction> pistonInfo = findPistonsAboveBelow(woolPos, Blocks.STICKY_PISTON);
                 if( pistonInfo == null ) continue; // no pistons above or below
                 sourcePortals.put(woolPos, pistonInfo);
@@ -191,7 +219,7 @@ public class ChallengeKeyBlockManager {
             if( sourcePortals.isEmpty() ) continue; // no wool blocks with pistons above or below
 
             Map<BlockPos, Pair<Integer, Direction>> destPortals = new HashMap<>();
-            for( BlockPos woolPos : BLOCKS.get(wool) ) {
+            for( BlockPos woolPos : challengeBlocks.get(wool) ) {
                 Pair<Integer, Direction> pistonInfo = findPistonsAboveBelow(woolPos, Blocks.PISTON);
                 if( pistonInfo == null ) continue; // no pistons above or below
                 destPortals.put(woolPos, pistonInfo);
@@ -287,7 +315,7 @@ public class ChallengeKeyBlockManager {
                 source.add(centering), dest.add(destCentering),
              dir );
 
-            PORTALS.add(portal);
+            portals.add(portal);
 
             //Cleanup blocks
             for (BlockPos pos : sourcePortals.keySet()) {
@@ -304,14 +332,14 @@ public class ChallengeKeyBlockManager {
 
     private void cleanupBlocks(BlockPos pos, Integer total, Block type) {
         //Add wool block as air or brick
-        if( total < 0) REPLACERS.get(AIR).add(pos);
-        else REPLACERS.get(BRICK).add(pos);
+        if( total < 0) blockStateReplacements.get(AIR).add(pos);
+        else blockStateReplacements.get(BRICK).add(pos);
 
         //add piston pos as air
         int d = (total > 0) ? 1 : -1;
         BlockPos temp = pos.offset(0, d, 0);
         for(int i = 0; i < Math.abs(total)-1; i++) {
-            REPLACERS.get(R.get(type)).add(temp);
+            blockStateReplacements.get(R.get(type)).add(temp);
             temp = temp.offset(0, d, 0);
         }
     }
@@ -353,7 +381,7 @@ public class ChallengeKeyBlockManager {
         //For all redstone blocks, place the block again where it is, update all neighbors of bloc below
         for (Block block : REDSTONE_BLOCKS)
         {
-            List<BlockPos> positions = BLOCKS.getOrDefault(block, Collections.emptyList());
+            List<BlockPos> positions = challengeBlocks.getOrDefault(block, Collections.emptyList());
             for (BlockPos pos : positions) {
                 BlockState state = level.getBlockState(pos);
                 level.setBlockAndUpdate(pos, state); // Replaces the block with itself
@@ -376,7 +404,7 @@ public class ChallengeKeyBlockManager {
         //Spawn skeletons on skeleton bricks
         for (BlockPos pos : getPositions(ModBlocks.skeletonBrick) ) {
             Entity entity = EntityType.SKELETON.spawn(CHALLENGE_LEVEL, pos.above(), MobSpawnType.NATURAL);
-            REPLACERS.get(R.get(ModBlocks.skeletonBrick)).add(pos);
+            blockStateReplacements.get(R.get(ModBlocks.skeletonBrick)).add(pos);
         }
 
         for (BlockPos pos : getPositions(ModBlocks.zombieBrick) ) {
@@ -387,8 +415,29 @@ public class ChallengeKeyBlockManager {
     }
 
 
+    public void onRoomShutdown() {
+        this.clearPortals();
+        this.clearEntities();
+        this.usedChests.clear();
+    }
+
+
+    //** UTILITY
+
     public List<BlockPos> getPositions(Block b) {
-        return BLOCKS.getOrDefault(b, Collections.emptyList()).stream().toList();
+        return challengeBlocks.getOrDefault(b, Collections.emptyList()).stream().toList();
+    }
+
+    public void challengerUsedBlock(BlockPos pos)
+    {
+        //Only scenario we care about currently is if its a single use chest
+        BlockEntity entity = CHALLENGE_LEVEL.getBlockEntity(pos);
+        if( entity == null) {
+            //nothing
+        } else if( entity instanceof ChallengeSingleUseChestBlockEntity) {
+            usedChests.add(pos);
+        }
+
     }
 
     /**
@@ -433,7 +482,7 @@ public class ChallengeKeyBlockManager {
      * @return
      */
     public List<Entity> getPortals() {
-        return PORTALS.stream().toList();
+        return portals.stream().toList();
     }
 
 
@@ -531,7 +580,6 @@ public class ChallengeKeyBlockManager {
 
         }
     }
-
 
 
 }

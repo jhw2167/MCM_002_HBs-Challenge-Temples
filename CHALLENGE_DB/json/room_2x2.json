@@ -4,6 +4,7 @@
     "challengeName": "Test2x2 loads any recently saved structure under template name challenge_room_2x2_##",
     "difficulty": 4,
     "size": "2x2",
+    "exitStructureTorchCount": 4,
     "replaceStructureBlocksWith": ["hbs_challenge_temple:challenge_brick", "air"],
     "challengeRules": {
         "playerMaxHearts": 10,

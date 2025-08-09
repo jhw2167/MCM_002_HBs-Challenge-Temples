@@ -139,6 +139,7 @@ Blocks to map on startup:
 	/give @p minecraft:structure_block
 	/give @s jigsaw
 	hbs_challenge_temple:challenge_room_4x4_00
+	hbs_challenge_temple:challenge_exit
 
 
 hbs_challenge_temple:challenge_room_4x4_00

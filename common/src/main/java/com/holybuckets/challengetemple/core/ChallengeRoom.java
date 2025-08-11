@@ -358,26 +358,36 @@ public class ChallengeRoom {
          * if all soul torches are present in the structure
          * @return true if the challenge is completed
          */
-        boolean testRoomCompleted(BlockPos playerUsedPos)
-        {
+        boolean testRoomCompleted(BlockPos playerUsedPos) {
             if(this.exitStructurePos == null) return false; // No exit structure found
 
-            BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
-            BlockPos temp = portalTorchPos;
-            //** Check all 4 soul torches in the 4x4 area
-            BlockState state = CHALLENGE_LEVEL.getBlockState(temp);
-            for(int i =0; i<4; i++)
-            {
-                if(!state.equals(EXIT_PORTAL_BLOCK))  return false;
-                if(i == 0) temp = temp.offset(3, 0, 0); // Move to next torch
-                else if(i == 1) temp = temp.offset(0, 0, 3); // Move to next torch
-                else if(i == 2) temp = temp.offset(-3, 0, 0); // Move to next torch
-                state = CHALLENGE_LEVEL.getBlockState(temp);
+            // Get the marker torch position
+            BlockPos markerTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
+            
+            // Verify the player placed a torch at a valid position
+            boolean validTorchPlacement = false;
+            List<BlockPos> torchPositions = new ArrayList<>();
+            torchPositions.add(markerTorchPos); // Add marker torch position
+            
+            // Add all other torch positions
+            for(Vec3i offset : EXIT_PORTAL_TORCH_OFFSETS) {
+                BlockPos torchPos = markerTorchPos.offset(offset);
+                torchPositions.add(torchPos);
+                if(playerUsedPos.equals(torchPos)) {
+                    validTorchPlacement = true;
+                }
+            }
+            
+            if(!validTorchPlacement) return false;
+
+            // Check if all torch positions have soul torches
+            for(BlockPos pos : torchPositions) {
+                BlockState state = CHALLENGE_LEVEL.getBlockState(pos);
+                if(!state.equals(EXIT_PORTAL_BLOCK)) return false;
             }
 
             this.roomCompleted = true;
-            return generateExitPortal(portalTorchPos);
-            //return true;
+            return generateExitPortal(markerTorchPos);
         }
 
 

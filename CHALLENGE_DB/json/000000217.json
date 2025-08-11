@@ -1,0 +1,26 @@
+{
+    "challengeId": "000000217",
+    "author": "Holy_Buckets",
+    "challengeName": "Void Parkour I",
+    "difficulty": 1,
+    "size": "4x4",
+    "exitStructureTorchCount": 0,
+    "replaceStructureBlocksWith": [
+        "hbs_challenge_temple:challenge_brick",
+        "air"
+    ],
+    "challengeRules": {
+        "playerMaxHearts": 10,
+        "maxDeaths": -1,
+        "resetBlocksOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": true,
+        "keepInventoryOnPlayerDeath": true,
+        "playerDropsInventoryOnDeath": false
+    },
+    "lootRules": {
+        "lootPool": 1,
+        "specificLoot": [
+            "minecraft:ender_pearl"
+        ]
+    }
+}

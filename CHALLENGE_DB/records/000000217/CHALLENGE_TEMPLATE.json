@@ -1,10 +1,10 @@
 {
-    "challengeId": "room_2x2",
-    "author": "You",
-    "challengeName": "Test2x2 loads any recently saved structure under template name challenge_room_2x2_##",
-    "difficulty": 4,
-    "size": "2x2",
-    "exitStructureTorchCount": 4,
+    "challengeId": "room_4x4",
+    "author": "Holy_Buckets",
+    "challengeName": "Void Parkour I",
+    "difficulty": 1,
+    "size": "4x4",
+    "exitStructureTorchCount": 0,
     "replaceStructureBlocksWith": ["hbs_challenge_temple:challenge_brick", "air"],
     "challengeRules": {
         "playerMaxHearts": 10,
@@ -15,9 +15,9 @@
         "playerDropsInventoryOnDeath": false
     },
     "lootRules": {
-        "lootPool": 4,
+        "lootPool": 1,
         "specificLoot": [
-            "minecraft:diamond_sword"
+            "minecraft:ender_pearl"
         ]
     }
 }

@@ -1,5 +1,6 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
@@ -28,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.holybuckets.challengetemple.core.ChallengeException.ChallengeLoadException;
+import static com.holybuckets.challengetemple.core.ChallengeException.ChallengeNotFoundException;
 
 import static com.holybuckets.challengetemple.ChallengeTempleMain.DEV_MODE;
 import static com.holybuckets.challengetemple.ChallengeTempleMain.OVERWORLD_DIM;
@@ -45,7 +47,7 @@ public class ManagedTemple {
     private SimpleBlockEntity templeEntity;
 
     private final Level level;
-    private final String templeId;
+    private String templeId;
     private ChallengeRoom challengeRoom;
     public Entity portalToChallenge;
     public Entity portalToHome;
@@ -118,7 +120,15 @@ public class ManagedTemple {
 
         String challengeId = templeEntity.getProperty("challengeId");
         if( (challengeId==null) || challengeId.isEmpty() ) return;
-        this.buildChallenge(challengeId);
+
+        try {
+            this.buildChallenge(new ChallengeDB.ChallengeFilter().setChallengeId(challengeId));
+        } catch (ChallengeNotFoundException e) {
+            String msg = "Failed to load challenge with ID: " + challengeId + " for temple: " + this.templeId
+            + ". Was this challenge removed from the mod? Skipping challenge room for temple.";
+            LoggerProject.logError("006001" , msg);
+        }
+
     }
 
         void findPortals()
@@ -203,22 +213,27 @@ public class ManagedTemple {
      */
     public void setChallenge(String challengeId) throws ChallengeLoadException
     {
-        if(ChallengeDB.getChallengeById(challengeId) == null) {
-            throw new ChallengeLoadException("Challenge with id " + challengeId + " does not exist");
+        try {
+
+            if (this.challengeRoom != null) {
+                this.challengeRoom.roomShutdown();
+            }
+
+            this.challengeRoom = new ChallengeRoom(templeId, overworldExitPos, level, challengeId);
+            this.challengeRoom.loadStructure();
+            this.templeEntity.setProperty("challengeId", challengeId);
+            this.templeEntity.setProperty("hasPortals", "true");
+
+            this.activePlayers.clear();
+            this.cleanupPortals();
+            this.swapPortals();
+
+        } catch (ChallengeNotFoundException e ){
+            throw new ChallengeLoadException("Failed to load challenge with ID: " + challengeId);
+        }  catch (Exception e) {
+            throw new ChallengeLoadException("Failed to load challenge with ID: " + challengeId);
         }
 
-        if (this.challengeRoom != null) {
-            this.challengeRoom.roomShutdown();
-        }
-
-        this.challengeRoom = new ChallengeRoom(this.templeId, overworldExitPos, level, challengeId);
-        this.challengeRoom.loadStructure();
-        this.templeEntity.setProperty("challengeId", challengeId);
-        this.templeEntity.setProperty("hasPortals", "true");
-
-        this.activePlayers.clear();
-        this.cleanupPortals();
-        this.swapPortals();
     }
 
     //** CORE
@@ -281,7 +296,7 @@ public class ManagedTemple {
             }
         }
 
-    public void buildChallenge(String challengeId)
+    public void buildChallenge(ChallengeDB.ChallengeFilter filter) throws ChallengeNotFoundException
     {
 
         if(templeId.equals( SPECIAL_TEMPLE)) {
@@ -298,16 +313,16 @@ public class ManagedTemple {
         else
             createHomePortal();
 
-        if (this.challengeRoom == null)
-        {
-            this.challengeRoom = new ChallengeRoom( this.templeId, overworldExitPos,
-                 this.level, challengeId);
+        if (this.challengeRoom != null) return;
 
-            if(this.activePlayers.isEmpty())
-                this.challengeRoom.loadStructure(); // don't reload if player is inside
 
-            this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
-        }
+        this.challengeRoom = new ChallengeRoom( this.templeId, overworldExitPos,
+             this.level, filter);
+
+        if(this.activePlayers.isEmpty())
+            this.challengeRoom.loadStructure(); // don't reload if player is inside
+
+        this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
 
     }
 

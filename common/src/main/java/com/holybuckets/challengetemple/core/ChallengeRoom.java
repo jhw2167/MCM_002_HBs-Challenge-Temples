@@ -40,6 +40,8 @@ import static com.holybuckets.challengetemple.core.TempleManager.*;
 import static com.holybuckets.challengetemple.core.ManagedTemple.*;
 import static com.holybuckets.challengetemple.core.ChallengeDB.ChallengeFilter;
 
+import static com.holybuckets.challengetemple.core.ChallengeException.ChallengeNotFoundException;
+
 public class ChallengeRoom {
 
     private static final String CLASS_ID = "007"; // Class ID for logging purposes
@@ -86,7 +88,8 @@ public class ChallengeRoom {
     };
     static BlockState EXIT_PORTAL_BLOCK;
 
-    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel, String challengeId)
+
+    private ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel)
     {
         if(chunkId.equals( SPECIAL_TEMPLE)) {
             int i = 0;
@@ -95,12 +98,30 @@ public class ChallengeRoom {
         this.worldPos = ChallengeRoom.getWorldPos(chunkId);
         this.overworldExitPos = overworldExitPos;
         this.returnLevel = returnLevel;
-        this.setChallenge(challengeId);
         this.roomLoaded = false;
         this.roomActive = false;
         this.roomCompleted = false;
 
+        ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
+    }
 
+    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel, ChallengeFilter filter)  throws ChallengeNotFoundException
+    {
+        this(chunkId, overworldExitPos, returnLevel);
+        this.chooseChallenge(filter);
+        this.loadChallengeChunks();
+    }
+
+    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel, String challengeId) throws ChallengeNotFoundException
+    {
+        this(chunkId, overworldExitPos, returnLevel);
+        this.setChallenge(challengeId);
+        this.loadChallengeChunks();
+    }
+
+
+    private void loadChallengeChunks()
+    {
         //Forceload all chunks in range - use nested  for loop over x and z axis starting with chunkId
         int chunkXStart = HBUtil.ChunkUtil.getChunkPos(chunkId).x;
         int chunkZStart = HBUtil.ChunkUtil.getChunkPos(chunkId).z;
@@ -115,14 +136,6 @@ public class ChallengeRoom {
             }
         }
 
-        ACTIVE_ROOMS.put(chunkId, this); // Register this room in the static map
-
-    }
-
-
-    ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel)
-    {
-        this(chunkId, overworldExitPos, returnLevel, null);
     }
 
 
@@ -156,15 +169,25 @@ public class ChallengeRoom {
         this.roomActive = isActive;
     }
 
-    public void setChallenge(String ChallengeId)
+    /**
+     * Chooses a challenge based on filter criteria. Defaults to random challenge if no
+     * @param filter
+     * @return
+     */
+    public Challenge chooseChallenge(ChallengeFilter filter) throws ChallengeNotFoundException
     {
-        ChallengeFilter filter = new ChallengeFilter()
-            .setChallengeId(ChallengeId);
         this.challenge = ChallengeDB.chooseChallenge(filter);
         if(this.challenge == null)
             this.challenge = ChallengeDB.chooseChallenge(null);
 
         this.challengeId = this.challenge.getChallengeId();
+        return this.challenge;
+    }
+
+    public void setChallenge(String challengeId) throws ChallengeNotFoundException
+    {
+        this.challenge = ChallengeDB.getChallengeById(challengeId);
+        this.challengeId = challengeId;
     }
 
     public void challengerUsedBlock(BlockPos pos) {

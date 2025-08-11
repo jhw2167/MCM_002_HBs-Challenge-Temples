@@ -192,7 +192,13 @@ public class TempleManager {
         }
 
         //build an unspecified challenge
-        temple.buildChallenge(null);
+        try {
+            temple.buildChallenge(null);
+        } catch (Exception e) {
+            LoggerProject.logError("005011", "Failed to build challenge for temple: " + temple.getTempleId()
+            + ". Error: \n" + e.getMessage());
+        }
+
     }
 
     public static ManagedTemple handlePlayerJoinedInTemple( ServerPlayer p, Level templeLevel, String id )

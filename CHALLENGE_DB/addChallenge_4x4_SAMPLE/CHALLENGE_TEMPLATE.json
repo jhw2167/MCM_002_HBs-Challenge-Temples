@@ -1,21 +1,23 @@
 {
-	"challengeId": "0000002x2",
-	"author": "Holy_Buckets",
-	"challengeName": "Template Small Temple",
-	"difficulty": 4,
-	"size": "2x2",
-	"challengeRules": {
-		"playerMaxHearts": 10,
-		"maxDeaths": -1,
-		"resetBlocksOnPlayerDeath": true,
-		"resetChestsOnPlayerDeath": true,
-		"keepInventoryOnPlayerDeath": true,
-		"playerDropsInventoryOnDeath": true
-		
-	},
-	"lootRules": {
-		"lootPool": 4,
-		"specificLoot": ["minecraft:diamond_sword"]
-	}
-
+    "challengeId": "room_4x4",
+    "author": "You",
+    "challengeName": "Test4x4 loads any recently saved structure under template name challenge_room_4x4_##",
+    "difficulty": 4,
+    "size": "4x4",
+    "exitStructureTorchCount": 4,
+    "replaceStructureBlocksWith": ["hbs_challenge_temple:challenge_brick", "air"],
+    "challengeRules": {
+        "playerMaxHearts": 10,
+        "maxDeaths": -1,
+        "resetBlocksOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": true,
+        "keepInventoryOnPlayerDeath": true,
+        "playerDropsInventoryOnDeath": false
+    },
+    "lootRules": {
+        "lootPool": 4,
+        "specificLoot": [
+            "minecraft:diamond_sword"
+        ]
+    }
 }

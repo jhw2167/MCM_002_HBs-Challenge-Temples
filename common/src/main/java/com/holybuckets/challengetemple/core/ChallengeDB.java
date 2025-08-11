@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.holybuckets.challengetemple.core.ChallengeException.ChallengeNotFoundException;
+
 /**
  * Loads ChallengeData from the config file and uses it to filter, generate, and return challengeIds
  */
@@ -144,18 +146,21 @@ public class ChallengeDB {
     }
 
     /**
-     * Returns a challenge abiding
+     * Returns a challenge abiding by the passed filter. Choose challenge filters out
+     * all challenges marked doUse = false.
      * @param filter filters acceptable list of challenges, may be null
      * @return
      */
-    static Challenge chooseChallenge(@Nullable ChallengeFilter filter)
+    static Challenge chooseChallenge(@Nullable ChallengeFilter filter) throws ChallengeNotFoundException
     {
         if(CHALLENGES.isEmpty()) return null;
 
-        List<Challenge> filteredChallenges = CHALLENGES;
+        List<Challenge> filteredChallenges = CHALLENGES.stream()
+            .filter(challenge -> challenge.doUse)
+            .toList();
         if( filter != null)
         {
-            filteredChallenges = CHALLENGES.stream()
+            filteredChallenges = filteredChallenges.stream()
                 .filter(challenge -> ChallengeFilter.filter(challenge, filter))
                 .toList();
             if(filteredChallenges.isEmpty())  return null;
@@ -166,14 +171,14 @@ public class ChallengeDB {
 
     }
 
-    public static Challenge getChallengeById(String challengeId)
+    public static Challenge getChallengeById(String challengeId) throws ChallengeNotFoundException
     {
         for(Challenge challenge : CHALLENGES) {
             if(challenge.challengeId.equals(challengeId)) {
                 return challenge;
             }
         }
-        return null;
+        throw new ChallengeNotFoundException("Challenge with ID: " + challengeId + " not found in the database.");
     }
 
 

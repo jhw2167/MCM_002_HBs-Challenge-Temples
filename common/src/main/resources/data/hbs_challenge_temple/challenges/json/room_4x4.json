@@ -4,7 +4,7 @@
     "challengeName": "Test4x4 loads any recently saved structure under template name challenge_room_4x4_##",
     "difficulty": 4,
     "size": "4x4",
-    "exitStructureTorchCount": 0,
+    "exitStructureTorchCount": 4,
     "replaceStructureBlocksWith": ["hbs_challenge_temple:challenge_brick", "air"],
     "challengeRules": {
         "playerMaxHearts": 10,

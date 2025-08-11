@@ -109,14 +109,12 @@ public class ChallengeRoom {
     {
         this(chunkId, overworldExitPos, returnLevel);
         this.chooseChallenge(filter);
-        this.loadChallengeChunks();
     }
 
     ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel, String challengeId) throws ChallengeNotFoundException
     {
         this(chunkId, overworldExitPos, returnLevel);
         this.setChallenge(challengeId);
-        this.loadChallengeChunks();
     }
 
 
@@ -131,7 +129,7 @@ public class ChallengeRoom {
                 String id = HBUtil.ChunkUtil.getId(x, z);
                 if(!HBUtil.ChunkUtil.isChunkForceLoaded(CHALLENGE_LEVEL, id)) {
                     forceloadedChunks.add(id);
-                    HBUtil.ChunkUtil.forceLoadChunk(CHALLENGE_LEVEL, id);
+                    HBUtil.ChunkUtil.forceLoadChunk(CHALLENGE_LEVEL, id, Constants.MOD_ID);
                 }
             }
         }
@@ -148,7 +146,11 @@ public class ChallengeRoom {
         return this.roomCompleted;
     }
 
-    public void startChallenge() {
+    public void startChallenge()
+    {
+        if(!this.roomLoaded)
+            this.loadStructure();
+
         if(this.challengeKeyBlocks != null)
             this.challengeKeyBlocks.refreshBlocks();
         this.generateExitStructure();
@@ -190,8 +192,9 @@ public class ChallengeRoom {
         this.challengeId = challengeId;
     }
 
-    public void challengerUsedBlock(BlockPos pos) {
-        if(this.challengeKeyBlocks != null)
+    public void challengerUsedBlock(BlockPos pos, boolean placedBlock) {
+        this.testRoomCompleted();
+        if(this.challengeKeyBlocks != null && !placedBlock)
             this.challengeKeyBlocks.challengerUsedBlock(pos);
     }
 
@@ -203,9 +206,11 @@ public class ChallengeRoom {
      * to generate.
      * @return true if structure was loaded successfully, false if any issues where encountered
      */
-    boolean loadStructure()
+    private boolean loadStructure()
     {
         if( this.roomLoaded ) return false;
+
+        this.loadChallengeChunks();
 
         this.roomLoaded = true;
         int totalPieces = challenge.getTotalPieces();
@@ -343,16 +348,21 @@ public class ChallengeRoom {
 
 
         private static final Vec3i EXIT_PORTAL_MARKER_OFFSET = new Vec3i(1, 1, 1);
+        private static final List<Vec3i> EXIT_PORTAL_TORCH_OFFSETS = List.of(
+            new Vec3i(0, 0, 3), // Torch 2
+            new Vec3i(3, 0, 0), // Torch 3
+            new Vec3i(0, 0, -3)  // Torch 4
+        );
         /**
          * Tries to test if the room is complete by determining
          * if all soul torches are present in the structure
          * @return true if the challenge is completed
          */
-        boolean testRoomCompleted()
+        boolean testRoomCompleted(BlockPos playerUsedPos)
         {
             if(this.exitStructurePos == null) return false; // No exit structure found
 
-              BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
+            BlockPos portalTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
             BlockPos temp = portalTorchPos;
             //** Check all 4 soul torches in the 4x4 area
             BlockState state = CHALLENGE_LEVEL.getBlockState(temp);
@@ -366,7 +376,7 @@ public class ChallengeRoom {
             }
 
             this.roomCompleted = true;
-            return  generateExitPortal(portalTorchPos);
+            return generateExitPortal(portalTorchPos);
             //return true;
         }
 
@@ -509,7 +519,7 @@ public class ChallengeRoom {
         // Clear forceloaded chunks
         for (String chunkId : forceloadedChunks) {
         if( HBUtil.ChunkUtil.isChunkForceLoaded(CHALLENGE_LEVEL, chunkId))
-            HBUtil.ChunkUtil.unforceLoadChunk(CHALLENGE_LEVEL, chunkId);
+            HBUtil.ChunkUtil.unforceLoadChunk(CHALLENGE_LEVEL, chunkId, Constants.MOD_ID);
         }
         setActive(false);
     }
@@ -519,7 +529,7 @@ public class ChallengeRoom {
     public static void init(EventRegistrar reg) {
         // Register the static event handler
         reg.registerOnServerTick(TickType.ON_120_TICKS, ChallengeRoom::on120TicksClearGraves);
-        reg.registerOnServerTick(TickType.ON_20_TICKS, ChallengeRoom::on20TicksTryExitPortal);
+        //reg.registerOnServerTick(TickType.ON_20_TICKS, ChallengeRoom::on20TicksTryExitPortal);
         reg.registerOnDataSave(ChallengeRoom::onDataSaveEvent);
 
         PORTAL_API = ChallengeTempleMain.INSTANCE.portalApi;
@@ -543,6 +553,8 @@ public class ChallengeRoom {
         EXIT_PORTAL_BLOCK = HBUtil.BlockUtil
             .blockNameToBlock("minecraft", "soul_torch")
             .defaultBlockState();
+
+        ChallengeKeyBlockManager.load();
 
     }
 
@@ -571,9 +583,9 @@ public class ChallengeRoom {
     }
 
     private static void on20TicksTryExitPortal(ServerTickEvent event) {
-        ACTIVE_ROOMS.values().stream()
-            .filter(room -> room.roomActive && room.exitPortal == null)
-            .forEach(r -> r.testRoomCompleted());
+        //ACTIVE_ROOMS.values().stream()
+            //.filter(room -> room.roomActive && room.exitPortal == null)
+            //.forEach(r -> r.testRoomCompleted());
     }
 
     private static final StructurePlaceSettings TEMPLATE_SETTINGS = new StructurePlaceSettings()

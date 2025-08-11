@@ -8,13 +8,16 @@ import com.holybuckets.foundation.HBUtil;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Stores settings and metadata specific to each challenge.
@@ -61,10 +64,31 @@ public class Challenge {
 
     public static class LootRules {
         int lootPool;
-        List<ItemStack> specificLoot;
+        List<Pair<String,Item>> specificLootItems;
+        Map<String, List<Consumer<ItemStack>>> attributeAppliers;
 
         public int getLootPool() { return lootPool; }
-        public List<ItemStack> getSpecificLoot() { return specificLoot; }
+        //Create a new list of ItemStack, create a default instance of each item in speficicLootItems, and apply all attributes to each item
+        public List<ItemStack> getSpecificLoot()
+        {
+            List<ItemStack> specificLootItems = new ArrayList<>();
+            if (this.specificLootItems == null || this.specificLootItems.isEmpty()) {
+                return specificLootItems; // Return empty list if no specific loot items are defined
+            }
+
+            for (var itemDef : this.specificLootItems)
+            {
+                String itemId = itemDef.getLeft();
+                Item item = itemDef.getRight();
+                ItemStack stack = item.getDefaultInstance();
+                if(!attributeAppliers.containsKey(itemId)) continue;
+                for (Consumer<ItemStack> attribute : attributeAppliers.get(item)) {
+                    attribute.accept(stack);
+                }
+                specificLootItems.add(stack);
+            }
+         return specificLootItems;
+        }
     }
 
     // Public getters for main Challenge fields
@@ -168,13 +192,32 @@ public class Challenge {
 
     void setSpecificLoot(JsonElement lootArr)
     {
-        this.lootRules.specificLoot = new ArrayList<>();
+        this.lootRules.specificLootItems = new ArrayList<>();
+        this.lootRules.attributeAppliers = new HashMap<>();
         if(lootArr.isJsonNull()) return;
 
         Map<Item, Integer> counts = new HashMap<>();
         String[] items = lootArr.getAsString().split(",");
-        for(String s : items) {
-            Item item = HBUtil.ItemUtil.itemNameToItem(s.trim());
+        for(String s : items)
+        {
+            String[] itemAttributes = s.trim().split("\\$");
+            String name = itemAttributes[0].trim();
+            Item item = HBUtil.ItemUtil.itemNameToItem(name);
+            ItemStack stack = item.getDefaultInstance();
+
+            for(int i = 1; i < itemAttributes.length; i++)
+            {
+                String atr = itemAttributes[i].trim();
+                Enchantment enchant = HBUtil.ItemUtil.enchantNameToEnchant(atr);
+
+                if(enchant != null) continue;
+                {
+                    if( !item.isEnchantable(stack) ) continue;
+                    if( !enchant.canEnchant(stack) ) continue;
+
+                }
+            }
+
             if(item == null) continue;
             if(counts.containsKey(item)) {
                 counts.put(item, counts.get(item) + 1);
@@ -185,9 +228,11 @@ public class Challenge {
 
         for(Map.Entry<Item, Integer> entry : counts.entrySet()) {
             ItemStack stack = new ItemStack(entry.getKey(), entry.getValue());
-            this.lootRules.specificLoot.add(stack);
+            this.lootRules.specificLootItems.add(stack);
         }
 
     }
+
+
 
 }

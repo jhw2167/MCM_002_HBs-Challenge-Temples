@@ -190,47 +190,45 @@ public class Challenge {
         }
     }
 
-    void setSpecificLoot(JsonElement lootArr)
-    {
+    void setSpecificLoot(JsonElement lootArr) {
         this.lootRules.specificLootItems = new ArrayList<>();
         this.lootRules.attributeAppliers = new HashMap<>();
         if(lootArr.isJsonNull()) return;
 
-        Map<Item, Integer> counts = new HashMap<>();
         String[] items = lootArr.getAsString().split(",");
-        for(String s : items)
-        {
+        for(String s : items) {
             String[] itemAttributes = s.trim().split("\\$");
-            String name = itemAttributes[0].trim();
-            Item item = HBUtil.ItemUtil.itemNameToItem(name);
-            ItemStack stack = item.getDefaultInstance();
+            String itemId = itemAttributes[0].trim();
+            Item item = HBUtil.ItemUtil.itemNameToItem(itemId);
+            
+            if(item == null) continue;
 
-            for(int i = 1; i < itemAttributes.length; i++)
-            {
+            // Create a list to store attribute appliers for this item
+            List<Consumer<ItemStack>> appliers = new ArrayList<>();
+            
+            // Process attributes (enchantments)
+            for(int i = 1; i < itemAttributes.length; i++) {
                 String atr = itemAttributes[i].trim();
                 Enchantment enchant = HBUtil.ItemUtil.enchantNameToEnchant(atr);
+                int level = HBUtil.ItemUtil.getEnchantmentLevel(atr);
 
-                if(enchant != null) continue;
-                {
-                    if( !item.isEnchantable(stack) ) continue;
-                    if( !enchant.canEnchant(stack) ) continue;
-
+                if(enchant != null) {
+                    // Create an attribute applier for this enchantment
+                    Consumer<ItemStack> enchantApplier = (stack) -> {
+                        if(item.isEnchantable(stack) && enchant.canEnchant(stack)) {
+                            stack.enchant(enchant, level);
+                        }
+                    };
+                    appliers.add(enchantApplier);
                 }
             }
 
-            if(item == null) continue;
-            if(counts.containsKey(item)) {
-                counts.put(item, counts.get(item) + 1);
-            } else {
-                counts.put(item, 1);
+            // Store the item and its attributes
+            this.lootRules.specificLootItems.add(Pair.of(itemId, item));
+            if(!appliers.isEmpty()) {
+                this.lootRules.attributeAppliers.put(itemId, appliers);
             }
         }
-
-        for(Map.Entry<Item, Integer> entry : counts.entrySet()) {
-            ItemStack stack = new ItemStack(entry.getKey(), entry.getValue());
-            this.lootRules.specificLootItems.add(stack);
-        }
-
     }
 
 

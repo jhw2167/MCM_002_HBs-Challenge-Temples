@@ -3,6 +3,7 @@
 
   "block.hbs_challenge_temple.challenge_brick": "Challenge Brick",
   "block.hbs_challenge_temple.challenge_brick.desc": "Stone Brick variant with properties of Bedrock",
+  "block.hbs_challenge_temple.random_brick": "Random Brick",
   "block.hbs_challenge_temple.challenge_": "Challenge Base Block",
   "block.hbs_challenge_temple.challenge_.desc": "Exists purely to easily tab complete other challenge blocks",
   "block.hbs_challenge_temple.challenge_bed": "Challenge Spawn Anchor",

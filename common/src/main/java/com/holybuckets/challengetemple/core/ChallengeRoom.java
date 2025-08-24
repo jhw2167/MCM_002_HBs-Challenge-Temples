@@ -223,7 +223,7 @@ public class ChallengeRoom {
         if(succeeded)
         {
             if(this.challengeKeyBlocks == null)
-                this.challengeKeyBlocks = new ChallengeKeyBlockManager( this.worldPos, challenge.getSize());
+                this.challengeKeyBlocks = new ChallengeKeyBlockManager(this.worldPos, challenge.getSize(), this.challenge);
         }
 
         return succeeded;

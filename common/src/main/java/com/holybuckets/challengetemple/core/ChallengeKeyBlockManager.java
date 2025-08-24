@@ -52,6 +52,7 @@ public class ChallengeKeyBlockManager {
     private final Map<BlockState, List<BlockPos>> blockStateReplacements;
     private final List<Entity> portals;
     private final Set<BlockPos> usedChests;
+    private final Challenge challenge;
 
 
     /**
@@ -60,7 +61,7 @@ public class ChallengeKeyBlockManager {
      * @param startPos
      * @param size
      */
-    public ChallengeKeyBlockManager(BlockPos startPos, Vec3i size)
+    public ChallengeKeyBlockManager(BlockPos startPos, Vec3i size, Challenge challenge)
     {
         this.challengeBlocks = new HashMap<>();
         this.blockStateReplacements = new HashMap<>();
@@ -136,7 +137,14 @@ public class ChallengeKeyBlockManager {
 
 
     private void setRandomBricks() {
+        List<BlockPos> randomBricks = getPositions(ModBlocks.randomBrick);
+        if (randomBricks.isEmpty()) return;
 
+        for (BlockPos pos : randomBricks) {
+            boolean spawn = level.getRandom().nextFloat() < challenge.randomBrickSpawnChance;
+            BlockState replacement = spawn ? ModBlocks.challengeBrick.defaultBlockState() : Blocks.AIR.defaultBlockState();
+            blockStateReplacements.get(replacement).add(pos);
+        }
     }
 
     private void checkChests()
@@ -569,6 +577,7 @@ public class ChallengeKeyBlockManager {
         //Misc
         KEY_BLOCKS.add(ChallengeRoom.EXIT_PORTAL_BLOCK);
         KEY_BLOCKS.add(Blocks.SPAWNER);
+        KEY_BLOCKS.add(ModBlocks.randomBrick);
 
     }
 

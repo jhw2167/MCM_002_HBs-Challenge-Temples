@@ -34,6 +34,7 @@ public class Challenge {
     Vec3i size;
     int exitStructureTorchCount;
     int totalPieces;
+    float randomBrickSpawnChance;
 
     ChallengeRules challengeRules;
     LootRules lootRules;
@@ -146,6 +147,7 @@ public class Challenge {
 
         private static void initDefaults(Challenge c) {
             c.exitStructureTorchCount = 4;
+            c.randomBrickSpawnChance = 0.5f;
         }
 
     void setReplaceEntityBlocks(JsonObject json)

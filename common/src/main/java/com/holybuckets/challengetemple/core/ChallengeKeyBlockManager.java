@@ -4,7 +4,6 @@ import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.block.be.ChallengeSingleUseChestBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
-import net.blay09.mods.balm.api.event.server.ServerStartingEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -23,6 +22,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 import static net.minecraft.core.Direction.NORTH;
@@ -52,7 +52,8 @@ public class ChallengeKeyBlockManager {
     private final Map<BlockState, List<BlockPos>> blockStateReplacements;
     private final List<Entity> portals;
     private final Set<BlockPos> usedChests;
-    private final Challenge challenge;
+    @Nullable
+    private final Challenge challengeData;
 
 
     /**
@@ -61,7 +62,7 @@ public class ChallengeKeyBlockManager {
      * @param startPos
      * @param size
      */
-    public ChallengeKeyBlockManager(BlockPos startPos, Vec3i size, Challenge challenge)
+    public ChallengeKeyBlockManager(BlockPos startPos, Vec3i size, @Nullable Challenge challengeData)
     {
         this.challengeBlocks = new HashMap<>();
         this.blockStateReplacements = new HashMap<>();
@@ -70,6 +71,7 @@ public class ChallengeKeyBlockManager {
         this.startPos = startPos;
         this.size = size;
         this.loaded = false;
+        this.challengeData = challengeData;
 
         this.usedChests = new HashSet<>();
 
@@ -98,7 +100,7 @@ public class ChallengeKeyBlockManager {
             challengeBlocks.put(block, new LinkedList<>());
         }
 
-        //1. Parse area for minecraft:soul_torch
+        //1. Parse area for any suspect key blocks
         Vec3i sz = size;
         if( loaded )
             sz = new Vec3i(0,0,0);
@@ -109,7 +111,7 @@ public class ChallengeKeyBlockManager {
                     BlockPos pos = startPos.offset(x, y, z);
                     BlockState state = CHALLENGE_LEVEL.getBlockState(pos);
                     Block block = state.getBlock();
-                    if (KEY_BLOCKS.contains(state.getBlock())) {
+                    if (KEY_BLOCKS.contains(block)) {
                         challengeBlocks.get(block).add(pos);
                     }
                 }
@@ -136,12 +138,19 @@ public class ChallengeKeyBlockManager {
     }
 
 
-    private void setRandomBricks() {
+    private void setRandomBricks()
+    {
+        if (challengeData == null || challengeData.getChallengeRules() == null) {
+            LoggerProject.logWarning(CLASS_ID, "027002", "Challenge data or rules not set, cannot set random bricks");
+            return;
+        }
+
         List<BlockPos> randomBricks = getPositions(ModBlocks.randomBrick);
         if (randomBricks.isEmpty()) return;
 
         for (BlockPos pos : randomBricks) {
-            boolean spawn = level.getRandom().nextFloat() < challenge.randomBrickSpawnChance;
+            float spawnChance = challengeData.getChallengeRules().randomBrickSpawnChance;
+            boolean spawn = level.getRandom().nextFloat() < spawnChance;
             BlockState replacement = spawn ? ModBlocks.challengeBrick.defaultBlockState() : Blocks.AIR.defaultBlockState();
             blockStateReplacements.get(replacement).add(pos);
         }
@@ -151,7 +160,8 @@ public class ChallengeKeyBlockManager {
     {
         //** SINGLE USE CHESTS -- Clear inventory
         for (BlockPos pos : getPositions(ModBlocks.challengeSingleUseChest)) {
-            if (usedChests.contains(pos)) {
+            if (usedChests.contains(pos))
+            {
                 BlockEntity entity = CHALLENGE_LEVEL.getBlockEntity(pos);
                 if (entity instanceof ChallengeSingleUseChestBlockEntity) {
                     ChallengeSingleUseChestBlockEntity chest = (ChallengeSingleUseChestBlockEntity) entity;
@@ -160,6 +170,8 @@ public class ChallengeKeyBlockManager {
                         chest.setItem(i++, ItemStack.EMPTY);
                     }
                 }
+                //set to air
+                blockStateReplacements.get(Blocks.AIR.defaultBlockState()).add(pos);
             }
         }
 
@@ -573,6 +585,27 @@ public class ChallengeKeyBlockManager {
         //SpawnBlocks
         KEY_BLOCKS.add(ModBlocks.skeletonBrick);
         KEY_BLOCKS.add(ModBlocks.zombieBrick);
+        KEY_BLOCKS.add(ModBlocks.creeperBrick);
+        KEY_BLOCKS.add(ModBlocks.spiderBrick);
+        KEY_BLOCKS.add(ModBlocks.endermanBrick);
+
+        KEY_BLOCKS.add(ModBlocks.slimeBrick);
+        KEY_BLOCKS.add(ModBlocks.polarBrick);
+        KEY_BLOCKS.add(ModBlocks.catBrick);
+        KEY_BLOCKS.add(ModBlocks.dogBrick);
+
+
+        KEY_BLOCKS.add(ModBlocks.witchBrick);
+        KEY_BLOCKS.add(ModBlocks.pillagerBrick);
+        KEY_BLOCKS.add(ModBlocks.vindicatorBrick);
+        KEY_BLOCKS.add(ModBlocks.evokerBrick);
+        KEY_BLOCKS.add(ModBlocks.ravagerBrick);
+        //KEY_BLOCKS.add(ModBlocks.wardenBrick);
+
+        KEY_BLOCKS.add(ModBlocks.blazeBrick);
+        KEY_BLOCKS.add(ModBlocks.ghastBrick);
+        KEY_BLOCKS.add(ModBlocks.zombiePiglinBrick);
+
 
         //Misc
         KEY_BLOCKS.add(ChallengeRoom.EXIT_PORTAL_BLOCK);
@@ -596,6 +629,25 @@ public class ChallengeKeyBlockManager {
         {
             R.put(ModBlocks.skeletonBrick, BRICK);
             R.put(ModBlocks.zombieBrick, BRICK);
+            R.put(ModBlocks.creeperBrick, BRICK);
+            R.put(ModBlocks.spiderBrick, BRICK);
+            R.put(ModBlocks.endermanBrick, BRICK);
+
+            R.put(ModBlocks.slimeBrick, BRICK);
+            R.put(ModBlocks.polarBrick, BRICK);
+            R.put(ModBlocks.catBrick, BRICK);
+            R.put(ModBlocks.dogBrick, BRICK);
+
+            R.put(ModBlocks.witchBrick, BRICK);
+            R.put(ModBlocks.pillagerBrick, BRICK);
+            R.put(ModBlocks.vindicatorBrick, BRICK);
+            R.put(ModBlocks.evokerBrick, BRICK);
+            R.put(ModBlocks.ravagerBrick, BRICK);
+
+            R.put(ModBlocks.blazeBrick, BRICK);
+            R.put(ModBlocks.ghastBrick, AIR);
+            R.put(ModBlocks.zombiePiglinBrick, BRICK);
+
         }
 
         //Chests

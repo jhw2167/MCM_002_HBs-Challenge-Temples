@@ -4,14 +4,15 @@
 	"challengeName": "Common name displayed to the player when they enter the temple",
 	"difficulty": "PEACEFUL | EASY | NORMAL | HARD",
 	"size": "2x2",
-	"exitStructureTorchCount": 4,
+	"exitStructureTorchCount": 1,
 	"challengeRules": {
 		"playerMaxHearts": 10,
 		"maxDeaths": -1,
 		"resetBlocksOnPlayerDeath": true,
 		"resetChestsOnPlayerDeath": true,
 		"keepInventoryOnPlayerDeath": true,
-		"playerDropsInventoryOnDeath": true
+		"playerDropsInventoryOnDeath": false,
+		"randomBrickSpawnChance": 0.1
 		
 	},
 	"lootRules": {

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static org.joml.Math.clamp;
+
 /**
  * Stores settings and metadata specific to each challenge.
  */
@@ -34,7 +36,6 @@ public class Challenge {
     Vec3i size;
     int exitStructureTorchCount;
     int totalPieces;
-    float randomBrickSpawnChance;
 
     ChallengeRules challengeRules;
     LootRules lootRules;
@@ -49,7 +50,8 @@ public class Challenge {
 
     public static class ChallengeRules {
         int playerMaxHearts;               
-        int maxDeaths;                     
+        int maxDeaths;
+        float randomBrickSpawnChance;
         boolean resetBlocksOnPlayerDeath;  
         boolean resetChestsOnPlayerDeath;  
         boolean keepInventoryOnPlayerDeath; 
@@ -124,7 +126,7 @@ public class Challenge {
             c.exitStructureTorchCount = json.get("exitStructureTorchCount").getAsInt();
 
         //Challenge Rules
-        ChallengeRules r = new ChallengeRules();
+        ChallengeRules r = c.getChallengeRules();
         c.challengeRules = r;
         JsonObject rules = json.getAsJsonObject("challengeRules");
         r.playerMaxHearts = rules.get("playerMaxHearts").getAsInt();
@@ -133,10 +135,15 @@ public class Challenge {
         r.resetChestsOnPlayerDeath = rules.get("resetChestsOnPlayerDeath").getAsBoolean();
         r.keepInventoryOnPlayerDeath = rules.get("keepInventoryOnPlayerDeath").getAsBoolean();
         r.playerDropsInventoryOnDeath = rules.get("playerDropsInventoryOnDeath").getAsBoolean();
+        if(rules.asMap().containsKey("randomBrickSpawnChance")) {
+            float f = rules.get("randomBrickSpawnChance").getAsFloat();
+            r.randomBrickSpawnChance = clamp(f, 0.0f, 1.0f);
+        }
+
 
 
         //Loot Rules
-        LootRules l = new LootRules();
+        LootRules l = c.getLootRules();
         c.lootRules = l;
         JsonObject lootRules = json.getAsJsonObject("lootRules");
         l.lootPool = lootRules.get("lootPool").getAsInt();
@@ -147,7 +154,11 @@ public class Challenge {
 
         private static void initDefaults(Challenge c) {
             c.exitStructureTorchCount = 4;
-            c.randomBrickSpawnChance = 0.5f;
+
+            c.challengeRules = new ChallengeRules();
+            c.getChallengeRules().randomBrickSpawnChance = 0.5f;
+
+            c.lootRules = new LootRules();
         }
 
     void setReplaceEntityBlocks(JsonObject json)

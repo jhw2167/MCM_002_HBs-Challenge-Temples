@@ -245,6 +245,28 @@ hbs foundation
 - bugtest on complete shrine unloading
 
 
+19. Instructions for builders
+----
+
+	- Main building materials
+		- challenge steps, stairs, bricks, slabs
+		- pushable brick, invisible brick, facade brick etc
+		- explain redstone mechanics and sheers
+		- challenge invisible brick, 
+		- other things can be used as long as they don't provide overwhelming ammo to cheese
+		
+
+		* add challenge_grass
+		
+
+20.
+---
+
+	- Test challengeRules load
+	- test random brick works differently each time - make dependent on seed and total deaths in challenge
+	-
+
+
 
 
 READ NOTES
@@ -274,9 +296,23 @@ Spawner blocks
 bone_block
 mossy_cobblestone
 
+
+Normal Blocks
+
+Like we added ChalllengBrick (id: challenge_brick, name: Challenge Brick), please add ChallengeGrass using vanilla grass_block_side and dirt textures.
+and add it to the middle of ModBlocks where appropriate and ModItems.
+Add the blockstate, item, and block jsonfiles as necessary. Also upate en_us to add the block name and description.
+This block has no special behavior, just replicate ChallengeBrick except with grass sounds
+
+Like we added ChalllengBrick (id: challenge_brick, name: Challenge Brick), please add RandomBrick using vanilla stone_bricks textures as ChallengeBrick does.
+This should be a duplicate of ChallengeBrick, special properties will be added at runtime later.
+
+
+Mob Blocks:
 Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add <BRICK> using textures from <TEXTURES>. 
 Make sure to add this block to the spawnerBlocks array in ModItems, and add it to the bottom of ModBlocks init method with skeletonBrick.
 Add the blockstate, item, and block jsonfiles as necessary. Also upate en_us to add the block name and description.
+
 
 Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add BlazeBrick using textures from nether_brick.
 Like we added SkeletonBrick (id: skeleton_brick, name: Skeleton Brick), please add EndermanBrick using textures from end_stone.

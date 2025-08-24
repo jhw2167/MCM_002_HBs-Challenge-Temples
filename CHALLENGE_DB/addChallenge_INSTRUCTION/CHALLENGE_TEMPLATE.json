@@ -10,7 +10,8 @@
 		"resetBlocksOnPlayerDeath": true,
 		"resetChestsOnPlayerDeath": true,
 		"keepInventoryOnPlayerDeath": true,
-		"playerDropsInventoryOnDeath": true
+		"playerDropsInventoryOnDeath": true,
+        "randomBrickSpawnChance": 0.5
 		
 	},
 	"lootRules": {

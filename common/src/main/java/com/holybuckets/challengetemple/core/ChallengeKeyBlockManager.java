@@ -54,6 +54,7 @@ public class ChallengeKeyBlockManager {
     private final Set<BlockPos> usedChests;
     @Nullable
     private final Challenge challengeData;
+    private int totalRefreshes;
 
 
     /**
@@ -72,6 +73,7 @@ public class ChallengeKeyBlockManager {
         this.size = size;
         this.loaded = false;
         this.challengeData = challengeData;
+        this.totalRefreshes = 0;
 
         this.usedChests = new HashSet<>();
 
@@ -518,6 +520,10 @@ public class ChallengeKeyBlockManager {
      */
     public List<Entity> getPortals() {
         return portals.stream().toList();
+    }
+
+    public int getTotalRefreshes() {
+        return totalRefreshes;
     }
 
 

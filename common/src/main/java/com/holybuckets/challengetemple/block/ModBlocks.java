@@ -42,6 +42,7 @@ public class ModBlocks {
     public static Block challengePushableBrick;
     public static Block challengeBrickSlab;
     public static Block challengeGlowstone;
+    public static Block challengeGrass;
     public static Block challengeGlass;
     public static Block challengePushableGlass;
     public static Block challengeGlassPane;
@@ -85,6 +86,7 @@ public class ModBlocks {
         blocks.register(() -> challengeBrick = new ChallengeBrick(), () -> itemBlock(challengeBrick), id("challenge_brick"));
         blocks.register(() -> challengePushableBrick = new ChallengePushableBrick(), () -> itemBlock(challengePushableBrick), id("challenge_pushable_brick"));
         blocks.register(() -> challengeGlowstone = new ChallengeGlowstone(), () -> itemBlock(challengeGlowstone), id("challenge_glowstone"));
+        blocks.register(() -> challengeGrass = new ChallengeGrass(), () -> itemBlock(challengeGrass), id("challenge_grass"));
         blocks.register(() -> challengeBrickSlab = new ChallengeBrickSlab(), () -> itemBlock(challengeBrickSlab), id("challenge_brick_slab"));
         blocks.register(() -> challengeGlass = new ChallengeGlass(), () -> itemBlock(challengeGlass), id("challenge_glass"));
         blocks.register(() -> challengePushableGlass = new ChallengePushableGlass(), () -> itemBlock(challengePushableGlass), id("challenge_pushable_glass"));

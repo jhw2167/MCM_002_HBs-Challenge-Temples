@@ -54,6 +54,7 @@ public class ModItems {
             ModBlocks.challengeInvisibleBrick,
             ModBlocks.challengePushableInvisibleBrick,
             ModBlocks.challengeGlowstone,
+            ModBlocks.challengeGrass,
             ModBlocks.challengeGlass,
             ModBlocks.challengePushableGlass,
             ModBlocks.challengeGlassPane,

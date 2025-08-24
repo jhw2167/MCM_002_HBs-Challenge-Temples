@@ -125,9 +125,18 @@ public class ChallengeKeyBlockManager {
 
         generatePortals();
         spawnEntities();
+
+        setRandomBricks();
+        checkChests();
+
         replaceBlocks();
         resetRedstone();
-        checkChests();
+
+    }
+
+
+    private void setRandomBricks() {
+
     }
 
     private void checkChests()

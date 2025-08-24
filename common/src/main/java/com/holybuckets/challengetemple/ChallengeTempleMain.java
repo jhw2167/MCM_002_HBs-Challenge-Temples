@@ -5,6 +5,7 @@ import com.holybuckets.challengetemple.config.ChallengeTempleConfig;
 import com.holybuckets.challengetemple.core.*;
 import com.holybuckets.challengetemple.externalapi.InventoryApi;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
+import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.CommandRegistry;
 import com.holybuckets.foundation.event.EventRegistrar;
@@ -61,7 +62,7 @@ public class ChallengeTempleMain {
         CommandList.register();
         EventRegistrar registrar = EventRegistrar.getInstance();
         ChallengeBlockBehavior.init(registrar);
-        ChallengeKeyBlockManager.init(registrar);
+        //ChallengeKeyBlockManager.init(registrar);
 
         TempleManager.init(registrar);
         ManagedChallenger.init(registrar);
@@ -84,14 +85,13 @@ public class ChallengeTempleMain {
 
 
     public static final ResourceLocation CHALLENGE_DIM = new ResourceLocation(Constants.MOD_ID, "challenge_dimension");
-    public  static final ResourceLocation OVERWORLD_DIM = new ResourceLocation("minecraft", "overworld");
     private void onLevelLoad(LevelLoadingEvent event)
     {
         Constants.LOG.info("Level loaded: {}", event.getLevel() );
         Level level = (Level) event.getLevel();
         if(level.isClientSide()) return;
 
-        if( HBUtil.LevelUtil.testLevel(level, OVERWORLD_DIM )  ) {
+        if( HBUtil.LevelUtil.testLevel(level, GeneralConfig.OVERWORLD_LOC )  ) {
             this.templeManager = new TempleManager( (ServerLevel) level);
         } else if ( HBUtil.LevelUtil.testLevel(level, CHALLENGE_DIM ) ) {
             this.challengeDimension = (ServerLevel) level;

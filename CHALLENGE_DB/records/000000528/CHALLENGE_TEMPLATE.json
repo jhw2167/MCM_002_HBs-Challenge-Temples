@@ -1,0 +1,23 @@
+{
+    "challengeId": "room_4x4",
+    "author": "Holy_Buckets",
+    "challengeName": "Skeleton Run III",
+    "difficulty": 3,
+    "size": "4x4",
+    "exitStructureTorchCount": 4,
+    "replaceStructureBlocksWith": ["air", "air"],
+    "challengeRules": {
+        "playerMaxHearts": 10,
+        "maxDeaths": -1,
+        "resetBlocksOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": true,
+        "keepInventoryOnPlayerDeath": false,
+        "playerDropsInventoryOnDeath": false
+    },
+    "lootRules": {
+        "lootPool": 3,
+        "specificLoot": [
+            "minecraft:bow$infinity#1"
+        ]
+    }
+}

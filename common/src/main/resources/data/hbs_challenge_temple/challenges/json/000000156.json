@@ -1,0 +1,26 @@
+{
+    "challengeId": "000000156",
+    "author": "Holy_Buckets",
+    "challengeName": "Skeleton Run II",
+    "difficulty": 2,
+    "size": "2x2",
+    "exitStructureTorchCount": 4,
+    "replaceStructureBlocksWith": [
+        "hbs_challenge_temple:challenge_brick",
+        "air"
+    ],
+    "challengeRules": {
+        "playerMaxHearts": 10,
+        "maxDeaths": -1,
+        "resetBlocksOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": true,
+        "keepInventoryOnPlayerDeath": false,
+        "playerDropsInventoryOnDeath": false
+    },
+    "lootRules": {
+        "lootPool": 2,
+        "specificLoot": [
+            "minecraft:bow"
+        ]
+    }
+}

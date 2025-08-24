@@ -1,6 +1,7 @@
 package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.ChallengeTempleMain;
+import com.holybuckets.challengetemple.Constants;
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.externalapi.PortalApi;
 import com.holybuckets.foundation.GeneralConfig;
@@ -127,7 +128,7 @@ public class TempleManager {
             .filter(t -> !t.isActive() )
             .filter(t -> HBUtil.ChunkUtil.isChunkForceLoaded(this.level, t.getTempleId()))
             .forEach(t -> {
-                    HBUtil.ChunkUtil.unforceLoadChunk(this.level, t.getTempleId());
+                    HBUtil.ChunkUtil.unforceLoadChunk(this.level, t.getTempleId(), Constants.MOD_ID);
                     t.cleanupPortals();
                 }
             );
@@ -137,7 +138,7 @@ public class TempleManager {
             .filter(t -> t.playerInPortalRange() )
             .filter(t -> !HBUtil.ChunkUtil.isChunkForceLoaded(this.level, t.getTempleId()))
             .forEach(t -> {
-                HBUtil.ChunkUtil.forceLoadChunk(this.level, t.getTempleId());
+                HBUtil.ChunkUtil.forceLoadChunk(this.level, t.getTempleId(), Constants.MOD_ID);
                 t.setMarkedForPortalCreationTime();
             });
 

@@ -2,6 +2,7 @@ package com.holybuckets.challengetemple.core;
 
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.block.ModBlocks;
+import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.block.entity.SimpleBlockEntity;
 import com.holybuckets.foundation.event.EventRegistrar;
@@ -32,7 +33,6 @@ import static com.holybuckets.challengetemple.core.ChallengeException.ChallengeL
 import static com.holybuckets.challengetemple.core.ChallengeException.ChallengeNotFoundException;
 
 import static com.holybuckets.challengetemple.ChallengeTempleMain.DEV_MODE;
-import static com.holybuckets.challengetemple.ChallengeTempleMain.OVERWORLD_DIM;
 import static com.holybuckets.challengetemple.core.TempleManager.*;
 
 public class ManagedTemple {
@@ -220,7 +220,6 @@ public class ManagedTemple {
             }
 
             this.challengeRoom = new ChallengeRoom(templeId, overworldExitPos, level, challengeId);
-            this.challengeRoom.loadStructure();
             this.templeEntity.setProperty("challengeId", challengeId);
             this.templeEntity.setProperty("hasPortals", "true");
 
@@ -320,7 +319,7 @@ public class ManagedTemple {
              this.level, filter);
 
         if(this.activePlayers.isEmpty())
-            this.challengeRoom.loadStructure(); // don't reload if player is inside
+            this.challengeRoom.refreshStructure(); // don't reload if player is inside
 
         this.templeEntity.setProperty("challengeId", this.challengeRoom.getChallengeId());
 
@@ -465,9 +464,9 @@ public class ManagedTemple {
         return !this.activePlayers.isEmpty();
     }
 
-    public void challengerUsedBlock(BlockPos pos) {
+    public void challengerUsedBlock(BlockPos pos, boolean placedBlock) {
         if (this.challengeRoom == null) return;
-        this.challengeRoom.challengerUsedBlock(pos);
+        this.challengeRoom.challengerUsedBlock(pos, placedBlock);
     }
 
     //** EVENTS
@@ -504,21 +503,10 @@ public class ManagedTemple {
     }
 
     static void onServer20Ticks(ServerTickEvent event) {
-        Level overworld = HBUtil.LevelUtil.toLevel(HBUtil.LevelUtil.LevelNameSpace.SERVER, OVERWORLD_DIM);
-        for (ManagedTemple temple : MANAGERS.get(overworld).getTemples() ) {
+        for (ManagedTemple temple : MANAGERS.get(GeneralConfig.OVERWORLD).getTemples() ) {
             if (temple.isFullyLoaded()) {
                 temple.onTick();
             }
-
-            /*
-            Moved to TempleManager
-            if(temple.activePlayers.isEmpty() && temple.nearPlayers.isEmpty()) {
-                temple.cleanupPortals();
-            } else {
-                temple.setMarkedForPortalCreationTime();
-            }
-            */
-
         }
     }
 

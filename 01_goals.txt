@@ -427,6 +427,12 @@ Under da see - swim and look for torches in a coral reef
 
 Duck hunt - shoot ducks going back n forth on Minecraft
 
+Hide n' seek - use some of the new blocks to create a little hide n seek game
+
+
+000000528 - SKIII
+/hbTemples loadChallenge 000000528
+
 
 
 RewardsClass: normal, rare, epic, none

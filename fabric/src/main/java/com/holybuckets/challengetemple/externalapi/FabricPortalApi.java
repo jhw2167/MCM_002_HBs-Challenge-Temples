@@ -35,6 +35,7 @@ public class FabricPortalApi implements PortalApi {
 
         Portal portal = new Portal(Portal.entityType, fromLevel);
         if (portal == null) return null;
+        portal.getPortalWaitTime();
 
         portal.setPosRaw(sourcePos.x, sourcePos.y, sourcePos.z);
 

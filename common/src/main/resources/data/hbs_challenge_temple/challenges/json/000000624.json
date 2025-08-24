@@ -15,7 +15,7 @@
     "lootRules": {
         "lootPool": 0,
         "specificLoot": [
-            "minecraft:gold_sword"
+            "minecraft:golden_sword"
         ]
     }
 }

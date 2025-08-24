@@ -117,8 +117,12 @@ public class ChallengeKeyBlockManager {
 
     }
 
-    public void refreshBlocks() {
+    public void refreshBlocks()
+    {
         //Clear portals, generate portals, replace blocks
+        clearPortals();
+        clearEntities();
+
         generatePortals();
         spawnEntities();
         replaceBlocks();
@@ -453,9 +457,10 @@ public class ChallengeKeyBlockManager {
         new Vec3i(5, 0, 0), // front left
         new Vec3i(0, 0, 5)  // back right
     );
-    public BlockPos getExitStructurePos() {
-        BlockState marker = ChallengeRoom.EXIT_PORTAL_BLOCK;
-        List<BlockPos> markers = getPositions(marker.getBlock());
+    public BlockPos getExitStructurePos()
+    {
+        Block marker = ChallengeRoom.EXIT_PORTAL_BLOCK;
+        List<BlockPos> markers = getPositions(marker);
         if (markers.isEmpty() || markers.size() < 4) {
             LoggerProject.logError("027001", "Exit structure markers not found in challenge area");
             return null; // No exit structure markers found
@@ -471,7 +476,7 @@ public class ChallengeKeyBlockManager {
                     allMarkersFound = false;
                 }
             }
-            if (allMarkersFound) return pos;
+            if (allMarkersFound) return pos.below();
         }
 
         return null;
@@ -489,10 +494,10 @@ public class ChallengeKeyBlockManager {
     //** STATICS
 
     public static void init(EventRegistrar reg) {
-        reg.registerOnBeforeServerStarted(ChallengeKeyBlockManager::onServerStarting);
+        //reg.registerOnBeforeServerStarted(ChallengeKeyBlockManager::load);
     }
 
-    static void onServerStarting(ServerStartingEvent event) {
+    static void load() {
         LoggerProject.logInit(CLASS_ID, "027000", "ChallengeKeyBlockManager");
         loadKeyBlocks();
         loadReplacementMap();
@@ -553,7 +558,7 @@ public class ChallengeKeyBlockManager {
         KEY_BLOCKS.add(ModBlocks.zombieBrick);
 
         //Misc
-        KEY_BLOCKS.add(Blocks.SOUL_TORCH);
+        KEY_BLOCKS.add(ChallengeRoom.EXIT_PORTAL_BLOCK);
         KEY_BLOCKS.add(Blocks.SPAWNER);
 
     }

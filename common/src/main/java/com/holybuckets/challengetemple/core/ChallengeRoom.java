@@ -86,7 +86,7 @@ public class ChallengeRoom {
         new Vec3i(32, 48, 32), // 07
         new Vec3i(0, 0, 0) // 08
     };
-    static BlockState EXIT_PORTAL_BLOCK;
+    static Block EXIT_PORTAL_BLOCK;
 
 
     private ChallengeRoom(String chunkId, Vec3i overworldExitPos, Level returnLevel)
@@ -193,7 +193,7 @@ public class ChallengeRoom {
     }
 
     public void challengerUsedBlock(BlockPos pos, boolean placedBlock) {
-        this.testRoomCompleted();
+        this.testRoomCompleted(pos);
         if(this.challengeKeyBlocks != null && !placedBlock)
             this.challengeKeyBlocks.challengerUsedBlock(pos);
     }
@@ -349,23 +349,21 @@ public class ChallengeRoom {
 
         private static final Vec3i EXIT_PORTAL_MARKER_OFFSET = new Vec3i(1, 1, 1);
         private static final List<Vec3i> EXIT_PORTAL_TORCH_OFFSETS = List.of(
-            new Vec3i(0, 0, 3), // Torch 2
-            new Vec3i(3, 0, 0), // Torch 3
-            new Vec3i(0, 0, -3)  // Torch 4
+            new Vec3i(3, 0, 0), // Torch 2
+            new Vec3i(3, 0, 3), // Torch 3
+            new Vec3i(0, 0, 3)  // Torch 4
         );
         /**
          * Tries to test if the room is complete by determining
          * if all soul torches are present in the structure
          * @return true if the challenge is completed
          */
-        boolean testRoomCompleted(BlockPos playerUsedPos) {
+        boolean testRoomCompleted(BlockPos playerUsedPos)
+        {
             if(this.exitStructurePos == null) return false; // No exit structure found
 
-            // Get the marker torch position
             BlockPos markerTorchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
-            
-            // Verify the player placed a torch at a valid position
-            boolean validTorchPlacement = false;
+            boolean validTorchPlacement = playerUsedPos.equals(markerTorchPos);
             List<BlockPos> torchPositions = new ArrayList<>();
             torchPositions.add(markerTorchPos); // Add marker torch position
             
@@ -373,17 +371,16 @@ public class ChallengeRoom {
             for(Vec3i offset : EXIT_PORTAL_TORCH_OFFSETS) {
                 BlockPos torchPos = markerTorchPos.offset(offset);
                 torchPositions.add(torchPos);
-                if(playerUsedPos.equals(torchPos)) {
+                if(playerUsedPos.equals(torchPos))
                     validTorchPlacement = true;
-                }
             }
             
             if(!validTorchPlacement) return false;
 
             // Check if all torch positions have soul torches
             for(BlockPos pos : torchPositions) {
-                BlockState state = CHALLENGE_LEVEL.getBlockState(pos);
-                if(!state.equals(EXIT_PORTAL_BLOCK)) return false;
+                Block b = CHALLENGE_LEVEL.getBlockState(pos).getBlock();
+                if(!b.equals(EXIT_PORTAL_BLOCK)) return false;
             }
 
             this.roomCompleted = true;
@@ -424,7 +421,6 @@ public class ChallengeRoom {
             this.exitPortal = null;
         }
 
-        this.challengeKeyBlocks.clearEntities();
         if( this.loadStructure() ) {
             this.challengeKeyBlocks.refreshBlocks();
             return this.generateExitStructure();
@@ -561,8 +557,7 @@ public class ChallengeRoom {
         }
 
         EXIT_PORTAL_BLOCK = HBUtil.BlockUtil
-            .blockNameToBlock("minecraft", "soul_torch")
-            .defaultBlockState();
+            .blockNameToBlock("minecraft", "soul_torch");
 
         ChallengeKeyBlockManager.load();
 

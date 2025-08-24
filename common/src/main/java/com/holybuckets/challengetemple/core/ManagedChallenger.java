@@ -124,6 +124,10 @@ public class ManagedChallenger implements IManagedPlayer {
 
 
         //2. Clear Inventory
+        if(managedTemple.getChallengeRoom() == null) {
+            Messager.getInstance().sendChat(sp, "Challenge room is not set, please exit and reset the temple via command or find a new temple");
+            return;
+        }
         lastGravePos = managedTemple.getChallengeRoom().addGrave(this);
         this.enqueueClearInventory();
 
@@ -196,7 +200,9 @@ public class ManagedChallenger implements IManagedPlayer {
         BlockPos hitPos = e.getHitResult().getBlockPos();
         BlockState hitBlockState = e.getLevel().getBlockState(hitPos);
         Block block = hitBlockState.getBlock();
-        if(block.equals( ModBlocks.challengeBed ))
+        boolean isSneaking = e.getPlayer().isShiftKeyDown();
+
+        if(block.equals( ModBlocks.challengeBed ) && !isSneaking)
         {
             this.bedBlockUsed(hitPos, hitBlockState);
             e.setCanceled(true);
@@ -219,7 +225,7 @@ public class ManagedChallenger implements IManagedPlayer {
 
         }
 
-        this.activeTemple.challengerUsedBlock(hitPos);
+        this.activeTemple.challengerUsedBlock(hitPos, false);
 
     }
 
@@ -251,6 +257,24 @@ public class ManagedChallenger implements IManagedPlayer {
             this.activeTemple.playerQuitChallenge(this);
         }
 
+    }
+
+    private void onChallengerBlockPlaced(UseBlockEvent e)
+    {
+        //Handle block placed in challenge temple
+        if (this.activeTemple == null) return;
+
+        BlockPos hitPos = e.getHitResult().getBlockPos();
+        BlockState hitBlockState = e.getLevel().getBlockState(hitPos);
+        Block block = hitBlockState.getBlock();
+
+        if(block.equals( ModBlocks.challengeBed )) {
+            this.bedBlockUsed(hitPos, hitBlockState);
+            e.setCanceled(true);
+            return;
+        }
+
+        this.activeTemple.challengerUsedBlock(hitPos, true);
     }
 
 

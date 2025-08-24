@@ -3,6 +3,11 @@ import shutil
 import sys
 from pathlib import Path
 
+# Reads from fabric/run/saves/2...
+# challenge_room_2x2 and 4x4 files. Does not descriminate based on the type of room, so make sure only a 
+# challenge room of a single size exists in the structures folder, will overwrite!
+
+
 # Arguments
 if len(sys.argv) != 2:
     print("Usage: python updateChallenge.py <challenge_id>")

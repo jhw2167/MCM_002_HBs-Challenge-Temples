@@ -1,0 +1,2 @@
+CHALLENGE_DB/json/000000624.json:18:            "minecraft:gold_sword"
+CHALLENGE_DB/records/000000624/CHALLENGE_TEMPLATE.json:18:		"specificLoot": ["minecraft:gold_sword"]

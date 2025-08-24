@@ -8,6 +8,7 @@ import com.holybuckets.foundation.HBUtil;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -68,7 +69,7 @@ public class Challenge {
         Map<String, List<Consumer<ItemStack>>> attributeAppliers;
 
         public int getLootPool() { return lootPool; }
-        //Create a new list of ItemStack, create a default instance of each item in speficicLootItems, and apply all attributes to each item
+        //Create a new list of ItemStack, create a default instance of each item in specificLootItems, and apply all attributes to each item
         public List<ItemStack> getSpecificLoot()
         {
             List<ItemStack> specificLootItems = new ArrayList<>();
@@ -82,7 +83,7 @@ public class Challenge {
                 Item item = itemDef.getRight();
                 ItemStack stack = item.getDefaultInstance();
                 if(!attributeAppliers.containsKey(itemId)) continue;
-                for (Consumer<ItemStack> attribute : attributeAppliers.get(item)) {
+                for (Consumer<ItemStack> attribute : attributeAppliers.get(itemId)) {
                     attribute.accept(stack);
                 }
                 specificLootItems.add(stack);
@@ -196,38 +197,40 @@ public class Challenge {
         if(lootArr.isJsonNull()) return;
 
         String[] items = lootArr.getAsString().split(",");
-        for(String s : items) {
+        for(String s : items)
+        {
             String[] itemAttributes = s.trim().split("\\$");
             String itemId = itemAttributes[0].trim();
             Item item = HBUtil.ItemUtil.itemNameToItem(itemId);
             
-            if(item == null) continue;
+            if(item == null|| item.equals(Items.AIR) ) continue;
 
-            // Create a list to store attribute appliers for this item
+            this.lootRules.specificLootItems.add(Pair.of(itemId, item));
+
+            if( itemAttributes.length < 2 ) continue;
             List<Consumer<ItemStack>> appliers = new ArrayList<>();
             
             // Process attributes (enchantments)
-            for(int i = 1; i < itemAttributes.length; i++) {
+            ItemStack instance = item.getDefaultInstance();
+            for(int i = 1; i < itemAttributes.length; i++)
+            {
                 String atr = itemAttributes[i].trim();
-                Enchantment enchant = HBUtil.ItemUtil.enchantNameToEnchant(atr);
-                int level = HBUtil.ItemUtil.getEnchantmentLevel(atr);
 
-                if(enchant != null) {
-                    // Create an attribute applier for this enchantment
-                    Consumer<ItemStack> enchantApplier = (stack) -> {
-                        if(item.isEnchantable(stack) && enchant.canEnchant(stack)) {
-                            stack.enchant(enchant, level);
-                        }
-                    };
-                    appliers.add(enchantApplier);
+                Enchantment enchant = HBUtil.ItemUtil.enchantNameToEnchant(atr);
+                if(enchant != null) //its an enchant
+                {
+                    int level = HBUtil.ItemUtil.getEnchantLevel(atr);
+                    if(!item.isEnchantable(instance)) continue;
+                    if(!enchant.canEnchant(instance)) continue;
+
+                    appliers.add( (stack) -> stack.enchant(enchant, level) );
                 }
             }
 
-            // Store the item and its attributes
-            this.lootRules.specificLootItems.add(Pair.of(itemId, item));
-            if(!appliers.isEmpty()) {
+            //Store appliers for applying to instance items
+            if(!appliers.isEmpty())
                 this.lootRules.attributeAppliers.put(itemId, appliers);
-            }
+
         }
     }
 

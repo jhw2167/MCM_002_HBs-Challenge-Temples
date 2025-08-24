@@ -122,6 +122,7 @@ public class ChallengeKeyBlockManager {
 
     public void refreshBlocks()
     {
+        this.totalRefreshes++;
         //Clear portals, generate portals, replace blocks
         clearPortals();
         clearEntities();

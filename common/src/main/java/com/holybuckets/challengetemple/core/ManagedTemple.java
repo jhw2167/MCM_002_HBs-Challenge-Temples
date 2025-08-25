@@ -209,6 +209,7 @@ public class ManagedTemple {
 
     /**
      * Loads a challenge at this temple corresponding to the challengeId.
+     *  Tags: loadChallenge
      * @param challengeId
      */
     public void setChallenge(String challengeId) throws ChallengeLoadException

@@ -3,6 +3,7 @@ package com.holybuckets.challengetemple.core;
 import com.holybuckets.challengetemple.LoggerProject;
 import com.holybuckets.challengetemple.block.ModBlocks;
 import com.holybuckets.challengetemple.block.be.ChallengeSingleUseChestBlockEntity;
+import com.holybuckets.foundation.HBUtil;
 import com.holybuckets.foundation.event.EventRegistrar;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,10 +15,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
@@ -50,6 +53,7 @@ public class ChallengeKeyBlockManager {
 
     private final Map<Block, List<BlockPos>> challengeBlocks;
     private final Map<BlockState, List<BlockPos>> blockStateReplacements;
+    private final Map<BlockState, List<BlockPos>> randomBrickReplacements;  //vary each temple reset
     private final List<Entity> portals;
     private final Set<BlockPos> usedChests;
     @Nullable
@@ -67,6 +71,7 @@ public class ChallengeKeyBlockManager {
     {
         this.challengeBlocks = new HashMap<>();
         this.blockStateReplacements = new HashMap<>();
+        this.randomBrickReplacements = new HashMap<>();
         this.portals = new ArrayList<>();
         this.level = CHALLENGE_LEVEL;
         this.startPos = startPos;
@@ -84,8 +89,12 @@ public class ChallengeKeyBlockManager {
 
     private void initReplacers() {
         //Initialize replacers
-        blockStateReplacements.put(Blocks.AIR.defaultBlockState(), new LinkedList<>());
-        blockStateReplacements.put(ModBlocks.challengeBrick.defaultBlockState(), new LinkedList<>());
+        blockStateReplacements.put(AIR, new LinkedList<>());
+        blockStateReplacements.put(BRICK, new LinkedList<>());
+
+        blockStateReplacements.keySet().forEach(
+            key -> randomBrickReplacements.put(key, new LinkedList<>())
+        );
     }
 
 
@@ -148,14 +157,16 @@ public class ChallengeKeyBlockManager {
             return;
         }
 
+        randomBrickReplacements.values().forEach( list -> list.clear());
+
         List<BlockPos> randomBricks = getPositions(ModBlocks.randomBrick);
         if (randomBricks.isEmpty()) return;
 
+        float spawnChance = challengeData.getChallengeRules().randomBrickSpawnChance;
+        Random random = HBUtil.HBMath.seededRandom(this.totalRefreshes);
         for (BlockPos pos : randomBricks) {
-            float spawnChance = challengeData.getChallengeRules().randomBrickSpawnChance;
-            boolean spawn = level.getRandom().nextFloat() < spawnChance;
-            BlockState replacement = spawn ? ModBlocks.challengeBrick.defaultBlockState() : Blocks.AIR.defaultBlockState();
-            blockStateReplacements.get(replacement).add(pos);
+            boolean spawn = random.nextFloat() < spawnChance;
+            randomBrickReplacements.get( spawn ? BRICK : AIR ).add(pos);
         }
     }
 
@@ -174,7 +185,7 @@ public class ChallengeKeyBlockManager {
                     }
                 }
                 //set to air
-                blockStateReplacements.get(Blocks.AIR.defaultBlockState()).add(pos);
+                blockStateReplacements.get(AIR).add(pos);
             }
         }
 
@@ -218,7 +229,18 @@ public class ChallengeKeyBlockManager {
 
     private void replaceBlocks() {
         //Replace blocks with air or brick
-        for (Map.Entry<BlockState, List<BlockPos>> entry : blockStateReplacements.entrySet()) {
+        var replacementsMap = new HashMap<BlockState, List<BlockPos>>();
+
+        //Add all replacements
+        replacementsMap.putAll(blockStateReplacements);
+        randomBrickReplacements.forEach((state, positions) ->
+            replacementsMap.merge(state, new ArrayList<>(positions), (list1, list2) -> {
+                list1.addAll(list2);
+                return list1;
+            })
+        );
+
+        for (Map.Entry<BlockState, List<BlockPos>> entry : replacementsMap.entrySet()) {
             BlockState state = entry.getKey();
             List<BlockPos> positions = entry.getValue();
             for (BlockPos pos : positions) {
@@ -452,6 +474,7 @@ public class ChallengeKeyBlockManager {
 
 
     public void onRoomShutdown() {
+        this.totalRefreshes = 0;
         this.clearPortals();
         this.clearEntities();
         this.usedChests.clear();
@@ -471,6 +494,12 @@ public class ChallengeKeyBlockManager {
         if( entity == null) {
             //nothing
         } else if( entity instanceof ChallengeSingleUseChestBlockEntity) {
+            BlockState chestState = CHALLENGE_LEVEL.getBlockState(pos);
+            ChestType type = chestState.getValue(ChestBlock.TYPE);
+            if (type != ChestType.SINGLE) {
+                BlockPos otherHalf = pos.relative(ChestBlock.getConnectedDirection(chestState));
+                usedChests.add(otherHalf);
+            }
             usedChests.add(pos);
         }
 

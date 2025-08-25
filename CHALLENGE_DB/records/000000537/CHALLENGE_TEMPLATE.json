@@ -1,10 +1,10 @@
 {
-    "challengeId": "room_2x2",
-    "author": "You",
-    "challengeName": "Test2x2 loads any recently saved structure under template name challenge_room_2x2_##",
-    "difficulty": 4,
-    "size": "2x2",
-    "exitStructureTorchCount": 4,
+    "challengeId": "",
+    "author": "Holy_Buckets",
+    "challengeName": "Over & Back I",
+    "difficulty": 0,
+    "size": "4x4",
+    "exitStructureTorchCount": 1,
     "replaceStructureBlocksWith": ["hbs_challenge_temple:challenge_brick", "air"],
     "challengeRules": {
         "playerMaxHearts": 10,
@@ -12,12 +12,13 @@
         "resetBlocksOnPlayerDeath": true,
         "resetChestsOnPlayerDeath": true,
         "keepInventoryOnPlayerDeath": true,
-        "playerDropsInventoryOnDeath": false
+        "playerDropsInventoryOnDeath": false,
+        "randomBrickSpawnChance": 0.33
     },
     "lootRules": {
-        "lootPool": 4,
+        "lootPool": 0,
         "specificLoot": [
-            "minecraft:diamond_sword"
+            
         ]
     }
 }

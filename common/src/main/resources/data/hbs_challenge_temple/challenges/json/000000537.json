@@ -1,0 +1,25 @@
+{
+    "challengeId": "000000537",
+    "author": "Holy_Buckets",
+    "challengeName": "Over & Back I",
+    "difficulty": 0,
+    "size": "4x4",
+    "exitStructureTorchCount": 1,
+    "replaceStructureBlocksWith": [
+        "hbs_challenge_temple:challenge_brick",
+        "air"
+    ],
+    "challengeRules": {
+        "playerMaxHearts": 10,
+        "maxDeaths": -1,
+        "resetBlocksOnPlayerDeath": true,
+        "resetChestsOnPlayerDeath": true,
+        "keepInventoryOnPlayerDeath": true,
+        "playerDropsInventoryOnDeath": false,
+        "randomBrickSpawnChance": 0.33
+    },
+    "lootRules": {
+        "lootPool": 0,
+        "specificLoot": []
+    }
+}

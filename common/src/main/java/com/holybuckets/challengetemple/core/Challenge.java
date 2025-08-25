@@ -204,14 +204,20 @@ public class Challenge {
         }
     }
 
-    void setSpecificLoot(JsonElement lootArr) {
+    void setSpecificLoot(JsonElement lootArr)
+    {
         this.lootRules.specificLootItems = new ArrayList<>();
         this.lootRules.attributeAppliers = new HashMap<>();
-        if(lootArr.isJsonNull()) return;
 
-        String[] items = lootArr.getAsString().split(",");
-        for(String s : items)
+        if (lootArr == null || lootArr.isJsonNull()) return;
+        if (!lootArr.isJsonArray()) return;
+        if (lootArr.getAsJsonArray().size() == 0) return;
+
+        JsonArray array = lootArr.getAsJsonArray();
+        for (JsonElement element : array)
         {
+            String s = element.getAsString();
+
             String[] itemAttributes = s.trim().split("\\$");
             String itemId = itemAttributes[0].trim();
             Item item = HBUtil.ItemUtil.itemNameToItem(itemId);

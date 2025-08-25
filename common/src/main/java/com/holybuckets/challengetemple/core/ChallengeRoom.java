@@ -326,7 +326,7 @@ public class ChallengeRoom {
         );
 
         //Replace torches in exit portal with air
-        BlockPos torchPos = this.exitStructurePos;
+        BlockPos torchPos = this.exitStructurePos.offset(EXIT_PORTAL_MARKER_OFFSET);
         int numTorches = this.challenge.getExitStructureTorchCount();
         for(int i=numTorches; i < TORCH_OFFSETS.size(); i++) {
             torchPos = torchPos.offset(TORCH_OFFSETS.get(i));

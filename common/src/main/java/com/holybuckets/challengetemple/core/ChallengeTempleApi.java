@@ -1,5 +1,7 @@
 package com.holybuckets.challengetemple.core;
 
+import com.holybuckets.challengetemple.ChallengeTempleMain;
+import com.holybuckets.foundation.GeneralConfig;
 import com.holybuckets.foundation.HBUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +36,16 @@ public class ChallengeTempleApi {
     {
         try {
             var challenger = getManagedChallenger(p);
+            if(challenger.activeTemple == null)
+                throw new NotActiveChallengerException("Player " + p.getName().getString() + " is not in an active challenge");
             challenger.activeTemple.playerEndChallenge(challenger);
+            if (p.level().equals(TempleManager.CHALLENGE_LEVEL)) {
+                // Teleport player to temple start
+                BlockPos templeStart = challenger.activeTemple.getPortalSourcePos().below(2);
+                p.teleportTo(GeneralConfig.OVERWORLD, templeStart.getX() + 0.5, templeStart.getY(), templeStart.getZ() + 0.5,
+                    null, p.getYRot(), p.getXRot());
+            }
+
         } catch (NotActiveChallengerException e) {
             return e.getMessage();
         }

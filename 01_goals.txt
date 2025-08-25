@@ -244,6 +244,9 @@ hbs foundation
 - bugtest join and leave
 - bugtest on complete shrine unloading
 
+- shrine shutdown does not add player back into shrine after reload
+- 
+
 
 19. Instructions for builders
 ----
@@ -266,6 +269,21 @@ hbs foundation
 	- test random brick works differently each time - make dependent on seed and total deaths in challenge
 	-
 
+	- test challenge grass as well
+
+	000000537
+
+21. Add loot pools
+---
+
+	- hbChallengeTemplesLootPools
+	- read in json, default is no loot in pool
+	- copy datapack loot pool format
+
+22. Add Challenge support for prerequisite challenge shrines and mod dependency
+---
+
+	- 
 
 
 
